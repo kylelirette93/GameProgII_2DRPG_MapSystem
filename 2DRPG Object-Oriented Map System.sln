@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2DRPG Object-Oriented Map System", "2DRPG Object-Oriented Map System\2DRPG Object-Oriented Map System.csproj", "{50B010BC-833A-4818-8D41-A03EA4A33DB1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50B010BC-833A-4818-8D41-A03EA4A33DB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50B010BC-833A-4818-8D41-A03EA4A33DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50B010BC-833A-4818-8D41-A03EA4A33DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50B010BC-833A-4818-8D41-A03EA4A33DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54167B1C-E05A-404F-8782-6850993BEBCD}
+	EndGlobalSection
+EndGlobal
