@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Text.RegularExpressions;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
-    internal class GameEntity : GameObject
+    internal class GameEntity
     {
         protected GameManager gameManager;
         protected GraphicsDeviceManager graphics;
@@ -12,25 +13,23 @@ namespace _2DRPG_Object_Oriented_Map_System
         protected Rectangle collider;
         protected float movementSpeed;
         protected Vector2 movementDirection;
+        public Texture2D Sprite { get { return _sprite; } set { _sprite = value; } }
+        protected Texture2D _sprite;
+        public Vector2 Position { get { return _position; } set { _position = value;  } }
+        protected Vector2 _position;
 
         public GameEntity(GameManager game, Vector2 initialPosition)
         {
             gameManager = game;
             graphics = game.Graphics;
-            Position = initialPosition;
             movementDirection = Vector2.Zero;
         }
 
         protected virtual void Update(float deltaTime)
         {
-            // Move the entity.
-            if (IsCollidable)
-            {
-                // Draw a collider.
-                collider = new Rectangle((int)Position.X, (int)Position.Y, Sprite.Width, Sprite.Height);
-            }
+            
         }
-        private void DrawCollider(Rectangle collider)
+        public virtual void DrawCollider(Rectangle collider)
         {
             Texture2D pixel = new Texture2D(gameManager.GraphicsDevice, 1, 1);
             // Set the collider as transparent.

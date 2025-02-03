@@ -25,17 +25,14 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             base.Initialize();      
-            tilemap = new Tilemap(this, Vector2.Zero);
+            // Initialize tilemap.
+            tilemap = new Tilemap(10, 15);
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
