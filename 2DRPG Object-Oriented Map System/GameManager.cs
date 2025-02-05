@@ -13,9 +13,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         private SpriteBatch _spriteBatch;
         public SpriteBatch SpriteBatch { get { return _spriteBatch; } }
 
-        private List<GameEntity> _gameEntites = new List<GameEntity>();
+        // List of game objects.
+        private List<GameObject> gameObjects = new List<GameObject>();
 
-        Tilemap tilemap;
         public GameManager()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -26,8 +26,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         protected override void Initialize()
         {
             base.Initialize();      
-            // Initialize tilemap.
-            tilemap = new Tilemap(10, 15);
         }
 
         protected override void LoadContent()
@@ -50,8 +48,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-
-            tilemap.Draw(_spriteBatch);
 
             _spriteBatch.End();
             // TODO: Add your drawing code here

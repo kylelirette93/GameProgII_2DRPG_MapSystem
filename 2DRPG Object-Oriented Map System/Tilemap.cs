@@ -1,43 +1,42 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
-    internal class Tilemap
-    {
-        // Array of tiles for the map.
-        public Tile[][] Tiles { get; private set; }
-
-        public Tilemap(string filePath)
+    public class Tilemap : Component
+{
+        public int Width
         {
-            LoadFromFile(filePath);
+            get { return _width; }
+            set { _width = value; }
+        }
+        private int _width;
+        public int Height
+        {
+            get { return _height; }
+            set { _height = value; }
+        }
+        private int _height;
+        
+        public Tile[,] Tiles
+        {
+            get { return _tiles; }
+            set { _tiles = value; }
+        }
+        private Tile[,] _tiles;
+
+        public void Draw()
+        {
+            // Draw the tilemap.
+            
         }
 
-        private void LoadFromFile(string filePath)
+        public override void Update()
         {
-            string[] lines = File.ReadAllLines(filePath);
-            Tiles = new Tile[lines.Length][];
-
-            for (int y = 0; y < lines.Length; y++)
-            {
-                Tiles[y] = new Tile[lines[y].Length];
-                for (int x = 0; x < lines[y].Length; x++)
-                {
-                    Tiles[y][x] = CreateTile(lines[y][x]);
-                }
-            }
+            // Update the tilemap.
         }
-
-        private Tile CreateTile(char symbol)
-        {
-            return symbol switch
-            {
-                'G' => new GrassTile(),
-                'W' => new WallTile(),
-                _ => null
-            };
-        }
-    }
+}
 }

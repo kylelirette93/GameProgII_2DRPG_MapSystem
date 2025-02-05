@@ -1,29 +1,32 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
-    public abstract class Tile
-    {
-        public abstract bool IsWalkable { get; }
-        public char Symbol { get; set; }
+    public class Tile : Component
+{
+        public int TileWidth
+        {
+            get { return _tileWidth; }
+            set { _tileWidth = value; }
+        }
+        private int _tileWidth;
+        public int TileHeight
+        {
+            get { return _tileHeight; }
+            set { _tileHeight = value; }
+        }
+        private int _tileHeight;
 
-        protected Tile(char symbol) => Symbol = symbol;
-
+        public Texture2D TileTexture
+        {
+            get { return tileTexture; }
+            set { tileTexture = value; }
+        }
+        private Texture2D tileTexture;
     }
-
-    public class GrassTile : Tile
-    {
-        public override bool IsWalkable => true;
-        public GrassTile() : base('G') { }
-    }
-
-    public class WallTile : Tile    
-    {
-        public override bool IsWalkable => false;
-
-        public WallTile() : base('W') { }
-    }
-
 }
