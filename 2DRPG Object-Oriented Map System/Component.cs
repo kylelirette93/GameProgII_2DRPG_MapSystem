@@ -8,12 +8,19 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public abstract class Component
 {
+        // The GameObject this component is attached to.
+        public GameObject GameObject { get; private set; }
         public bool IsActive
         {
             get { return isActive; }
             set { isActive = value; }
         }
         private bool isActive;
+
+        public void SetGameObject(GameObject gameObject)
+        {
+            GameObject = gameObject;
+        }
 
         public void OnEnable()
         {

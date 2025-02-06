@@ -1,16 +1,20 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
     public class GameObject
     {
-        // Generic list of components.
+        public string Tag { get; private set; }
         private List<Component> components = new List<Component>();
+        public GameObject(string tag)
+        {
+            Tag = tag;
+        }
 
         public Vector2 Position { get; set; }
         private Vector2 _position;
@@ -30,6 +34,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void AddComponent(Component component)
         {
+            component.SetGameObject(this);
             components.Add(component);
         }
 
@@ -63,6 +68,27 @@ namespace _2DRPG_Object_Oriented_Map_System
                 component.Update();
             }
         }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (var component in components)
+            {
+                if (component is Sprite sprite)
+                {
+                    sprite.Draw(spriteBatch);
+                }
+                else if (component is Tilemap tilemap)
+                {
+                    tilemap.Draw(spriteBatch);
+                }
+                else if (component is Collider collider)
+                {
+                    collider.Draw(spriteBatch);
+                }
+            }
+        }
+
+
 
         public virtual void Update()
         {
