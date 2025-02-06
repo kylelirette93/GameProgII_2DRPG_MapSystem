@@ -28,11 +28,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             IsActive = false;
         }
 
-        public void Update()
-        {
-
-        }
-
         public void AddComponent(Component component)
         {
             components.Add(component);
@@ -67,6 +62,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 component.Update();
             }
+        }
+
+        public virtual void Update()
+        {
+            UpdateComponents();
         }
     }
 

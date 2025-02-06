@@ -1,32 +1,19 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
-    public class Tile : Component
+    public class Tile
 {
-        public int TileWidth
-        {
-            get { return _tileWidth; }
-            set { _tileWidth = value; }
-        }
-        private int _tileWidth;
-        public int TileHeight
-        {
-            get { return _tileHeight; }
-            set { _tileHeight = value; }
-        }
-        private int _tileHeight;
+        public bool IsWalkable { get; set; }
+        public Texture2D Texture { get; set; }
+        public Rectangle SourceRectangle { get; set; }
 
-        public Texture2D TileTexture
+        public void Draw(SpriteBatch spriteBatch, Vector2 tilePosition)
         {
-            get { return tileTexture; }
-            set { tileTexture = value; }
+            spriteBatch.Draw(Texture, tilePosition, SourceRectangle, Color.White);
         }
-        private Texture2D tileTexture;
     }
 }
