@@ -18,9 +18,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         GameObject playerObject;
         GameObject tilemapObject;
         public static Texture2D whitePixel;
-        public int screenHeight;
-        public int screenWidth;
-        
+        MapManager mapManager;
 
         public Game1()
         {
@@ -28,13 +26,13 @@ namespace _2DRPG_Object_Oriented_Map_System
             GameGraphicsDevice = GraphicsDevice;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            screenHeight = _graphics.PreferredBackBufferHeight;
-            screenWidth = _graphics.PreferredBackBufferWidth;
         }
 
         protected override void Initialize()
         {
-            base.Initialize();        
+            base.Initialize();
+            mapManager = new MapManager();
+            mapManager.CreateMap();
         }
 
         protected override void LoadContent()
@@ -46,7 +44,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Load all the textures at once.
             SpriteManager.LoadContent(Content);
 
-            GenerateTilemap();
             SpawnPlayer();
         }
         private void SpawnPlayer()
@@ -72,11 +69,12 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
 
             GameManager.DrawAll(_spriteBatch);
+            mapManager.Draw(_spriteBatch);
 
             _spriteBatch.End();
             // TODO: Add your drawing code here

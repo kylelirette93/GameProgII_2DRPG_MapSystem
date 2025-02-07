@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 namespace _2DRPG_Object_Oriented_Map_System
 {
     public class Tilemap : Component
@@ -93,6 +96,52 @@ namespace _2DRPG_Object_Oriented_Map_System
                         Tiles[x, y].IsWalkable = false;
                     }
                 }
+            }
+        }
+
+        public void LoadFromFile(string filePath)
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            int width = lines[0].Length;
+            int height = lines.Length;
+            Tiles = new Tile[width, height];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    char symbol = lines[y][x];
+                    Tiles[x, y] = CreateTileFromSymbol(symbol);
+                }
+            }
+        }
+
+        private Tile CreateTileFromSymbol(char symbol)
+        {
+            switch (symbol)
+            {
+                case 'G':
+                    return new Tile
+                    {
+                        IsWalkable = true,
+                        Texture = SpriteManager.GetTexture("ground_tile"),
+                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
+                    };
+                case 'W':
+                    return new Tile
+                    {
+                        IsWalkable = false,
+                        Texture = SpriteManager.GetTexture("wall_tile"),
+                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
+                    };
+                case 'X':
+                    return new Tile
+                    {
+                        IsWalkable = true,
+                        Texture = SpriteManager.GetTexture("exit_tile"),
+                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
+                    };
+                default:
+                    throw new Exception($"Unknown tile symbol: {symbol}");
             }
         }
     }

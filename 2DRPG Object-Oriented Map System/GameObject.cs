@@ -9,6 +9,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public class GameObject
     {
+        // Tag property for game object.
         public string Tag { get; private set; }
         private List<Component> components = new List<Component>();
         public GameObject(string tag)

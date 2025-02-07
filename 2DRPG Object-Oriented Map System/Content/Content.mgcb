@@ -121,6 +121,9 @@
 /processorParam:TextureFormat=Color
 /build:../../../../../Downloads/kenney_micro-roguelike/Tilemap/west_wall.png;west_wall.png
 
+#begin Level1.txt
+/copy:Level1.txt
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor

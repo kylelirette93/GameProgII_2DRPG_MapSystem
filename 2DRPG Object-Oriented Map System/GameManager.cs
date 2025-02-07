@@ -16,7 +16,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             gameObjects.Add(obj);
         }
-
+        /// <summary>
+        /// Find game object by tag
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         public static GameObject Find(string tag)
         {
             return gameObjects.FirstOrDefault(obj => obj.Tag == tag);

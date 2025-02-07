@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 
@@ -11,6 +12,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     {
         private float movementSpeed = 5f;
         private GameObject player;
+        private KeyboardState previousState;
 
         public override void Update()
         {
@@ -28,22 +30,25 @@ namespace _2DRPG_Object_Oriented_Map_System
         private void HandleInput()
         {
             Vector2 movement = Vector2.Zero;
-            if (Keyboard.GetState().IsKeyDown(Keys.W)) movement.Y -= 1;
-            if (Keyboard.GetState().IsKeyDown(Keys.S)) movement.Y += 1;
-            if (Keyboard.GetState().IsKeyDown(Keys.A)) movement.X -= 1;
-            if (Keyboard.GetState().IsKeyDown(Keys.D)) movement.X += 1;
+            KeyboardState currentState = Keyboard.GetState();
+
+            // Check for key presses
+            if (currentState.IsKeyDown(Keys.W) && !previousState.IsKeyDown(Keys.W)) movement.Y -= 16;
+            if (currentState.IsKeyDown(Keys.S) && !previousState.IsKeyDown(Keys.S)) movement.Y += 16;
+            if (currentState.IsKeyDown(Keys.A) && !previousState.IsKeyDown(Keys.A)) movement.X -= 16;
+            if (currentState.IsKeyDown(Keys.D) && !previousState.IsKeyDown(Keys.D)) movement.X += 16;
 
             if (movement != Vector2.Zero && player != null)
             {
-                movement.Normalize();
-                movement *= movementSpeed;
-
                 Vector2 newPosition = player.GetComponent<Transform>().Position + movement;
-                if (CanMoveTo(newPosition)) 
+                if (CanMoveTo(newPosition))
                 {
                     player.GetComponent<Transform>()?.Translate(movement);
                 }
             }
+
+            // Update the previous state
+            previousState = currentState;
         }
 
         private bool CanMoveTo(Vector2 newPosition)

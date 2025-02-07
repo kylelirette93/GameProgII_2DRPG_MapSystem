@@ -8,7 +8,9 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public abstract class Component
 {
-        // The GameObject this component is attached to.
+        // Different components inherit from this class.
+
+        // Property for the game object this component is attached to.
         public GameObject GameObject { get; private set; }
         public bool IsActive
         {
