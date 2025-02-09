@@ -10,7 +10,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         Texture2D _texture;
         public Texture2D Texture { get { return _texture; } }
         Vector2 Position { get; set; }
-        public Rectangle SpriteBounds { get; set; }
+        public Rectangle SpriteBounds { get { return _spriteBounds; } set { _spriteBounds = value; } }
+        private Rectangle _spriteBounds;
 
         public Sprite(Texture2D texture)
         {

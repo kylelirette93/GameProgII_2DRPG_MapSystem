@@ -7,6 +7,8 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class Tile
 {
         public bool IsWalkable { get; set; }
+
+        public bool IsExit { get; set; }
         public Texture2D Texture { get; set; }
         public Rectangle SourceRectangle { get; set; }
         

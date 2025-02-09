@@ -10,9 +10,15 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public class PlayerController : Component
     {
+        public event Action OnExitTile;
         private float movementSpeed = 5f;
         private GameObject player;
         private KeyboardState previousState;
+
+        public PlayerController()
+        {
+            previousState = Keyboard.GetState();
+        }
 
         public override void Update()
         {
@@ -57,14 +63,19 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (tilemap != null)
             {
-                // Get the tile position based on newPosition
+                // Get the tile position based on the new position.
                 int tileX = (int)(newPosition.X / tilemap.TileWidth);
                 int tileY = (int)(newPosition.Y / tilemap.TileHeight);
 
-                // Check if the tile is within bounds and walkable
+                // Check if the tile is within bounds and walkable.
                 if (tileX >= 0 && tileX < tilemap.Tiles.GetLength(0) && tileY >= 0 && tileY < tilemap.Tiles.GetLength(1))
                 {
                     Tile tile = tilemap.Tiles[tileX, tileY];
+                    if (tile.IsExit)
+                    {
+                        OnExitTile?.Invoke();
+                        return false;
+                    }
                     return tile.IsWalkable;
                 }
             }

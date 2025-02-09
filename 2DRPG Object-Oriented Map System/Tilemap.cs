@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,8 +11,29 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Tile[,] Tiles { get; set; }
         public int TileWidth { get; private set; } = 32; 
         public int TileHeight { get; private set; } = 32;
+        private Dictionary<Char, Tile> tileMappings;
         public Tilemap()
         {
+            InitializeTileMappings();
+        }
+
+        private void InitializeTileMappings()
+        {
+            // Initialize dictionary with tile mappings based on symbols.
+            tileMappings = new Dictionary<char, Tile>
+            {
+                { 'G', new Tile { IsWalkable = true, Texture = SpriteManager.GetTexture("ground_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'N', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("north_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'S', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("south_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'E', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'W', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'P', new Tile { IsWalkable = true, Texture = SpriteManager.GetTexture("ground_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'X', new Tile { IsExit = true, Texture = SpriteManager.GetTexture("exit_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '1', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("top_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '2', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("top_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '3', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("bottom_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '4', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("bottom_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } }
+            };
         }
 
         public override void Update()
@@ -31,6 +53,25 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
+
+        public Vector2 FindSpawnPoint(string filePath)
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            int width = lines[0].Length;
+            int height = lines.Length;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    char symbol = lines[y][x];
+                    if (symbol == 'P')
+                    {
+                        return new Vector2(x * TileWidth, y * TileHeight);
+                    }
+                }
+            }
+            throw new Exception("Spawn point 'P' not found in map file.");
+        } 
 
         public void GenerateProceduralMap(int width, int height)
         {
@@ -117,32 +158,15 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private Tile CreateTileFromSymbol(char symbol)
         {
-            switch (symbol)
+            if (tileMappings.TryGetValue(symbol, out Tile tile))
             {
-                case 'G':
-                    return new Tile
-                    {
-                        IsWalkable = true,
-                        Texture = SpriteManager.GetTexture("ground_tile"),
-                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
-                    };
-                case 'W':
-                    return new Tile
-                    {
-                        IsWalkable = false,
-                        Texture = SpriteManager.GetTexture("wall_tile"),
-                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
-                    };
-                case 'X':
-                    return new Tile
-                    {
-                        IsWalkable = true,
-                        Texture = SpriteManager.GetTexture("exit_tile"),
-                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
-                    };
-                default:
-                    throw new Exception($"Unknown tile symbol: {symbol}");
+                return tile;
+            }
+            else
+            {
+                throw new Exception($"Unknown tile symbol: {symbol}");
             }
         }
+    
     }
 }

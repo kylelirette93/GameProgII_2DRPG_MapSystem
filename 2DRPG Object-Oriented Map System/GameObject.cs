@@ -10,7 +10,8 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class GameObject
     {
         // Tag property for game object.
-        public string Tag { get; private set; }
+        private string _tag;
+        public string Tag { get { return _tag; } set { _tag = value; } }
         private List<Component> components = new List<Component>();
         public GameObject(string tag)
         {
@@ -25,11 +26,13 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void OnEnable()
         {
+            // Not fully implemented.
             IsActive = true;
         }
 
         public void OnDisable()
         {
+            // Not fully implemented.
             IsActive = false;
         }
 

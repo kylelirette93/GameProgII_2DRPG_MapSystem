@@ -17,25 +17,39 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Vector2 _spawnPoint;
         private SpriteBatch _spriteBatch;
         List<string> levels = new List<string>();
+        private int currentLevelIndex = 0;
 
         public MapManager()
         {
-
+            LoadMaps();
         }
 
         public Tilemap map { get; set; }
 
         public void LoadMaps()
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
             {
-                levels.Add(String.Format("Content/Level{0}.text", i));
+                currentLevelIndex = i;
+                levels.Add(String.Format("Content/Level{0}.txt", i));
             }
         }
-        public void CreateMap()
+        public Tilemap CreateMap()
         {
             map = new Tilemap();
-            map.LoadFromFile(levels[1]);           
+            map.LoadFromFile(levels[currentLevelIndex]);      
+            _spawnPoint = map.FindSpawnPoint(levels[currentLevelIndex]);
+            return map;
+        }
+
+        public void LoadNextLevel()
+        {
+            if (currentLevelIndex < levels.Count - 1)
+            {
+                _spawnPoint = map.FindSpawnPoint(levels[currentLevelIndex + 1]);
+                currentLevelIndex++;
+                CreateMap();
+            }
         }
 
 

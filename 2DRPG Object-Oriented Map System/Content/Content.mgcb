@@ -121,8 +121,26 @@
 /processorParam:TextureFormat=Color
 /build:../../../../../Downloads/kenney_micro-roguelike/Tilemap/west_wall.png;west_wall.png
 
+#begin exit_tile.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:exit_tile.png
+
+#begin Level0.txt
+/copy:Level0.txt
+
 #begin Level1.txt
 /copy:Level1.txt
+
+#begin Level2.txt
+/copy:Level2.txt
 
 #begin player.png
 /importer:TextureImporter

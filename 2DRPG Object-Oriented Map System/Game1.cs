@@ -19,6 +19,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         GameObject tilemapObject;
         public static Texture2D whitePixel;
         MapManager mapManager;
+        Tilemap currentMap;
+        PlayerController playerController;
 
         public Game1()
         {
@@ -31,10 +33,19 @@ namespace _2DRPG_Object_Oriented_Map_System
         protected override void Initialize()
         {
             base.Initialize();
-            mapManager = new MapManager();
-            mapManager.CreateMap();
+            LoadLevel();
+            SpawnPlayer();
         }
 
+        private void LoadLevel()
+        {
+            // Initialize the map manager and create the first map.
+            mapManager = new MapManager();
+            currentMap = mapManager.CreateMap();
+            tilemapObject = new GameObject("tilemap");
+            tilemapObject.AddComponent(currentMap);
+            GameManager.AddGameObject(tilemapObject);
+        }
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -43,13 +54,25 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             // Load all the textures at once.
             SpriteManager.LoadContent(Content);
-
-            SpawnPlayer();
         }
         private void SpawnPlayer()
         {
             playerObject = GameObjectFactory.CreatePlayer();
+            playerObject.GetComponent<Transform>().Position = mapManager.SpawnPoint;
             GameManager.AddGameObject(playerObject);
+            playerController = playerObject.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                // Subscribe to on exit tile event.
+                playerController.OnExitTile += HandleExitTile;
+            }
+        }
+
+        private void HandleExitTile()
+        {
+            mapManager.LoadNextLevel();
+            // Update player's position to the start position of the new map.
+            playerObject.GetComponent<Transform>().Position = mapManager.SpawnPoint;
         }
 
         private void GenerateTilemap()
@@ -63,8 +86,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             GameManager.UpdateAll();
-            base.Update(gameTime);
-            
+            base.Update(gameTime);          
         }
 
         protected override void Draw(GameTime gameTime)
@@ -74,7 +96,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             _spriteBatch.Begin();
 
             GameManager.DrawAll(_spriteBatch);
-            mapManager.Draw(_spriteBatch);
 
             _spriteBatch.End();
             // TODO: Add your drawing code here
