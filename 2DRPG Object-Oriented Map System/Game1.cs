@@ -7,7 +7,6 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public class Game1 : Game
     {
-        // Entry point class.
         public static GraphicsDevice GameGraphicsDevice;
         private GraphicsDeviceManager _graphics;
         public GraphicsDeviceManager Graphics { get { return _graphics; } }
@@ -70,7 +69,10 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private void HandleExitTile()
         {
+            // Reload current map with next map.
+            tilemapObject.RemoveComponent<Tilemap>();
             currentMap = mapManager.LoadNextLevel(currentMap);
+            tilemapObject.AddComponent(currentMap);
             // Update player's position to the start position of the new map.
             playerObject.GetComponent<Transform>().Position = mapManager.SpawnPoint;
         }

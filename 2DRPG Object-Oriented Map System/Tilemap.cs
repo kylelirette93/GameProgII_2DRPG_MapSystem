@@ -159,17 +159,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-        public void ClearAllTiles()
-        {
-           for (int x = 0; x < Tiles.GetLength(0); x++)
-            {
-                for (int y = 0; y < Tiles.GetLength(1); y++)
-                {
-                    Tiles[x, y] = null;
-                }
-            }
-        }
-
         private Tile CreateTileFromSymbol(char symbol)
         {
             if (tileMappings.TryGetValue(symbol, out Tile tile))

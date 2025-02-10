@@ -9,6 +9,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
         // Auto-implemented transform.
         public Vector2 Position { get; set; } = new Vector2(200, 200);
+        // Currently not using rotation for anything, but I can in the future.
         public float Rotation { get; set; } = 0f;
         public Vector2 Scale { get; set; } = Vector2.One;
 
@@ -18,13 +19,15 @@ namespace _2DRPG_Object_Oriented_Map_System
             base.Update();
         }
 
-        public void SetScale(float scale)
-        {
-            Scale = new Vector2(scale, scale);
-        }
         public void Translate(Vector2 translation)
         {
             Position += translation;
+        }
+
+        // Currently not using scale logic.
+        public void SetScale(float scale)
+        {
+            Scale = new Vector2(scale, scale);
         }
 
         public void IncreaseScale(float amount)

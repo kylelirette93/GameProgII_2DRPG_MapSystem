@@ -10,6 +10,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public static class GameManager
     {
+        // List of game objects to update and draw dynamically.
         private static List<GameObject> gameObjects = new List<GameObject>();
 
         public static void AddGameObject(GameObject obj)
@@ -40,6 +41,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 obj.Draw(spriteBatch);
             }
+        }
+
+        public static void DisplayVictory()
+        {
+
         }
     }
 }

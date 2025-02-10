@@ -12,34 +12,16 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         // Property for the game object this component is attached to.
         public GameObject GameObject { get; private set; }
-        public bool IsActive
-        {
-            get { return isActive; }
-            set { isActive = value; }
-        }
-        private bool isActive;
+       
 
         public void SetGameObject(GameObject gameObject)
         {
             GameObject = gameObject;
         }
 
-        public void OnEnable()
-        {
-            isActive = true;
-        }
-
-        public void OnDisable()
-        {
-            isActive = false;
-        }
-
         public virtual void Update()
         {
-            if (isActive)
-            {
-                // Do stuff here.
-            }
+            // Enforces all subclasses to inherit this method. Kinda like an interface but not really.
         }
 }
 }

@@ -18,8 +18,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             textures["east_wall"] = content.Load<Texture2D>("east_wall");
             textures["west_wall"] = content.Load<Texture2D>("west_wall");
             textures["south_wall"] = content.Load<Texture2D>("south_wall");
-            textures["top_west_wall"] = content.Load<Texture2D>("top_west_wall");
-            textures["top_east_wall"] = content.Load<Texture2D>("top_east_wall");
+            textures["top_west_wall"] = content.Load<Texture2D>("north_west_wall");
+            textures["top_east_wall"] = content.Load<Texture2D>("north_east_wall");
             textures["bottom_west_wall"] = content.Load<Texture2D>("bottom_west_wall");
             textures["bottom_east_wall"] = content.Load<Texture2D>("bottom_east_wall");
             textures["ground_tile"] = content.Load<Texture2D>("ground_tile");

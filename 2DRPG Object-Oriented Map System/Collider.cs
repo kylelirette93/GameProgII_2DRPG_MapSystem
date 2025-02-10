@@ -41,17 +41,18 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void Draw(SpriteBatch spriteBatch)
         {
             { 
-                // Drawing a semi-transparent rectangle to represent the collider bounds
+                // Draws a rectangle to represent collider bounds.
                 spriteBatch.Draw(
-                    Game1.whitePixel,  // Use a 1x1 white texture for drawing the rectangle
+                    Game1.whitePixel,  // Reuse pixel texture to draw.
                     colliderBounds,
-                    Color.Red * 0.5f // Semi-transparent red for visibility
+                    Color.Red * 0.5f // Red, semi-transparent for visibility of collider.
                 );
             }
         }
 
         public override void Update()
         {
+            // Update the collider.
             SetColliderBounds();
         }
 }

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -13,33 +14,23 @@ namespace _2DRPG_Object_Oriented_Map_System
         private string _tag;
         public string Tag { get { return _tag; } set { _tag = value; } }
         private List<Component> components = new List<Component>();
+        private List<Component> toRemove = new List<Component>();
         public GameObject(string tag)
         {
             Tag = tag;
         }
 
-        public Vector2 Position { get; set; }
-        private Vector2 _position;
-
-        public bool IsActive { get; set; }
-        private bool _isActive;
-
-        public void OnEnable()
-        {
-            // Not fully implemented.
-            IsActive = true;
-        }
-
-        public void OnDisable()
-        {
-            // Not fully implemented.
-            IsActive = false;
-        }
-
         public void AddComponent(Component component)
         {
-            component.SetGameObject(this);
-            components.Add(component);
+            if (component != null)
+            {
+                component.SetGameObject(this);
+                components.Add(component);
+            }
+            else
+            {
+                Console.WriteLine("Component is null!");
+            }
         }
 
         public T GetComponent<T>() where T : Component
@@ -56,17 +47,25 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void RemoveComponent<T>() where T : Component
         {
+            // Collect components to remove.
             foreach (Component component in components)
             {
                 if (component is T)
                 {
-                    components.Remove(component);
+                    toRemove.Add(component);
                 }
+            }
+
+            // Remove components outside of the loop to avoid modification during iteration.
+            foreach (Component component in toRemove)
+            {
+                components.Remove(component);
             }
         }
 
         public void UpdateComponents()
         {
+            // Update all components.
             foreach (Component component in components)
             {
                 component.Update();
@@ -91,13 +90,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
-
-
-
         public virtual void Update()
         {
+            // Updates all components attached to this game object.
             UpdateComponents();
         }
     }
-
 }
