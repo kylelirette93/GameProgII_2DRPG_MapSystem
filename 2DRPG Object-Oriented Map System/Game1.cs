@@ -33,11 +33,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         protected override void Initialize()
         {
             base.Initialize();
-            LoadLevel();
+            InitializeLevel();
             SpawnPlayer();
         }
 
-        private void LoadLevel()
+        private void InitializeLevel()
         {
             // Initialize the map manager and create the first map.
             mapManager = new MapManager();
@@ -70,7 +70,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private void HandleExitTile()
         {
-            mapManager.LoadNextLevel();
+            currentMap = mapManager.LoadNextLevel(currentMap);
             // Update player's position to the start position of the new map.
             playerObject.GetComponent<Transform>().Position = mapManager.SpawnPoint;
         }

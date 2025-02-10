@@ -47,9 +47,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 for (int y = 0; y < Tiles.GetLength(1); y++)
                 {
-                    Tile tile = Tiles[x, y];
-                    Vector2 position = new Vector2(x * TileWidth, y * TileHeight);
-                    tile.Draw(spriteBatch, position);
+                    if (Tiles[x, y] != null)
+                    {
+                        Tile tile = Tiles[x, y];
+                        Vector2 position = new Vector2(x * TileWidth, y * TileHeight);
+                        tile.Draw(spriteBatch, position);
+                    }
                 }
             }
         }
@@ -152,6 +155,17 @@ namespace _2DRPG_Object_Oriented_Map_System
                 {
                     char symbol = lines[y][x];
                     Tiles[x, y] = CreateTileFromSymbol(symbol);
+                }
+            }
+        }
+
+        public void ClearAllTiles()
+        {
+           for (int x = 0; x < Tiles.GetLength(0); x++)
+            {
+                for (int y = 0; y < Tiles.GetLength(1); y++)
+                {
+                    Tiles[x, y] = null;
                 }
             }
         }

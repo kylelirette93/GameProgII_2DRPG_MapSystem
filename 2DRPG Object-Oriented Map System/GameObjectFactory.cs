@@ -18,6 +18,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             return player;
         }
 
+        // To use for procedural generation only.
         public static GameObject GenerateTilemap()
         {
             Tilemap tilemap = new Tilemap();

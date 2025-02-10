@@ -30,25 +30,37 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             for (int i = 0; i < 3; i++)
             {
-                currentLevelIndex = i;
-                levels.Add(String.Format("Content/Level{0}.txt", i));
+                string levelPath = $"Content/Level{i}.txt";
+                if (File.Exists(levelPath))
+                {
+                    levels.Add(levelPath);
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Level file {levelPath} does not exist.");
+                }
             }
         }
         public Tilemap CreateMap()
         {
             map = new Tilemap();
-            map.LoadFromFile(levels[currentLevelIndex]);      
-            _spawnPoint = map.FindSpawnPoint(levels[currentLevelIndex]);
+            map.LoadFromFile(levels[currentLevelIndex]);
+            SpawnPoint = map.FindSpawnPoint(levels[currentLevelIndex]);
             return map;
         }
 
-        public void LoadNextLevel()
+        public Tilemap LoadNextLevel(Tilemap map)
         {
+            map.ClearAllTiles();
             if (currentLevelIndex < levels.Count - 1)
             {
-                _spawnPoint = map.FindSpawnPoint(levels[currentLevelIndex + 1]);
                 currentLevelIndex++;
-                CreateMap();
+                Tilemap newMap = CreateMap();
+                return newMap;
+            }
+            else
+            {
+                return null;
             }
         }
 

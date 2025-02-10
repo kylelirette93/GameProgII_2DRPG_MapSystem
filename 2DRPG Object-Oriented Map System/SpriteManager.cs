@@ -8,6 +8,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public static class SpriteManager
 {
+        // Class to handle loading of all textures.
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
 
         public static void LoadContent(ContentManager content)
