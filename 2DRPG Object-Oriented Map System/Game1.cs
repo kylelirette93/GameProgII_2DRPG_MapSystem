@@ -7,24 +7,15 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public class Game1 : Game
     {
-        public static GraphicsDevice GameGraphicsDevice;
         private GraphicsDeviceManager _graphics;
-        public GraphicsDeviceManager Graphics { get { return _graphics; } }
-
         private SpriteBatch _spriteBatch;
-        public SpriteBatch SpriteBatch { get { return _spriteBatch; } }
-
-        GameObject playerObject;
-        GameObject tilemapObject;
         public static Texture2D whitePixel;
         MapManager mapManager;
-        Tilemap currentMap;
-        PlayerController playerController;
+        private Scene currentScene;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            GameGraphicsDevice = GraphicsDevice;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -33,17 +24,14 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             base.Initialize();
             InitializeLevel();
-            SpawnPlayer();
         }
 
         private void InitializeLevel()
         {
-            // Initialize the map manager and create the first map.
+            // Load maps, create new scene, initialize current scene.
             mapManager = new MapManager();
-            currentMap = mapManager.CreateMap();
-            tilemapObject = new GameObject("tilemap");
-            tilemapObject.AddComponent(currentMap);
-            GameManager.AddGameObject(tilemapObject);
+            currentScene = new Scene();
+            currentScene.Initialize(mapManager);
         }
         protected override void LoadContent()
         {
@@ -53,34 +41,6 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             // Load all the textures at once.
             SpriteManager.LoadContent(Content);
-        }
-        private void SpawnPlayer()
-        {
-            playerObject = GameObjectFactory.CreatePlayer();
-            playerObject.GetComponent<Transform>().Position = mapManager.SpawnPoint;
-            GameManager.AddGameObject(playerObject);
-            playerController = playerObject.GetComponent<PlayerController>();
-            if (playerController != null)
-            {
-                // Subscribe to on exit tile event.
-                playerController.OnExitTile += HandleExitTile;
-            }
-        }
-
-        private void HandleExitTile()
-        {
-            // Reload current map with next map.
-            tilemapObject.RemoveComponent<Tilemap>();
-            currentMap = mapManager.LoadNextLevel(currentMap);
-            tilemapObject.AddComponent(currentMap);
-            // Update player's position to the start position of the new map.
-            playerObject.GetComponent<Transform>().Position = mapManager.SpawnPoint;
-        }
-
-        private void GenerateTilemap()
-        {
-            tilemapObject = GameObjectFactory.GenerateTilemap();
-            GameManager.AddGameObject(tilemapObject);
         }
 
         protected override void Update(GameTime gameTime)
@@ -96,9 +56,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-
             GameManager.DrawAll(_spriteBatch);
-
             _spriteBatch.End();
             // TODO: Add your drawing code here
 

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -16,25 +11,27 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class MapManager
 {
-        public Vector2 SpawnPoint { get; set; }
-        private Vector2 _spawnPoint;
-        private SpriteBatch _spriteBatch;
-        List<string> levels = new List<string>();
-        private int currentLevelIndex;
+        // Properties
+        public Vector2 SpawnPoint { get; private set; }
+
+        private List<string> _levelPaths;
+        public int CurrentLevelIndex => _currentLevelIndex;
+        private int _currentLevelIndex;
+        private Tilemap _currentMap;
+
+        public Tilemap CurrentMap => _currentMap;
 
         /// <summary>
-        /// Constructor that loads map files.
+        /// Initializes the map manager, loads map files and sets current level index.
         /// </summary>
         public MapManager()
         {
-            currentLevelIndex = 0;
+            _currentLevelIndex = 0;
+            _levelPaths = new List<string>();
             LoadMaps();
         }
-
-        public Tilemap map { get; set; }
-
         /// <summary>
-        ///  Load maps concatenate's a string with the index of the map list and adds file paths according to the index to the list.
+        ///  Loads map files by scanning for files at predefined paths.
         /// </summary>
         public void LoadMaps()
         {
@@ -43,7 +40,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 string levelPath = $"Content/Level{i}.txt";
                 if (File.Exists(levelPath))
                 {
-                    levels.Add(levelPath);
+                    _levelPaths.Add(levelPath);
                 }
                 else
                 {
@@ -51,48 +48,41 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
-        
-
-        /// <summary>
-        /// Load next level clear's the previous map and returns a new map based on the incremented index.
-        /// </summary>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        public Tilemap LoadNextLevel(Tilemap map)
+        public void NextMap()
         {
-            if (currentLevelIndex < levels.Count - 1)
-            {
-                currentLevelIndex++;
-                Tilemap newMap = CreateMap();
-                return newMap;
-            }
-            else
-            {
-                GameManager.DisplayVictory();
-                return null;
-            }
+            _currentLevelIndex++;
         }
 
         /// <summary>
-        /// Create map method creates a new map and load's it from a text file. Returns the map.
+        /// Creates and loads a new map from the current level's file.
+        /// Sets the spawn point for the player.
         /// </summary>
         /// <returns></returns>
         public Tilemap CreateMap()
         {
-            map = new Tilemap();
-            map.LoadFromFile(levels[currentLevelIndex]);
-            SpawnPoint = map.FindSpawnPoint(levels[currentLevelIndex]);
-            return map;
+            _currentMap = new Tilemap();
+            if (_currentLevelIndex < _levelPaths.Count)
+            {
+                _currentMap.LoadFromFile(_levelPaths[_currentLevelIndex]);
+                SpawnPoint = _currentMap.FindSpawnPoint(_levelPaths[_currentLevelIndex]);
+                return _currentMap;
+            }
+            else
+            {
+                return null;
+            }
         }
-
-
+        public void SetPlayerStartPosition(GameObject player)
+        {
+           player.GetComponent<Transform>().Position = SpawnPoint;
+        }
         /// <summary>
-        /// Draw's the map.
+        /// Draw's the current map to screen using the sprite batch.
         /// </summary>
         /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            map.Draw(spriteBatch);
+            _currentMap?.Draw(spriteBatch);
         }
 }
 }

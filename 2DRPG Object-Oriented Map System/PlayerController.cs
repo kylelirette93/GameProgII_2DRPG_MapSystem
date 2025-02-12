@@ -14,6 +14,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         private float movementSpeed = 5f;
         private GameObject player;
         private KeyboardState previousState;
+        private KeyboardState currentState;
+        private Tilemap tilemap;
 
         public PlayerController()
         {
@@ -36,7 +38,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private void HandleInput()
         {
             Vector2 movement = Vector2.Zero;
-            KeyboardState currentState = Keyboard.GetState();
+            currentState = Keyboard.GetState();
 
             // Check for key presses
             if (currentState.IsKeyDown(Keys.W) && !previousState.IsKeyDown(Keys.W)) movement.Y -= 16;
@@ -59,7 +61,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private bool CanMoveTo(Vector2 newPosition)
         {
-            Tilemap tilemap = GameManager.Find("tilemap")?.GetComponent<Tilemap>();
+            tilemap = GameManager.Find("tilemap")?.GetComponent<Tilemap>();
 
             if (tilemap != null)
             {

@@ -8,7 +8,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public static class GameObjectFactory
     {
-        public static GameObject CreatePlayer()
+        public static GameObject CreatePlayer(MapManager mapManager)
         {
             GameObject player = new GameObject("player");
             player.AddComponent(new Transform());
@@ -17,6 +17,18 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.AddComponent(new PlayerController());
             return player;
         }
+
+        public static GameObject CreateTilemap(MapManager mapManager)
+        {
+            GameObject tilemapObject = new GameObject("tilemap");
+            Tilemap tilemap = mapManager.CreateMap();
+            tilemapObject.AddComponent(tilemap);
+            tilemapObject.AddComponent(new Transform());
+
+            return tilemapObject;
+        }
+
+      
 
         // To use for procedural generation only.
         public static GameObject GenerateTilemap()

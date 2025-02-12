@@ -17,6 +17,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             gameObjects.Add(obj);
         }
+
+        public static void CreateGameObject(string tag)
+        {
+            gameObjects.Add(new GameObject(tag));
+        }
         /// <summary>
         /// Find game object by tag.
         /// </summary>

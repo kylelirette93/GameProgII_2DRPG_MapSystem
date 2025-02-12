@@ -6,12 +6,29 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// Tilemap Class is responsible for creating and drawing a map. Either procedurally or from a file.
+    /// </summary>
     public class Tilemap : Component
     {
+        /// <summary>
+        /// List of tiles that make up a map.
+        /// </summary>
         public Tile[,] Tiles { get; set; }
-        public int TileWidth { get; private set; } = 32; 
+        /// <summary>
+        /// Tile width.
+        /// </summary>
+        public int TileWidth { get; private set; } = 32;
+        /// <summary>
+        /// Tile height.
+        /// </summary>
         public int TileHeight { get; private set; } = 32;
+
         private Dictionary<Char, Tile> tileMappings;
+
+        /// <summary>
+        /// Tilemap constructor initializes the tile mappings to a dictionary.
+        /// </summary>
         public Tilemap()
         {
             InitializeTileMappings();
@@ -36,11 +53,18 @@ namespace _2DRPG_Object_Oriented_Map_System
             };
         }
 
+        /// <summary>
+        /// Tilemap class's Update method is not implemented, no need yet.
+        /// </summary>
         public override void Update()
         {
             //TODO: IMPLEMENT UPDATE.
         }
 
+        /// <summary>
+        /// Draw method is responsible for drawing the map to the screen based on the tiles height and width.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             for (int x = 0; x < Tiles.GetLength(0); x++)
@@ -57,6 +81,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// Iterates through the map file to find the spawn point.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public Vector2 FindSpawnPoint(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
@@ -76,6 +106,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             throw new Exception("Spawn point 'P' not found in map file.");
         } 
 
+        /// <summary>
+        /// Generate's a procedural map based on the width and height and tile rules.
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void GenerateProceduralMap(int width, int height)
         {
             Tiles = new Tile[width, height];
@@ -143,6 +178,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// Load's a map from a file based on the file path.
+        /// </summary>
+        /// <param name="filePath"></param>
         public void LoadFromFile(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
@@ -159,6 +198,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// Create's a tile based on the symbol from the file.
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private Tile CreateTileFromSymbol(char symbol)
         {
             if (tileMappings.TryGetValue(symbol, out Tile tile))
