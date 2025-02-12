@@ -4,19 +4,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// Game Manager class manages all game entities, updating them & drawing them.
+    /// </summary>
     public static class GameManager
     {
         // List of game objects to update and draw dynamically.
         private static List<GameObject> gameObjects = new List<GameObject>();
 
+        /// <summary>
+        /// Add Game Object method add's a game object to a list.
+        /// </summary>
+        /// <param name="obj"></param>
         public static void AddGameObject(GameObject obj)
         {
             gameObjects.Add(obj);
-        }
-
-        public static void CreateGameObject(string tag)
-        {
-            gameObjects.Add(new GameObject(tag));
         }
         /// <summary>
         /// Find game object by tag.
@@ -28,6 +30,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             return gameObjects.FirstOrDefault(obj => obj.Tag == tag);
         }
 
+        /// <summary>
+        /// Update All method updates all game objects at once.
+        /// </summary>
         public static void UpdateAll()
         {
             foreach (var obj in gameObjects)
@@ -35,18 +40,16 @@ namespace _2DRPG_Object_Oriented_Map_System
                 obj.Update();
             }
         }
-
+        /// <summary>
+        /// Draw All method draws all game objects at once.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public static void DrawAll(SpriteBatch spriteBatch)
         {
             foreach (var obj in gameObjects)
             {
                 obj.Draw(spriteBatch);
             }
-        }
-
-        public static void DisplayVictory()
-        {
-            //TODO: Display victory screen.
         }
     }
 }

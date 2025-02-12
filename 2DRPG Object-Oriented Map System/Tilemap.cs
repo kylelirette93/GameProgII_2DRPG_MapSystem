@@ -23,6 +23,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Tile height.
         /// </summary>
         public int TileHeight { get; private set; } = 32;
+        public Vector2 LastExitTile;
+        private Vector2 lastExitTile { get; set; }
 
         private Dictionary<Char, Tile> tileMappings;
         Random random = new Random();
@@ -183,11 +185,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                         {
                             Tiles[x, y].Texture = SpriteManager.GetTexture("exit_tile");
                             Tiles[x, y].IsExit = true;
-                            exitX = x; // Store exit tile position
-                            exitY = y;
+                            LastExitTile = new Vector2(x, y);
                         }
                     }
-
                 }
             }
         }

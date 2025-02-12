@@ -15,12 +15,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         private List<string> _levelPaths;
         private int _currentLevelIndex;
         private Tilemap _currentMap;
-
         /// <summary>
         /// Initializes the map manager, loads map files and sets current level index.
         /// </summary>
         public MapManager()
         {
+            
             _currentLevelIndex = 0;
             _levelPaths = new List<string>();
             LoadMaps();
@@ -65,6 +65,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             else
             {
                 _currentMap.GenerateProceduralMap(25, 15);
+                SpawnPoint = _currentMap.LastExitTile;
                 return _currentMap;
             }
         }
