@@ -8,7 +8,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Sprite class is responsible for rendering a texture to the screen.
     /// </summary>
-    public class Sprite : Component
+    public class Sprite : DrawableComponent
 {
         Texture2D _texture;
         public Texture2D Texture { get { return _texture; } }
@@ -37,7 +37,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Draw method is responsible for rendering the sprite to the screen.
         /// </summary>
         /// <param name="spriteBatch"></param>
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_texture, GameObject.GetComponent<Transform>().Position, null, Color.White);
         }     

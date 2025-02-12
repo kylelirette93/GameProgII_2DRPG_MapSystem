@@ -7,7 +7,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Collider class is responsible for handling collision detection.
     /// </summary>
-    public class Collider : Component
+    public class Collider : DrawableComponent
 {     
         // For triggering events.
         /// <summary>
@@ -53,7 +53,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Draw method is responsible for rendering the collider bounds to the screen.
         /// </summary>
         /// <param name="spriteBatch"></param>
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             { 
                 // Draws a rectangle to represent collider bounds.

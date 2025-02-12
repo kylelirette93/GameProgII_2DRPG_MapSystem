@@ -64,7 +64,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             else
             {
-                return null;
+                _currentMap.GenerateProceduralMap(25, 15);
+                return _currentMap;
             }
         }
         public void SetPlayerStartPosition(GameObject player)

@@ -9,7 +9,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Tilemap Class is responsible for creating and drawing a map. Either procedurally or from a file.
     /// </summary>
-    public class Tilemap : Component
+    public class Tilemap : DrawableComponent
     {
         /// <summary>
         /// List of tiles that make up a map.
@@ -25,6 +25,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public int TileHeight { get; private set; } = 32;
 
         private Dictionary<Char, Tile> tileMappings;
+        Random random = new Random();
 
         /// <summary>
         /// Tilemap constructor initializes the tile mappings to a dictionary.
@@ -44,7 +45,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 { 'S', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("south_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { 'E', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { 'W', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'P', new Tile { IsWalkable = true, Texture = SpriteManager.GetTexture("ground_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'P', new Tile { IsWalkable = true, Texture = SpriteManager.GetTexture("spawn_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { 'X', new Tile { IsExit = true, Texture = SpriteManager.GetTexture("exit_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { '1', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("top_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { '2', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("top_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
@@ -65,7 +66,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Draw method is responsible for drawing the map to the screen based on the tiles height and width.
         /// </summary>
         /// <param name="spriteBatch"></param>
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             for (int x = 0; x < Tiles.GetLength(0); x++)
             {
@@ -114,6 +115,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void GenerateProceduralMap(int width, int height)
         {
             Tiles = new Tile[width, height];
+            int exitX = 0;
+            int exitY = 0;
 
             // Initialize all tiles to ground
             for (int x = 0; x < width; x++)
@@ -174,6 +177,17 @@ namespace _2DRPG_Object_Oriented_Map_System
                         Tiles[x, y].Texture = SpriteManager.GetTexture("south_wall");
                         Tiles[x, y].IsWalkable = false;
                     }
+                    else if ((y > 3 && y < height - 3) && (x > 3 && x < width - 3))
+                    {
+                        if (random.Next(0, (height - 6)) == y && random.Next(0, (width - 6)) == x)
+                        {
+                            Tiles[x, y].Texture = SpriteManager.GetTexture("exit_tile");
+                            Tiles[x, y].IsExit = true;
+                            exitX = x; // Store exit tile position
+                            exitY = y;
+                        }
+                    }
+
                 }
             }
         }

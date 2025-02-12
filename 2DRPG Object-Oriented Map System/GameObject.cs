@@ -97,17 +97,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             foreach (var component in components)
             {
-                if (component is Sprite sprite)
+                if (component is DrawableComponent)
                 {
-                    sprite.Draw(spriteBatch);
-                }
-                else if (component is Tilemap tilemap)
-                {
-                    tilemap.Draw(spriteBatch);
-                }
-                else if (component is Collider collider)
-                {
-                    collider.Draw(spriteBatch);
+                    (component as DrawableComponent).Draw(spriteBatch);
                 }
             }
         }

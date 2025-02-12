@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.Xna.Framework.Graphics;
+
 namespace _2DRPG_Object_Oriented_Map_System
 {
     /// <summary>
@@ -31,5 +33,14 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             // This method is overridden by the inheriting class.
         }
-}
+    }
+
+    public abstract class DrawableComponent : Component
+    {
+        public virtual void Draw(SpriteBatch spriteBatch)
+        {
+
+        }
+    }
+
 }
