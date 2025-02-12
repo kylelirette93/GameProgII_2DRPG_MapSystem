@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// Main game class. Initializes the game and runs the game loop.
+    /// </summary>
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -12,7 +14,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         public static Texture2D whitePixel;
         MapManager mapManager;
         private Scene currentScene;
-
+        /// <summary>
+        /// Main game constructor. Initializes the graphics device manager and sets the content root directory.
+        /// </summary>
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -20,6 +24,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             IsMouseVisible = true;
         }
 
+        /// <summary>
+        /// Initialize method is responsible for initializing the game.
+        /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
@@ -33,6 +40,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             currentScene = new Scene();
             currentScene.Initialize(mapManager);
         }
+        /// <summary>
+        /// Load Content method is responsible for loading all textures.
+        /// </summary>
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -42,7 +52,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Load all the textures at once.
             SpriteManager.LoadContent(Content);
         }
-
+        /// <summary>
+        /// Update method is responsible for updating the game state.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -50,7 +63,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             GameManager.UpdateAll();
             base.Update(gameTime);          
         }
-
+        /// <summary>
+        /// Draw method is responsible for drawing the game state.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);

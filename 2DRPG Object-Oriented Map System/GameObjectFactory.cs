@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// Game Object Factory is a factory class with a static factory method pattern. It encapsulates object creation.
+    /// </summary>
     public static class GameObjectFactory
     {
         public static GameObject CreatePlayer(MapManager mapManager)
@@ -24,7 +27,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             Tilemap tilemap = mapManager.CreateMap();
             tilemapObject.AddComponent(tilemap);
             tilemapObject.AddComponent(new Transform());
-
             return tilemapObject;
         }
 

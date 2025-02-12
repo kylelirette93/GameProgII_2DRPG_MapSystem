@@ -25,7 +25,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             _texture = texture;        
             SpriteBounds = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
         }
-
         /// <summary>
         /// Update method is responsible for updating the sprite's position.
         /// </summary>
@@ -34,7 +33,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Move the sprite based on transform position.
             Position = GameObject.GetComponent<Transform>().Position;
         }
-
         /// <summary>
         /// Draw method is responsible for rendering the sprite to the screen.
         /// </summary>
@@ -42,7 +40,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_texture, GameObject.GetComponent<Transform>().Position, null, Color.White);
-        }
-        
+        }     
 }
 }

@@ -11,15 +11,10 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class MapManager
 {
-        // Properties
         public Vector2 SpawnPoint { get; private set; }
-
         private List<string> _levelPaths;
-        public int CurrentLevelIndex => _currentLevelIndex;
         private int _currentLevelIndex;
         private Tilemap _currentMap;
-
-        public Tilemap CurrentMap => _currentMap;
 
         /// <summary>
         /// Initializes the map manager, loads map files and sets current level index.
@@ -75,14 +70,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void SetPlayerStartPosition(GameObject player)
         {
            player.GetComponent<Transform>().Position = SpawnPoint;
-        }
-        /// <summary>
-        /// Draw's the current map to screen using the sprite batch.
-        /// </summary>
-        /// <param name="spriteBatch"></param>
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            _currentMap?.Draw(spriteBatch);
         }
 }
 }
