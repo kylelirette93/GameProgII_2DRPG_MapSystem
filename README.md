@@ -1,10 +1,10 @@
-#Game Programming I Oriented Map System#
+# Game Programming I Oriented Map System #
 
-##Overview##
+## Overview ##
 
-###This is a Object-Oriented Map System in Monogame. Implementing a mixture Object-oriented programming principles and Entity Component structure.###
+### This is a Object-Oriented Map System in Monogame. Implementing a mixture Object-oriented programming principles and Entity Component structure. ###
 
-#Design Decisions#
+# Design Decisions #
 
 - **GameObject Class**
   I created a 'GameObject' class that represents a game entity, similar to Unity. This class allows components to be added to or removed from the object dynamically. 
