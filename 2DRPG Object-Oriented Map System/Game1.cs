@@ -60,7 +60,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            GameManager.UpdateAll();
+            ObjectManager.UpdateAll();
             base.Update(gameTime);          
         }
         /// <summary>
@@ -72,7 +72,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-            GameManager.DrawAll(_spriteBatch);
+            ObjectManager.DrawAll(_spriteBatch);
             _spriteBatch.End();
             // TODO: Add your drawing code here
 

@@ -7,7 +7,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Game Manager class manages all game entities, updating them & drawing them.
     /// </summary>
-    public static class GameManager
+    public static class ObjectManager
     {
         // List of game objects to update and draw dynamically.
         private static List<GameObject> gameObjects = new List<GameObject>();

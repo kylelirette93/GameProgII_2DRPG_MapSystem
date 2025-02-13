@@ -23,10 +23,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Tile height.
         /// </summary>
         public int TileHeight { get; private set; } = 32;
-        public Vector2 LastExitTile;
-        private Vector2 lastExitTile { get; set; }
+        private Vector2 lastExitTile;
+        public Vector2 LastExitTile { get; set; }
 
         private Dictionary<Char, Tile> tileMappings;
+        int exitX;
+        int exitY;
         Random random = new Random();
 
         /// <summary>
@@ -83,6 +85,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
+       
 
         /// <summary>
         /// Iterates through the map file to find the spawn point.
@@ -107,7 +110,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
             throw new Exception("Spawn point 'P' not found in map file.");
-        } 
+        }
 
         /// <summary>
         /// Generate's a procedural map based on the width and height and tile rules.
@@ -117,8 +120,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void GenerateProceduralMap(int width, int height)
         {
             Tiles = new Tile[width, height];
-            int exitX = 0;
-            int exitY = 0;
 
             // Initialize all tiles to ground
             for (int x = 0; x < width; x++)
@@ -179,17 +180,13 @@ namespace _2DRPG_Object_Oriented_Map_System
                         Tiles[x, y].Texture = SpriteManager.GetTexture("south_wall");
                         Tiles[x, y].IsWalkable = false;
                     }
-                    else if ((y > 3 && y < height - 3) && (x > 3 && x < width - 3))
-                    {
-                        if (random.Next(0, (height - 6)) == y && random.Next(0, (width - 6)) == x)
-                        {
-                            Tiles[x, y].Texture = SpriteManager.GetTexture("exit_tile");
-                            Tiles[x, y].IsExit = true;
-                            LastExitTile = new Vector2(x, y);
-                        }
-                    }
                 }
             }
+            exitX = random.Next(4, width - 4);
+            exitY = random.Next(4, height - 4);
+            Tiles[exitX, exitY].Texture = SpriteManager.GetTexture("exit_tile");
+            Tiles[exitX, exitY].IsExit = true;
+            LastExitTile = new Vector2(exitX * TileWidth, exitY * TileHeight);
         }
 
         /// <summary>
@@ -207,6 +204,11 @@ namespace _2DRPG_Object_Oriented_Map_System
                 for (int x = 0; x < width; x++)
                 {
                     char symbol = lines[y][x];
+                    // Store the last exit tile.
+                    if (symbol == 'X')
+                    {
+                        LastExitTile = new Vector2(x * TileWidth, y * TileHeight);
+                    }
                     Tiles[x, y] = CreateTileFromSymbol(symbol);
                 }
             }

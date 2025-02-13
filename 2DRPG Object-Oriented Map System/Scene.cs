@@ -23,13 +23,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Create the player and tilemap.
             Tilemap = GameObjectFactory.CreateTilemap(mapManager);
             Player = GameObjectFactory.CreatePlayer(mapManager);
-            mapManager.SetPlayerStartPosition(Player);
             // Wrapper function to pass map manager argument to the event handler.
             Player.GetComponent<PlayerController>().OnExitTile += () => HandleExitTile(mapManager);
 
             // Add the player and tilemap to the game manager.
-            GameManager.AddGameObject(Tilemap);
-            GameManager.AddGameObject(Player);
+            ObjectManager.AddGameObject(Tilemap);
+            ObjectManager.AddGameObject(Player);
         }
 
         private void HandleExitTile(MapManager mapManager)

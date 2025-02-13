@@ -26,7 +26,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (player == null)
             {
-                player = GameManager.Find("player");
+                player = ObjectManager.Find("player");
             }
 
             if (player != null)
@@ -61,7 +61,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private bool CanMoveTo(Vector2 newPosition)
         {
-            tilemap = GameManager.Find("tilemap")?.GetComponent<Tilemap>();
+            tilemap = ObjectManager.Find("tilemap")?.GetComponent<Tilemap>();
 
             if (tilemap != null)
             {
