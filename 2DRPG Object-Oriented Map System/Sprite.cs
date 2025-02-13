@@ -10,11 +10,13 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class Sprite : DrawableComponent
 {
-        Texture2D _texture;
+        private Texture2D _texture;
         public Texture2D Texture { get { return _texture; } }
-        Vector2 Position { get; set; }
+        private Vector2 _position;
+        public Vector2 Position { get { return _position; } set { _position = value; } }
         public Rectangle SpriteBounds { get { return _spriteBounds; } set { _spriteBounds = value; } }
         private Rectangle _spriteBounds;
+        
 
         /// <summary>
         /// Sprite constructor is responsible for setting the texture and sprite bounds.
@@ -22,16 +24,18 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="texture"></param>
         public Sprite(Texture2D texture)
         {
-            _texture = texture;        
-            SpriteBounds = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+            _texture = texture;
+            _position = Vector2.Zero;
+            _spriteBounds = new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
         }
         /// <summary>
         /// Update method is responsible for updating the sprite's position.
         /// </summary>
         public override void Update()
         {
-            // Move the sprite based on transform position.
-            Position = GameObject.GetComponent<Transform>().Position;
+            // Update the sprite and it's bounds based on transform position.
+            _position = GameObject.GetComponent<Transform>().Position;
+            _spriteBounds.Location = _position.ToPoint();
         }
         /// <summary>
         /// Draw method is responsible for rendering the sprite to the screen.
@@ -39,7 +43,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, GameObject.GetComponent<Transform>().Position, null, Color.White);
+            // Draw the sprite at the object's position.
+            spriteBatch.Draw(_texture, _position, null, Color.White);
         }     
 }
 }

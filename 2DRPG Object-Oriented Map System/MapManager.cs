@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -22,6 +21,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public MapManager()
         {          
+            // Initialize map manager and list of level paths.
             _currentLevelIndex = 0;
             _levelPaths = new List<string>();
             LoadMaps();
@@ -31,6 +31,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public void LoadMaps()
         {
+            // Add three levels to the list, because I made three levels.
             for (int i = 0; i < 3; i++)
             {
                 string levelPath = $"Content/Level{i}.txt";
@@ -44,6 +45,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
+        /// <summary>
+        /// Next Map method increments the current level index.
+        /// </summary>
         public void NextMap()
         {
             _currentLevelIndex++;
@@ -71,6 +75,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             return _currentMap;
         }
+        /// <summary>
+        /// Set Player Start Position method sets the player's position to the spawn point.
+        /// </summary>
+        /// <param name="player"></param>
         public void SetPlayerStartPosition(GameObject player)
         {
            player.GetComponent<Transform>().Position = SpawnPoint;

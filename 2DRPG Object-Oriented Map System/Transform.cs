@@ -11,10 +11,14 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class Transform : Component
 {
         // Auto-implemented transform.
-        public Vector2 Position { get; set; } = new Vector2(200, 200);
+        public Vector2 Position { get { return _position; } }
+        private Vector2 _position = new Vector2(200, 200);
         // Currently not using rotation for anything, but I can in the future.
-        public float Rotation { get; set; } = 0f;
-        public Vector2 Scale { get; set; } = Vector2.One;
+        public float Rotation { get { return _rotation; } }
+        private float _rotation = 0f;
+
+        public Vector2 Scale { get { return _scale; } }
+        private Vector2 _scale = Vector2.One;
 
         /// <summary>
         /// Updates the transform continuously.
@@ -31,7 +35,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="translation"></param>
         public void Translate(Vector2 translation)
         {
-            Position += translation;
+            _position += translation;
         }
 
         // Currently not using scale logic.
@@ -41,7 +45,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="scale"></param>
         public void SetScale(float scale)
         {
-            Scale = new Vector2(scale, scale);
+            _scale = new Vector2(scale, scale);
         }
 
         /// <summary>
@@ -50,7 +54,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="amount"></param>
         public void IncreaseScale(float amount)
         {
-            Scale += new Vector2(amount, amount);
+            _scale += new Vector2(amount, amount);
         }
 
     }

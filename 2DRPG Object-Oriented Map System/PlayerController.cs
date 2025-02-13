@@ -8,8 +8,14 @@ using System.Collections.Generic;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// Player Controller is a component that handles player input and movement.
+    /// </summary>
     public class PlayerController : Component
     {
+        /// <summary>
+        /// Event for when the player reaches the exit tile.
+        /// </summary>
         public event Action OnExitTile;
         private float movementSpeed = 5f;
         private GameObject player;
@@ -17,11 +23,17 @@ namespace _2DRPG_Object_Oriented_Map_System
         private KeyboardState currentState;
         private Tilemap tilemap;
 
+        /// <summary>
+        /// Initializes the previous state of the keyboard.
+        /// </summary>
         public PlayerController()
         {
             previousState = Keyboard.GetState();
         }
 
+        /// <summary>
+        /// Update method is responsible for checking player input and moving the player.
+        /// </summary>
         public override void Update()
         {
             if (player == null)
@@ -37,10 +49,12 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private void HandleInput()
         {
+            // Create a movement vector.
             Vector2 movement = Vector2.Zero;
+            // Update the current state of the keyboard.
             currentState = Keyboard.GetState();
 
-            // Check for key presses
+            // Compare the current state with the previous state to check for key presses.
             if (currentState.IsKeyDown(Keys.W) && !previousState.IsKeyDown(Keys.W)) movement.Y -= 16;
             if (currentState.IsKeyDown(Keys.S) && !previousState.IsKeyDown(Keys.S)) movement.Y += 16;
             if (currentState.IsKeyDown(Keys.A) && !previousState.IsKeyDown(Keys.A)) movement.X -= 16;
@@ -48,6 +62,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (movement != Vector2.Zero && player != null)
             {
+                // Normalize the movement vector.
                 Vector2 newPosition = player.GetComponent<Transform>().Position + movement;
                 if (CanMoveTo(newPosition))
                 {
@@ -55,14 +70,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
 
-            // Update the previous state
+            // Assign the current state to the previous state, this is used to check for key presses.
             previousState = currentState;
         }
 
         private bool CanMoveTo(Vector2 newPosition)
         {
             tilemap = ObjectManager.Find("tilemap")?.GetComponent<Tilemap>();
-
+     
             if (tilemap != null)
             {
                 // Get the tile position based on the new position.

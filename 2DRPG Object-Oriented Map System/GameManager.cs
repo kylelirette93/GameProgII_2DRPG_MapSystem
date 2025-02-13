@@ -7,7 +7,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Main game class. Initializes the game and runs the game loop.
     /// </summary>
-    public class Game1 : Game
+    public class GameManager : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -17,7 +17,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Main game constructor. Initializes the graphics device manager and sets the content root directory.
         /// </summary>
-        public Game1()
+        public GameManager()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -74,7 +74,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             _spriteBatch.Begin();
             ObjectManager.DrawAll(_spriteBatch);
             _spriteBatch.End();
-            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }

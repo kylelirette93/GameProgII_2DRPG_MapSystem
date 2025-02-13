@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -9,7 +8,6 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class Collider : DrawableComponent
 {     
-        // For triggering events.
         /// <summary>
         /// IsTrigger is a boolean that checks if a collider is a trigger or not.
         /// </summary>
@@ -39,7 +37,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (colliderTransform != null && colliderSprite != null)
             {
-                // Set the collider bounds based on position from transform and sprite dimensions
+                // Set the collider bounds based on position from transform and sprite dimensions.
                 colliderBounds = new Rectangle(
                     (int)colliderTransform.Position.X,
                     (int)colliderTransform.Position.Y,
@@ -55,13 +53,14 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            { 
+            {
                 // Draws a rectangle to represent collider bounds.
                 spriteBatch.Draw(
-                    Game1.whitePixel,  // Reuse pixel texture to draw.
+                    GameManager.whitePixel,  // Reuse the white pixel texture to draw collider bounds.
                     colliderBounds,
-                    Color.Red * 0.5f // Red, semi-transparent for visibility of collider.
-                );
+                    Color.Transparent
+                // Color.Red * 0.5f // Semi-Transparent, for collider visibility.
+                ); 
             }
         }
 

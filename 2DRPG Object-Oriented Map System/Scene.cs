@@ -11,8 +11,12 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class Scene
 {
-        public GameObject Player { get; set; }
-        public GameObject Tilemap { get; set; }
+        /// <summary>
+        /// Read only properties for player and tilemap, the property can only be modified from within the class. 
+        /// </summary>
+        public GameObject Player { get; private set; }
+
+        public GameObject Tilemap { get; private set; }
 
         /// <summary>
         /// Initializes the scene with the player and tilemap.
@@ -35,11 +39,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             Transition(mapManager);
         }
-        /// <summary>
-        /// Handles transitioning to the next scene.
-        /// </summary>
-        /// <param name="mapManager"></param>
-        public void Transition(MapManager mapManager)
+
+        private void Transition(MapManager mapManager)
         {
             // Transition to next scene, replacing tilemap.
             mapManager.NextMap();

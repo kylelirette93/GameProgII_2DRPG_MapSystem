@@ -14,17 +14,22 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// List of tiles that make up a map.
         /// </summary>
-        public Tile[,] Tiles { get; set; }
+        public Tile[,] Tiles { get { return _tiles; } set { _tiles = value; } }
+        private Tile[,] _tiles;
+
+        private int _tileWidth = 32;
+        private int _tileHeight = 32;
         /// <summary>
         /// Tile width.
         /// </summary>
-        public int TileWidth { get; private set; } = 32;
+        public int TileWidth { get { return _tileWidth; } }
         /// <summary>
         /// Tile height.
         /// </summary>
-        public int TileHeight { get; private set; } = 32;
+        public int TileHeight { get { return _tileHeight; } }
         private Vector2 lastExitTile;
-        public Vector2 LastExitTile { get; set; }
+        public Vector2 LastExitTile { get { return _lastExitTile; } set { _lastExitTile = value; } }
+        private Vector2 _lastExitTile;
 
         private Dictionary<Char, Tile> tileMappings;
         int exitX;
@@ -72,14 +77,14 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            for (int x = 0; x < Tiles.GetLength(0); x++)
+            for (int x = 0; x <_tiles.GetLength(0); x++)
             {
-                for (int y = 0; y < Tiles.GetLength(1); y++)
+                for (int y = 0; y < _tiles.GetLength(1); y++)
                 {
-                    if (Tiles[x, y] != null)
+                    if (_tiles[x, y] != null)
                     {
-                        Tile tile = Tiles[x, y];
-                        Vector2 position = new Vector2(x * TileWidth, y * TileHeight);
+                        Tile tile = _tiles[x, y];
+                        Vector2 position = new Vector2(x * _tileWidth, y * _tileHeight);
                         tile.Draw(spriteBatch, position);
                     }
                 }
@@ -105,7 +110,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     char symbol = lines[y][x];
                     if (symbol == 'P')
                     {
-                        return new Vector2(x * TileWidth, y * TileHeight);
+                        return new Vector2(x * _tileWidth, y * _tileHeight);
                     }
                 }
             }
@@ -119,18 +124,18 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="height"></param>
         public void GenerateProceduralMap(int width, int height)
         {
-            Tiles = new Tile[width, height];
+            _tiles = new Tile[width, height];
 
             // Initialize all tiles to ground
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Tiles[x, y] = new Tile
+                    _tiles[x, y] = new Tile
                     {
                         IsWalkable = true,
                         Texture = SpriteManager.GetTexture("ground_tile"),
-                        SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight)
+                        SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight)
                     };
                 }
             }
@@ -142,51 +147,51 @@ namespace _2DRPG_Object_Oriented_Map_System
                 {
                     if (x == 0 && y == 0) // Top-left
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("top_west_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("top_west_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (x == width - 1 && y == 0) // Top-right
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("top_east_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("top_east_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (x == 0 && y == height - 1) // Bottom-left
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("bottom_west_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("bottom_west_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (x == width - 1 && y == height - 1) // Bottom-right
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("bottom_east_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("bottom_east_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (x == 0) // West wall
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("west_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("west_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (x == width - 1) // East wall
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("east_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("east_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (y == 0) // North wall
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("north_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("north_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                     else if (y == height - 1) // South wall
                     {
-                        Tiles[x, y].Texture = SpriteManager.GetTexture("south_wall");
-                        Tiles[x, y].IsWalkable = false;
+                        _tiles[x, y].Texture = SpriteManager.GetTexture("south_wall");
+                        _tiles[x, y].IsWalkable = false;
                     }
                 }
             }
             exitX = random.Next(4, width - 4);
             exitY = random.Next(4, height - 4);
-            Tiles[exitX, exitY].Texture = SpriteManager.GetTexture("exit_tile");
-            Tiles[exitX, exitY].IsExit = true;
-            LastExitTile = new Vector2(exitX * TileWidth, exitY * TileHeight);
+            _tiles[exitX, exitY].Texture = SpriteManager.GetTexture("exit_tile");
+            _tiles[exitX, exitY].IsExit = true;
+            LastExitTile = new Vector2(exitX * _tileWidth, exitY * _tileHeight);
         }
 
         /// <summary>
@@ -198,7 +203,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             string[] lines = File.ReadAllLines(filePath);
             int width = lines[0].Length;
             int height = lines.Length;
-            Tiles = new Tile[width, height];
+            _tiles = new Tile[width, height];
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -209,7 +214,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     {
                         LastExitTile = new Vector2(x * TileWidth, y * TileHeight);
                     }
-                    Tiles[x, y] = CreateTileFromSymbol(symbol);
+                    _tiles[x, y] = CreateTileFromSymbol(symbol);
                 }
             }
         }

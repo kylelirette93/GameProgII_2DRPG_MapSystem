@@ -28,7 +28,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             tilemapObject.AddComponent(new Transform());
             return tilemapObject;
         }
-        // To use for procedural generation only.
+        // To use for procedural generation.
         public static GameObject GenerateTilemap()
         {
             Tilemap tilemap = new Tilemap();
