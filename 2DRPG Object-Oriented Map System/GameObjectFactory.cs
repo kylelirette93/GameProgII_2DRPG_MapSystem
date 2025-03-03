@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -49,6 +50,16 @@ namespace _2DRPG_Object_Oriented_Map_System
             tilemapObject.AddComponent(new Transform());
             tilemap.GenerateProceduralMap(15, 10);
             return tilemapObject;
+        }
+
+        public static GameObject CreateExit(MapManager mapManager)
+        {
+            GameObject exit = new GameObject("exit");
+            exit.AddComponent(new Transform());
+            exit.AddComponent(new Sprite(SpriteManager.GetTexture("exit_tile")));
+            exit.AddComponent(new Collider(exit.GetComponent<Sprite>().SpriteBounds));
+            mapManager.SpawnPoint = exit.GetComponent<Transform>().Position;
+            return exit;
         }
     }
 }

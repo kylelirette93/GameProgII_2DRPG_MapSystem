@@ -12,6 +12,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// IsTrigger is a boolean that checks if a collider is a trigger or not.
         /// </summary>
         public bool IsTrigger { get; set; }
+        public Rectangle Bounds { get { return colliderBounds; } }
         private Rectangle colliderBounds;
         Transform colliderTransform;
         Sprite colliderSprite;

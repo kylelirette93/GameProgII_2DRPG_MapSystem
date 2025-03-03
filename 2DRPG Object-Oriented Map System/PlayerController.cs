@@ -76,6 +76,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         private bool CanMoveTo(Vector2 newPosition)
         {
+            if (ObjectManager.Find("player").GetComponent<Collider>().Bounds.Intersects(ObjectManager.Find("exit").GetComponent<Collider>().Bounds))
+            {
+                OnExitTile?.Invoke();
+            }
             tilemap = ObjectManager.Find("tilemap")?.GetComponent<Tilemap>();
      
             if (tilemap != null)

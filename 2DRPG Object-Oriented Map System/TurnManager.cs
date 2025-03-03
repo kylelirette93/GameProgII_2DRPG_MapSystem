@@ -11,7 +11,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     {
         private static Queue<TurnComponent> _turnQueue = new Queue<TurnComponent>();
         private static bool _isTurnInProgress = false;
-        private static int _turnDelayMilliseconds = 100;
+        private static int _turnDelayMilliseconds = 0;
 
 
         public static void PopulateQueue()

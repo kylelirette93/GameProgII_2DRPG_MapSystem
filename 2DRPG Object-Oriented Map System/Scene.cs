@@ -23,6 +23,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public GameObject Tilemap { get; private set; }
 
+        public GameObject Exit { get; private set; }
+
         /// <summary>
         /// Initializes the scene with the player and tilemap.
         /// </summary>
@@ -34,6 +36,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             Player = GameObjectFactory.CreatePlayer(mapManager);
             Enemy = GameObjectFactory.CreateEnemy(mapManager, "enemy");
             Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
+            Exit = GameObjectFactory.CreateExit(mapManager);
             // Wrapper function to pass map manager argument to the event handler.
             Player.GetComponent<PlayerController>().OnExitTile += () => HandleExitTile(mapManager);
 
@@ -42,6 +45,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.AddGameObject(Player);
             ObjectManager.AddGameObject(Enemy);
             ObjectManager.AddGameObject(Enemy2);
+            ObjectManager.AddGameObject(Exit);
             TurnManager.StartTurnCycle();
         }
 

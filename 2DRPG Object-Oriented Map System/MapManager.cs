@@ -10,7 +10,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class MapManager
 {
-        public Vector2 SpawnPoint { get; private set; }
+        public Vector2 SpawnPoint { get; set; }
         private List<string> _levelPaths;
         private int _currentLevelIndex;
         private Tilemap _currentMap;

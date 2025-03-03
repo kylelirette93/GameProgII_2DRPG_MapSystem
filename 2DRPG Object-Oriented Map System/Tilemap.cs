@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -170,6 +171,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             _tiles[exitX, exitY].Texture = SpriteManager.GetTexture("exit_tile");
             _tiles[exitX, exitY].IsExit = true;
             LastExitTile = new Vector2(exitX * _tileWidth, exitY * _tileHeight);
+            Debug.WriteLine(LastExitTile);
 
             // Randomly seed obstacles.
             float obstacleChance = 0.35f;
@@ -177,7 +179,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 for (int y = 1; y < height - 1; y++)
                 {
-                    if (random.NextDouble() < obstacleChance && (x != LastExitTile.X || y != LastExitTile.Y))
+                    if (random.NextDouble() < obstacleChance && (x != (int)LastExitTile.X || y != (int)LastExitTile.Y))
                     {                     
                         _tiles[x, y].Texture = SpriteManager.GetTexture("obstacle_tile");
                         _tiles[x, y].IsWalkable = false;
@@ -205,7 +207,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 _tiles = tempTiles;
             }
-            EnsurePathToExit(exitX, exitY);
+            
 
         }
         // Helper to set a wall tile
@@ -240,50 +242,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
             return count;
-        }
-
-        private void EnsurePathToExit(int exitX, int exitY)
-        {
-            bool[,] visited = new bool[_tiles.GetLength(0), _tiles.GetLength(1)];
-            Queue<Point> queue = new Queue<Point>();
-            queue.Enqueue(new Point(1, 1));
-
-            while (queue.Count > 0)
-            {
-                Point p = queue.Dequeue();
-                int x = p.X, y = p.Y;
-
-                if (visited[x, y] || !_tiles[x, y].IsWalkable) continue;
-                visited[x, y] = true;
-
-                if (x == exitX && y == exitY) return; // Path found!
-
-                // Enqueue valid neighbors
-                if (x > 1) queue.Enqueue(new Point(x - 1, y));
-                if (x < _tiles.GetLength(0) - 2) queue.Enqueue(new Point(x + 1, y));
-                if (y > 1) queue.Enqueue(new Point(x, y - 1));
-                if (y < _tiles.GetLength(1) - 2) queue.Enqueue(new Point(x, y + 1));
-            }
-
-            // If no path was found, clear obstacles along a simple path
-            CreatePathToExit(exitX, exitY);
-        }
-
-        private void CreatePathToExit(int exitX, int exitY)
-        {
-            int x = 1, y = 1;
-
-            while (x != exitX || y != exitY)
-            {
-                _tiles[x, y].Texture = SpriteManager.GetTexture("ground_tile");
-                _tiles[x, y].IsWalkable = true;
-
-                if (x < exitX) x++;
-                else if (x > exitX) x--;
-
-                if (y < exitY) y++;
-                else if (y > exitY) y--;
-            }
         }
 
         /// <summary>
