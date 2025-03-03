@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Read only properties for player and tilemap, the property can only be modified from within the class. 
         /// </summary>
+        
         public GameObject Player { get; private set; }
+
+        public GameObject Enemy { get; private set; }
+        public GameObject Enemy2 { get; private set; }
 
         public GameObject Tilemap { get; private set; }
 
@@ -27,12 +32,17 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Create the player and tilemap.
             Tilemap = GameObjectFactory.CreateTilemap(mapManager);
             Player = GameObjectFactory.CreatePlayer(mapManager);
+            Enemy = GameObjectFactory.CreateEnemy(mapManager, "enemy");
+            Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
             // Wrapper function to pass map manager argument to the event handler.
             Player.GetComponent<PlayerController>().OnExitTile += () => HandleExitTile(mapManager);
 
             // Add the player and tilemap to the game manager.
             ObjectManager.AddGameObject(Tilemap);
             ObjectManager.AddGameObject(Player);
+            ObjectManager.AddGameObject(Enemy);
+            ObjectManager.AddGameObject(Enemy2);
+            TurnManager.StartTurnCycle();
         }
 
         private void HandleExitTile(MapManager mapManager)

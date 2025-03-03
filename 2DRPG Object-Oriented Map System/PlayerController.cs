@@ -11,7 +11,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Player Controller is a component that handles player input and movement.
     /// </summary>
-    public class PlayerController : Component
+    public class PlayerController : TurnComponent
     {
         /// <summary>
         /// Event for when the player reaches the exit tile.
@@ -22,6 +22,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private KeyboardState previousState;
         private KeyboardState currentState;
         private Tilemap tilemap;
+        bool isTurn = false;
 
         /// <summary>
         /// Initializes the previous state of the keyboard.
@@ -40,8 +41,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 player = ObjectManager.Find("player");
             }
-
-            if (player != null)
+            if (isTurn)
             {
                 HandleInput();
             }
@@ -53,7 +53,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             Vector2 movement = Vector2.Zero;
             // Update the current state of the keyboard.
             currentState = Keyboard.GetState();
-
             // Compare the current state with the previous state to check for key presses.
             if (currentState.IsKeyDown(Keys.W) && !previousState.IsKeyDown(Keys.W)) movement.Y -= 16;
             if (currentState.IsKeyDown(Keys.S) && !previousState.IsKeyDown(Keys.S)) movement.Y += 16;
@@ -67,13 +66,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                 if (CanMoveTo(newPosition))
                 {
                     player.GetComponent<Transform>()?.Translate(movement);
+                    isTurn = false;
+                    TurnManager.EndTurn();
                 }
             }
 
             // Assign the current state to the previous state, this is used to check for key presses.
             previousState = currentState;
         }
-
         private bool CanMoveTo(Vector2 newPosition)
         {
             tilemap = ObjectManager.Find("tilemap")?.GetComponent<Tilemap>();
@@ -97,6 +97,11 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
             return false;
+        }
+
+        public override void TakeTurn()
+        {
+            isTurn = true;
         }
     }
 }

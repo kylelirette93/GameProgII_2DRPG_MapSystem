@@ -48,4 +48,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    public abstract class TurnComponent : Component
+    {
+        public abstract void TakeTurn();
+    }
+
 }

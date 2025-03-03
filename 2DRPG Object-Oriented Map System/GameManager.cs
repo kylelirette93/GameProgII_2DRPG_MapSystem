@@ -29,6 +29,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         protected override void Initialize()
         {
+            _graphics.PreferredBackBufferWidth = 800;  // Set custom width
+            _graphics.PreferredBackBufferHeight = 480;  // Set custom height
+            _graphics.ApplyChanges();  // Apply the changes
+
             base.Initialize();
             InitializeLevel();
         }

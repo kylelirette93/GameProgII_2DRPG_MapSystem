@@ -16,6 +16,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Tilemap _currentMap;
         private Vector2 _lastExitTile;
 
+        public int MapHeight { get { return _mapHeight; } }
+        private int _mapHeight = 25;
+
+        public int MapWidth { get { return _mapWidth; } }
+        private int _mapWidth = 15;
+
         /// <summary>
         /// Initializes the map manager, loads map files and sets current level index.
         /// </summary>
@@ -69,12 +75,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             else
             {           
-                _currentMap.GenerateProceduralMap(25, 15);
+                _currentMap.GenerateProceduralMap(_mapHeight, _mapWidth);
                 SpawnPoint = _lastExitTile;
                 _lastExitTile = _currentMap.LastExitTile;
             }
             return _currentMap;
         }
+
+        public Vector2 FindEnemySpawn(string name)
+        {
+            if (_currentMap != null)
+            {
+                return _currentMap.FindEnemySpawn(name);
+            }
+            return Vector2.Zero;
+        }
+
         /// <summary>
         /// Set Player Start Position method sets the player's position to the spawn point.
         /// </summary>

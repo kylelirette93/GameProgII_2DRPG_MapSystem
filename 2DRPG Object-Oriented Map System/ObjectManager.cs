@@ -18,7 +18,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="obj"></param>
         public static void AddGameObject(GameObject obj)
         {
-            gameObjects.Add(obj);
+            if (!gameObjects.Contains(obj))
+            {
+                gameObjects.Add(obj);
+            }
         }
         /// <summary>
         /// Find game object by tag.
@@ -28,6 +31,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         public static GameObject Find(string tag)
         {
             return gameObjects.FirstOrDefault(obj => obj.Tag == tag);
+        }
+
+        public static Queue<TurnComponent> ReturnAll()
+        {
+            return new Queue<TurnComponent>(
+                gameObjects
+                    .Select(obj => obj.GetComponent<TurnComponent>()) // Get TurnComponent from each object
+                    .Where(tc => tc != null) // Ensure only valid components are added
+                    .Distinct()
+            );
         }
 
         /// <summary>
