@@ -13,6 +13,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Vector2 SpawnPoint { get; set; }
         private List<string> _levelPaths;
         private int _currentLevelIndex;
+        public Tilemap CurrentMap { get { return _currentMap; } }
         private Tilemap _currentMap;
         private Vector2 _lastExitTile;
 
@@ -21,6 +22,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public int MapWidth { get { return _mapWidth; } }
         private int _mapWidth = 15;
+        private Random _random = new Random();
 
         /// <summary>
         /// Initializes the map manager, loads map files and sets current level index.
@@ -70,14 +72,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (_currentLevelIndex < _levelPaths.Count)
             {
                 _currentMap.LoadFromFile(_levelPaths[_currentLevelIndex]);
-                SpawnPoint = _currentMap.FindSpawnPoint(_levelPaths[_currentLevelIndex]);
-                _lastExitTile = _currentMap.LastExitTile;
             }
             else
             {           
                 _currentMap.GenerateProceduralMap(_mapHeight, _mapWidth);
-                SpawnPoint = _lastExitTile;
-                _lastExitTile = _currentMap.LastExitTile;
             }
             return _currentMap;
         }
@@ -91,13 +89,14 @@ namespace _2DRPG_Object_Oriented_Map_System
             return Vector2.Zero;
         }
 
+
         /// <summary>
         /// Set Player Start Position method sets the player's position to the spawn point.
         /// </summary>
         /// <param name="player"></param>
-        public void SetPlayerStartPosition(GameObject player)
+        public void SetPlayerStartPosition(GameObject player, GameObject previousExit)
         {
-           player.GetComponent<Transform>().Position = SpawnPoint;
+           player.GetComponent<Transform>().Position = previousExit.GetComponent<Transform>().Position;
         }
 }
 }

@@ -9,9 +9,10 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public static class TurnManager
     {
+        public static Queue<TurnComponent> TurnQueue { get { return _turnQueue; } }
         private static Queue<TurnComponent> _turnQueue = new Queue<TurnComponent>();
         private static bool _isTurnInProgress = false;
-        private static int _turnDelayMilliseconds = 0;
+        private static int _turnDelayMilliseconds = 100;
 
 
         public static void PopulateQueue()
@@ -23,7 +24,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (_turnQueue.Count == 0)
             {
-               PopulateQueue();
+                PopulateQueue();
             }
             NextTurn();
         }
@@ -52,8 +53,18 @@ namespace _2DRPG_Object_Oriented_Map_System
                 NextTurn();
             }
         }
+        public static void DequeueParticipant(TurnComponent participant)
+        {
+            if (participant == null || _turnQueue == null)
+            {
+                return; // Handle null cases.
+            }
+
+            // Create a new queue without the participant.
+            _turnQueue = new Queue<TurnComponent>(_turnQueue.Where(p => p != participant));
+        }
+
     }
 }
 
-
-
+  

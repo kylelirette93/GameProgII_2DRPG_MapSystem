@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -16,10 +12,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             GameObject player = new GameObject("player");
             player.AddComponent(new Transform());
-            player.GetComponent<Transform>().Position = mapManager.SpawnPoint;
             player.AddComponent(new Sprite(SpriteManager.GetTexture("player")));
             player.AddComponent(new Collider(player.GetComponent<Sprite>().SpriteBounds));
             player.AddComponent(new PlayerController());
+            player.AddComponent(new HealthComponent(100));
             return player;
         }
         public static GameObject CreateTilemap(MapManager mapManager)
@@ -39,6 +35,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             enemy.AddComponent(new Sprite(SpriteManager.GetTexture("enemy")));
             enemy.AddComponent(new Collider(enemy.GetComponent<Sprite>().SpriteBounds));
             enemy.AddComponent(new EnemyAI(name));
+            enemy.AddComponent(new HealthComponent(40));
+            Debug.WriteLine("Created enemy: " + name + "Turn Component: " + enemy.GetComponent<EnemyAI>());
             return enemy;
         }
         // To use for procedural generation.
@@ -52,13 +50,14 @@ namespace _2DRPG_Object_Oriented_Map_System
             return tilemapObject;
         }
 
-        public static GameObject CreateExit(MapManager mapManager)
+        public static GameObject CreateExit(MapManager mapManager, Vector2 playerPosition, float minDistance)
         {
+            Vector2 exitPosition = mapManager.CurrentMap.FindExitSpawn(playerPosition, minDistance);
             GameObject exit = new GameObject("exit");
             exit.AddComponent(new Transform());
+            exit.GetComponent<Transform>().Position = exitPosition;
             exit.AddComponent(new Sprite(SpriteManager.GetTexture("exit_tile")));
             exit.AddComponent(new Collider(exit.GetComponent<Sprite>().SpriteBounds));
-            mapManager.SpawnPoint = exit.GetComponent<Transform>().Position;
             return exit;
         }
     }

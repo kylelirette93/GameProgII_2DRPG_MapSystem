@@ -11,11 +11,13 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class Sprite : DrawableComponent
 {
         private Texture2D _texture;
-        public Texture2D Texture { get { return _texture; } }
+        public Texture2D Texture { get { return _texture; } set { _texture = value; } }
         private Vector2 _position;
         public Vector2 Position { get { return _position; } set { _position = value; } }
         public Rectangle SpriteBounds { get { return _spriteBounds; } set { _spriteBounds = value; } }
         private Rectangle _spriteBounds;
+        public Color Color { get { return _color; } set { _color = value; } }
+        private Color _color = Color.White;
         
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void Draw(SpriteBatch spriteBatch)
         {
             // Draw the sprite at the object's position.
-            spriteBatch.Draw(_texture, _position, null, Color.White);
+            spriteBatch.Draw(_texture, _position, null, _color);
         }     
 }
 }

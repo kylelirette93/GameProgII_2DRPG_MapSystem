@@ -21,6 +21,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         private int _tileWidth = 32;
         private int _tileHeight = 32;
 
+        private int _mapWidth;
+        private int _mapHeight;
+
         /// <summary>
         /// Tile width.
         /// </summary>
@@ -29,13 +32,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Tile height.
         /// </summary>
         public int TileHeight { get { return _tileHeight; } }
-        private Vector2 lastExitTile;
         public Vector2 LastExitTile { get { return _lastExitTile; } set { _lastExitTile = value; } }
         private Vector2 _lastExitTile;
 
         private Dictionary<Char, Tile> tileMappings;
-        int exitX;
-        int exitY;
+
         Random random = new Random();
 
         /// <summary>
@@ -92,32 +93,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
-       
-
-        /// <summary>
-        /// Iterates through the map file to find the spawn point.
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public Vector2 FindSpawnPoint(string filePath)
-        {
-            string[] lines = File.ReadAllLines(filePath);
-            int width = lines[0].Length;
-            int height = lines.Length;
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    char symbol = lines[y][x];
-                    if (symbol == 'P')
-                    {
-                        return new Vector2(x * _tileWidth, y * _tileHeight);
-                    }
-                }
-            }
-            throw new Exception("Spawn point 'P' not found in map file.");
-        }
 
         /// <summary>
         /// Generate's a procedural map based on the width and height and tile rules.
@@ -127,6 +102,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void GenerateProceduralMap(int width, int height)
         {
             _tiles = new Tile[width, height];
+            _mapWidth = width;
+            _mapHeight = height;
             Random random = new Random();          
 
             // Initialize all tiles to ground
@@ -166,21 +143,24 @@ namespace _2DRPG_Object_Oriented_Map_System
                         SetWall(x, y, "south_wall");
                 }
             }
-            exitX = random.Next(4, width - 4);
-            exitY = random.Next(4, height - 4);
-            _tiles[exitX, exitY].Texture = SpriteManager.GetTexture("exit_tile");
-            _tiles[exitX, exitY].IsExit = true;
-            LastExitTile = new Vector2(exitX * _tileWidth, exitY * _tileHeight);
-            Debug.WriteLine(LastExitTile);
+
 
             // Randomly seed obstacles.
-            float obstacleChance = 0.35f;
+            float baseObstacleChance = 0.35f;
+            Vector2 center = new Vector2(width / 2f, height / 2f);
+            float maxDistance = Vector2.Distance(center, new Vector2(0, 0));
             for (int x = 1; x < width - 1; x++)
             {
                 for (int y = 1; y < height - 1; y++)
                 {
+                    Vector2 tilePos = new Vector2(x, y);
+                    float distance = Vector2.Distance(center, tilePos);
+                    float weight = 1 - (distance / maxDistance); // Weight closer to center.
+
+                    float obstacleChance = baseObstacleChance * weight; // Weighted chance.
+
                     if (random.NextDouble() < obstacleChance && (x != (int)LastExitTile.X || y != (int)LastExitTile.Y))
-                    {                     
+                    {
                         _tiles[x, y].Texture = SpriteManager.GetTexture("obstacle_tile");
                         _tiles[x, y].IsWalkable = false;
                     }
@@ -193,9 +173,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 Tile[,] tempTiles = (Tile[,])_tiles.Clone();
 
-                for (int x = 1; x < width - 1; x++)
+                for (int x = 1; x < width - 2; x++)
                 {
-                    for (int y = 1; y < height - 1; y++)
+                    for (int y = 1; y < height - 2; y++)
                     {
                         int neighbourCount = CountObstacleNeighbors(x, y);
 
@@ -207,9 +187,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 _tiles = tempTiles;
             }
-            
-
         }
+
         // Helper to set a wall tile
         private void SetWall(int x, int y, string texture)
         {
@@ -220,6 +199,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         // Helper to set an obstacle tile
         private void SetObstacle(Tile[,] map, int x, int y)
         {
+            // Check if obstacle is not on the last exit tile.
+            if (x == (int)LastExitTile.X && y == (int)LastExitTile.Y)
+            {
+                return;
+            }
+      
             map[x, y].Texture = SpriteManager.GetTexture("obstacle_tile");
             map[x, y].IsWalkable = false;
         }
@@ -244,6 +229,87 @@ namespace _2DRPG_Object_Oriented_Map_System
             return count;
         }
 
+        public void SetTile(int x, int y, Tile tile)
+        {
+            if (x >= 0 && x < _tiles.GetLength(0) && y >= 0 && y < _tiles.GetLength(1))
+            {
+                _tiles[x, y] = tile;
+            }
+            else
+            {
+                Debug.WriteLine($"Warning: SetTile called with out-of-bounds coordinates: x={x}, y={y}");
+            }
+        }
+
+        public void ClearPathToExit(Point playerPosition, Point exitPosition)
+        {
+            int width = _tiles.GetLength(0);
+            int height = _tiles.GetLength(1);
+
+            Point current = playerPosition;
+            Point target = exitPosition;
+
+            SetTile(current.X, current.Y, new Tile
+            {
+                IsWalkable = true,
+                Texture = SpriteManager.GetTexture("ground_tile"),
+                SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight)
+            });
+
+            while (current != target)
+            {
+               // Debug.WriteLine($"  Before: current={current}, target={target}");
+
+                int nextX = current.X;
+                int nextY = current.Y;
+
+                if (current.X < target.X)
+                    nextX++;
+                else if (current.X > target.X)
+                    nextX--;
+                else if (current.Y < target.Y)
+                    nextY++;
+                else if (current.Y > target.Y)
+                    nextY--;
+
+                if (nextX >= 0 && nextX < width && nextY >= 0 && nextY < height)
+                {
+                    current.X = nextX;
+                    current.Y = nextY;
+
+                    // Debug.WriteLine($"  After: current={current}, target={target}");
+
+                    SetTile(current.X, current.Y, new Tile
+                    {
+                        IsWalkable = true,
+                        Texture = SpriteManager.GetTexture("ground_tile"),
+                        SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight)
+                    });
+                }
+                else
+                {
+                    // Debug.WriteLine("Path went out of bounds!");
+                    break;
+                }
+            }
+        }
+
+        public Vector2 FindExitSpawn(Vector2 playerPosition, float minDistance)
+        {
+            Vector2 exitPosition;
+            do
+            {
+                // Generate random coordinates within the map bounds, excluding the edges.
+                exitPosition = new Vector2(
+                    random.Next(2, _mapWidth - 2) * 32,
+                    random.Next(2, _mapHeight - 2) * 32
+                );
+                // Debug.WriteLine($"FindExitSpawn: generated exitPosition={exitPosition}");
+            } while (Vector2.Distance(exitPosition, playerPosition) < minDistance);
+
+            return exitPosition;
+        }
+
         /// <summary>
         /// Load's a map from a file based on the file path.
         /// </summary>
@@ -253,32 +319,32 @@ namespace _2DRPG_Object_Oriented_Map_System
             string[] lines = File.ReadAllLines(filePath);
             int width = lines[0].Length;
             int height = lines.Length;
+            _mapWidth = width;
+            _mapHeight = height;
             _tiles = new Tile[width, height];
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     char symbol = lines[y][x];
-                    // Store the last exit tile.
-                    if (symbol == 'X')
-                    {
-                        LastExitTile = new Vector2(x * TileWidth, y * TileHeight);
-                    }
                     _tiles[x, y] = CreateTileFromSymbol(symbol);
                 }
             }
         }
+
         public Vector2 FindEnemySpawn(string name)
         {
             for (int x = 0; x < _tiles.GetLength(0); x++)
             {
                 for (int y = 0; y < _tiles.GetLength(1); y++)
                 {
-                    if (_tiles[x, y].IsWalkable)
-                    {
-                        return new Vector2(x * _tileWidth, y * _tileHeight);
-                    }
-                }              
+                    // Check if tile is walkable and certain distance from player.
+                        if (_tiles[x, y].IsWalkable)
+                        {
+                            return new Vector2(x * _tileWidth, y * _tileHeight);
+                        }
+                    
+                }          
             }
             return Vector2.Zero;
         }

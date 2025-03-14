@@ -12,9 +12,9 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
         // Auto-implemented transform.
         public Vector2 Position { get { return _position; } set { _position = value; } }
-        private Vector2 _position = new Vector2(200, 200);
+        private Vector2 _position = new Vector2(256, 256);
         // Currently not using rotation for anything, but I can in the future.
-        public float Rotation { get { return _rotation; } }
+        public float Rotation { get { return _rotation; } set { _rotation = value; } }
         private float _rotation = 0f;
 
         public Vector2 Scale { get { return _scale; } }

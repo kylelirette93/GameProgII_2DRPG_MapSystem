@@ -16,10 +16,13 @@
     <None Remove="Content\bin\DesktopGL\Level0.txt" />
     <None Remove="Content\bin\DesktopGL\Level1.txt" />
     <None Remove="Content\Content.mgcb" />
+    <None Remove="Content\enemy.png" />
+    <None Remove="Content\enemy_stunned.png" />
     <None Remove="Content\Level0.txt" />
     <None Remove="Content\Level1.txt" />
     <None Remove="Content\Level2.txt" />
     <None Remove="Content\obstacle_tile.png" />
+    <None Remove="Content\player.png" />
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
   </ItemGroup>
@@ -33,7 +36,16 @@
     <Content Include="Content\bin\DesktopGL\Level1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\enemy_stunned.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\obstacle_tile.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\player.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

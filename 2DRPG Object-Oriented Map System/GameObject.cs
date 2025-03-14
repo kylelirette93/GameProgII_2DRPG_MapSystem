@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -87,6 +89,24 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 component.Update();
             }
+        }
+
+        public void Destroy()
+        {
+            TurnComponent turnComponentInstance = GetComponent<TurnComponent>();
+            if (turnComponentInstance != null)
+            {
+                Debug.WriteLine($"Retrieved component: {turnComponentInstance.GetType().Name}");
+                TurnManager.DequeueParticipant(turnComponentInstance);
+            }
+
+            // Destroy all components.
+            while (components.Count > 0)
+            {
+                RemoveComponent<Component>();
+            }
+
+            ObjectManager.RemoveGameObject(this);
         }
 
         /// <summary>
