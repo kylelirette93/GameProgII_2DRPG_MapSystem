@@ -58,6 +58,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 { 'E', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { 'W', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { 'P', new Tile { IsWalkable = true, Texture = AssetManager.GetTexture("spawn_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'O', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("obstacle_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { 'X', new Tile { IsExit = true, Texture = AssetManager.GetTexture("exit_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { '1', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("top_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
                 { '2', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("top_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
