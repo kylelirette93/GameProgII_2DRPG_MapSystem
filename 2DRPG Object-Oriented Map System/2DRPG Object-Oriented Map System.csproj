@@ -17,14 +17,24 @@
     <None Remove="Content\bin\DesktopGL\Level1.txt" />
     <None Remove="Content\Content.mgcb" />
     <None Remove="Content\enemy.png" />
-    <None Remove="Content\enemy_stunned.png" />
+    <None Remove="Content\enemy_hurt.png" />
+    <None Remove="Content\font.spritefont" />
     <None Remove="Content\Level0.txt" />
     <None Remove="Content\Level1.txt" />
     <None Remove="Content\Level2.txt" />
+    <None Remove="Content\mapMusic.wav" />
     <None Remove="Content\obstacle_tile.png" />
     <None Remove="Content\player.png" />
+    <None Remove="Content\player_hurt.png" />
+    <None Remove="Content\turn_arrow.png" />
+    <None Remove="Content\turn_arrow_point.png" />
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\mapMusic.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.manifest">
@@ -39,13 +49,25 @@
     <Content Include="Content\enemy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\enemy_stunned.png">
+    <Content Include="Content\enemy_hurt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\font.spritefont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\obstacle_tile.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\player.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\player_hurt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\turn_arrow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\turn_arrow_point.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

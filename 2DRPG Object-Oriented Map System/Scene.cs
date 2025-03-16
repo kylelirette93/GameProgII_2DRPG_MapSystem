@@ -22,6 +22,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public GameObject Exit { get; private set; }
 
+        public GameObject TurnArrow { get; private set; }
+
 
         /// <summary>
         /// Initializes the scene with the player and tilemap.
@@ -52,9 +54,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             Player.GetComponent<PlayerController>().OnExitTile += () => HandleExitTile(mapManager);
             Tilemap.GetComponent<Tilemap>().LastExitTile = Exit.GetComponent<Transform>().Position;
 
+            TurnArrow = GameObjectFactory.CreateTurnArrow();
+            ObjectManager.AddGameObject(TurnArrow);
+
             // 6. Update Object Manager and start turn cycle.
             ObjectManager.UpdateAll();
             TurnManager.StartTurnCycle();
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            if (Player.GetComponent<PlayerController>().IsTurn)  
+            TurnArrow.GetComponent<Transform>().Position = Player.GetComponent<Transform>().Position + new Vector2(1, -32);
+            else
+            {
+                TurnArrow.GetComponent<Transform>().Position = new Vector2(-100, -100);
+            }
         }
 
         private void HandleExitTile(MapManager mapManager)
@@ -68,18 +83,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             mapManager.NextMap();
             Tilemap.RemoveComponent<Tilemap>();
             Tilemap.AddComponent(mapManager.CreateMap());
-
+            Tilemap.GetComponent<Tilemap>().LastExitTile = Exit.GetComponent<Transform>().Position;
             Debug.WriteLine("Before enemy creation.");
             Enemy = GameObjectFactory.CreateEnemy(mapManager, "enemy");
-            Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
-            Debug.WriteLine("After enemy creation.");
-
             ObjectManager.AddGameObject(Enemy);
-            // Debug.WriteLine("Enemy added.");
+            Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
             ObjectManager.AddGameObject(Enemy2);
-            // Debug.WriteLine("Enemy2 added.");
-
-            // Create the new exit first
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 

@@ -25,7 +25,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (!gameObjects.Contains(obj) && !toAdd.Contains(obj))
             {
                 toAdd.Add(obj);
-                Debug.WriteLine("Adding game object: " + obj.Tag);
+                // Debug.WriteLine("Adding game object: " + obj.Tag);
             }
         }
 
@@ -36,7 +36,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
         /// <summary>
-        /// Find game object by tag.
+        /// Find method find's a game object by tag assigned to it.
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
@@ -45,11 +45,20 @@ namespace _2DRPG_Object_Oriented_Map_System
             return gameObjects.FirstOrDefault(obj => obj.Tag == tag);
         }
 
+        /// <summary>
+        /// Find All Objects By Tag method find's all game objects by tag prefix.
+        /// </summary>
+        /// <param name="tagPrefix"></param>
+        /// <returns></returns>
         public static List<GameObject> FindAllObjectsByTag(string tagPrefix)
         {
             return gameObjects.Where(obj => obj.Tag.StartsWith(tagPrefix)).ToList();
         }
 
+        /// <summary>
+        /// This method returns all game objects that have a TurnComponent.
+        /// </summary>
+        /// <returns></returns>
         public static Queue<TurnComponent> ReturnAll()
         {
             var turnComponentQueue = new Queue<TurnComponent>(
@@ -69,6 +78,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             return turnComponentQueue;
         }
 
+        /// <summary>
+        /// Find all game objects and return a list of them.
+        /// </summary>
+        /// <returns></returns>
         public static List<GameObject> FindAll()
         {
             return gameObjects;
@@ -79,7 +92,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public static void UpdateAll()
         {
-            // Remove objects
+            // Remove objects first.
             foreach (var obj in toRemove)
             {
                 if (obj != null && gameObjects.Contains(obj))
@@ -90,7 +103,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             toRemove.Clear();
 
-            // Add objects
+            // Add objects to a list of objects to update.
             foreach (var obj in toAdd)
             {
                 if (obj != null && !gameObjects.Contains(obj))
@@ -101,8 +114,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             toAdd.Clear();
 
-            // Iterate over a copy for updating
-            var gameObjectsCopy = new List<GameObject>(gameObjects); // Create a copy
+            // Iterate over a copy for updating.
+            var gameObjectsCopy = new List<GameObject>(gameObjects); 
             //Debug.WriteLine($"gameObjects count: {gameObjects.Count}");
             foreach (var obj in gameObjectsCopy)
             {

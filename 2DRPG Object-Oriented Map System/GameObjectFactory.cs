@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Diagnostics;
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -12,10 +13,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             GameObject player = new GameObject("player");
             player.AddComponent(new Transform());
-            player.AddComponent(new Sprite(SpriteManager.GetTexture("player")));
+            player.AddComponent(new Sprite(AssetManager.GetTexture("player")));
             player.AddComponent(new Collider(player.GetComponent<Sprite>().SpriteBounds));
-            player.AddComponent(new PlayerController());
-            player.AddComponent(new HealthComponent(100));
+            player.AddComponent(new PlayerController("Player"));
+            TurnManager.SubscribeToDestroy(player);
+            player.AddComponent(new HealthComponent(20));
             return player;
         }
         public static GameObject CreateTilemap(MapManager mapManager)
@@ -32,11 +34,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             GameObject enemy = new GameObject(name);
             enemy.AddComponent(new Transform());
             enemy.GetComponent<Transform>().Position = mapManager.FindEnemySpawn(name);
-            enemy.AddComponent(new Sprite(SpriteManager.GetTexture("enemy")));
+            enemy.AddComponent(new Sprite(AssetManager.GetTexture("enemy")));
             enemy.AddComponent(new Collider(enemy.GetComponent<Sprite>().SpriteBounds));
             enemy.AddComponent(new EnemyAI(name));
-            enemy.AddComponent(new HealthComponent(40));
-            Debug.WriteLine("Created enemy: " + name + "Turn Component: " + enemy.GetComponent<EnemyAI>());
+            enemy.AddComponent(new HealthComponent(5));
             return enemy;
         }
         // To use for procedural generation.
@@ -50,13 +51,24 @@ namespace _2DRPG_Object_Oriented_Map_System
             return tilemapObject;
         }
 
+        public static GameObject CreateTurnArrow()
+        {
+            GameObject turnArrow = new GameObject("turnArrow");
+            turnArrow.AddComponent(new Transform());
+            turnArrow.AddComponent(new Sprite(AssetManager.GetTexture("turn_arrow")));
+            AnimationComponent arrowAnimation = new(AssetManager.GetTexture("turn_arrow_point"), 10, true);
+            turnArrow.AddComponent(arrowAnimation);
+            arrowAnimation.PlayAnimation();
+            return turnArrow;
+        }
+
         public static GameObject CreateExit(MapManager mapManager, Vector2 playerPosition, float minDistance)
         {
             Vector2 exitPosition = mapManager.CurrentMap.FindExitSpawn(playerPosition, minDistance);
             GameObject exit = new GameObject("exit");
             exit.AddComponent(new Transform());
             exit.GetComponent<Transform>().Position = exitPosition;
-            exit.AddComponent(new Sprite(SpriteManager.GetTexture("exit_tile")));
+            exit.AddComponent(new Sprite(AssetManager.GetTexture("exit_tile")));
             exit.AddComponent(new Collider(exit.GetComponent<Sprite>().SpriteBounds));
             return exit;
         }

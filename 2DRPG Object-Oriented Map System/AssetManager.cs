@@ -1,24 +1,27 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
     /// <summary>
-    /// Sprite Manager class is responsible for loading every sprite at once.
+    /// Asset Manager class is responsible for loading all assets at once.
     /// </summary>
-    public static class SpriteManager
+    public static class AssetManager
 {
         // Class to handle loading of all textures.
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
+        public static Dictionary<string, SoundEffect> soundFiles = new Dictionary<string, SoundEffect>();
+        private static SpriteFont font;
 
         /// <summary>
-        /// Load Content method is responsible for loading all textures.
+        /// Load Content method is responsible for loading all textures, sound files, fonts etc.
         /// </summary>
         /// <param name="content"></param>
         public static void LoadContent(ContentManager content)
         {
-            // Load all the textures at once.
+            // Load all the textures, sound files and fonts at once.
             textures["north_wall"] = content.Load<Texture2D>("north_wall");
             textures["east_wall"] = content.Load<Texture2D>("east_wall");
             textures["west_wall"] = content.Load<Texture2D>("west_wall");
@@ -34,8 +37,13 @@ namespace _2DRPG_Object_Oriented_Map_System
             textures["spawn_tile"] = content.Load<Texture2D>("spawn_tile");
             textures["enemy"] = content.Load<Texture2D>("enemy");
             textures["obstacle_tile"] = content.Load<Texture2D>("obstacle_tile");
-            textures["enemy_stunned"] = content.Load<Texture2D>("enemy_stunned");
-
+            textures["enemy_hurt"] = content.Load<Texture2D>("enemy_hurt");
+            textures["player_hurt"] = content.Load<Texture2D>("player_hurt");
+            textures["turn_arrow"] = content.Load<Texture2D>("turn_arrow");
+            textures["turn_arrow_point"] = content.Load<Texture2D>("turn_arrow_point");
+            font = content.Load<SpriteFont>("font");
+            soundFiles["hurtSound"] = content.Load<SoundEffect>("hurtSound");
+            soundFiles["mapMusic"] = content.Load<SoundEffect>("mapMusic");
         }
 
         /// <summary>
@@ -51,6 +59,35 @@ namespace _2DRPG_Object_Oriented_Map_System
                 return textures[name];
             }
             throw new System.Exception($"Texture {name} not found.");
+        }
+
+        /// <summary>
+        /// Get's a font by name and returns it.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static SpriteFont GetFont(string name)
+        {
+            if (font != null)
+            {
+                return font;
+            }
+            return null;
+        }
+
+        /// <summary>
+        ///  Get's a sound effect by name and returns it.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="System.Exception"></exception>
+        public static SoundEffect GetSound(string name)
+        {
+            if (soundFiles.ContainsKey(name))
+            {
+                return soundFiles[name];
+            }
+            throw new System.Exception($"Sound {name} not found");
         }
 }
 }

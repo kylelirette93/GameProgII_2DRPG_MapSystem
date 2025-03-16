@@ -15,7 +15,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Event for when the player reaches the exit tile.
         /// </summary>
-
         public event Action OnExitTile;
         private float movementSpeed = 5f;
         private GameObject player;
@@ -24,14 +23,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         private KeyboardState previousState;
         private KeyboardState currentState;
         private Tilemap tilemap;
+        public bool IsTurn { get => isTurn; }
         bool isTurn = false;
 
         /// <summary>
         /// Initializes the previous state of the keyboard.
         /// </summary>
 
-        public PlayerController()
+        public PlayerController(string name)
         {
+            Name = name;
             previousState = Keyboard.GetState();
         }
 
@@ -81,9 +82,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         private bool CanMoveTo(Vector2 newPosition)
         {
-            var player = ObjectManager.Find("player");
+            player = ObjectManager.Find("player");
             var exit = ObjectManager.Find("exit");
-            var tilemap = ObjectManager.Find("tilemap")?.GetComponent<Tilemap>();
+            tilemap = ObjectManager.Find("tilemap")?.GetComponent<Tilemap>();
 
             if (player != null)
             {
@@ -97,7 +98,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                       playerCollider.Bounds.Height
                     );
 
-                    var enemies = ObjectManager.FindAllObjectsByTag("enemy").ToList(); // Create a copy
+                    // Create a copy of the enemies list to avoid concurrent modification
+                    var enemies = ObjectManager.FindAllObjectsByTag("enemy").ToList(); 
                     foreach (var enemyObject in enemies)
                     {
                         if (enemyObject != null)
@@ -107,8 +109,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                             {
                                 var enemyHealth = enemyObject.GetComponent<HealthComponent>();
                                 enemyAI = enemyObject.GetComponent<EnemyAI>();
-                                enemyHealth?.TakeDamage(10);
-                                enemyAI?.Stun();                              
+                                enemyHealth?.TakeDamage(1);
+                                enemyAI?.Stun();   
+
+                                EndTurn();
                                 return false;
                             }
                         }
@@ -116,6 +120,12 @@ namespace _2DRPG_Object_Oriented_Map_System
                     if (exit != null)
                     {
                         var exitCollider = exit.GetComponent<Collider>();
+
+                        // Check if all enemies are dead and the player is on the exit tile.
+                        if (enemies.Any(enemy => enemy.GetComponent<HealthComponent>()?.CurrentHealth > 0))
+                        {
+                            return CheckTilemapCollision(tilemap, newPosition);
+                        }
                         if (exitCollider != null && tempPlayerBounds.Intersects(exitCollider.Bounds))
                         {
                             OnExitTile?.Invoke();
@@ -128,18 +138,30 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (tilemap != null)
             {
-                int tileX = (int)(newPosition.X / tilemap.TileWidth);
-                int tileY = (int)(newPosition.Y / tilemap.TileHeight);
-
-                if (tileX >= 0 && tileX < tilemap.Tiles.GetLength(0) && tileY >= 0 && tileY < tilemap.Tiles.GetLength(1))
-                {
-                    Tile tile = tilemap.Tiles[tileX, tileY];
-                    return tile.IsWalkable;
-                }
+                return CheckTilemapCollision(tilemap, newPosition);
             }
             return false;
         }
 
+        /// <summary>
+        /// This method checks if the player can move to a new position on the tilemap.
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="newPosition"></param>
+        /// <returns></returns>
+        private bool CheckTilemapCollision(Tilemap tilemap, Vector2 newPosition)
+        {
+            // Get the tile coordinates based on the new position.
+            int tileX = (int)(newPosition.X / tilemap.TileWidth);
+            int tileY = (int)(newPosition.Y / tilemap.TileHeight);
+
+            if (tileX >= 0 && tileX < tilemap.Tiles.GetLength(0) && tileY >= 0 && tileY < tilemap.Tiles.GetLength(1))
+            {
+                Tile tile = tilemap.Tiles[tileX, tileY];
+                return tile.IsWalkable;
+            }
+            return false;
+        }
         private void EndTurn()
         {
             isTurn = false;
@@ -147,8 +169,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         public override void TakeTurn()
         {
+            if (this == null)             
+            {
+                return;
+            }
             isTurn = true;
-            Debug.WriteLine("Player turn.");
+            // Debug.WriteLine("Player turn.");
         }
     }
 }

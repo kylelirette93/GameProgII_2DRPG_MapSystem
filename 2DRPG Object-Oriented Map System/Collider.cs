@@ -59,7 +59,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 spriteBatch.Draw(
                     GameManager.whitePixel,  // Reuse the white pixel texture to draw collider bounds.
                     colliderBounds,
-                   Color.Red * 0.5f // Semi-Transparent, for collider visibility.
+                   Color.Transparent // Semi-Transparent, for collider visibility.
                 ); 
             }
         }

@@ -30,7 +30,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Source rectangle of the tile.
         /// </summary>
         public Rectangle SourceRectangle { get { return _sourceRectangle; } set { _sourceRectangle = value; } }
-        
+
         /// <summary>
         /// Used in the tilemap class to draw a tile.
         /// </summary>
@@ -38,7 +38,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="tilePosition"></param>
         public void Draw(SpriteBatch spriteBatch, Vector2 tilePosition)
         {
-            spriteBatch.Draw(_texture, tilePosition, _sourceRectangle, Color.White);
+            spriteBatch.Draw(_texture, tilePosition, SourceRectangle, Color.White);
+                
         }
     }
 }

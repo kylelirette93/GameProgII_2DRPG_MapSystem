@@ -73,7 +73,7 @@
 /processorParam:TextureFormat=Color
 /build:east_wall.png
 
-#begin enemy_stunned.png
+#begin enemy_hurt.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -83,7 +83,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:enemy_stunned.png
+/build:enemy_hurt.png
 
 #begin enemy.png
 /importer:TextureImporter
@@ -109,6 +109,13 @@
 /processorParam:TextureFormat=Color
 /build:exit_tile.png
 
+#begin font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:font.spritefont
+
 #begin ground_tile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -121,6 +128,12 @@
 /processorParam:TextureFormat=Color
 /build:ground_tile.png
 
+#begin hurtSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:hurtSound.wav
+
 #begin Level0.txt
 /copy:Level0.txt
 
@@ -129,6 +142,12 @@
 
 #begin Level2.txt
 /copy:Level2.txt
+
+#begin mapMusic.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:mapMusic.wav
 
 #begin north_east_wall.png
 /importer:TextureImporter
@@ -178,6 +197,18 @@
 /processorParam:TextureFormat=Color
 /build:obstacle_tile.png
 
+#begin player_hurt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:player_hurt.png
+
 #begin player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -213,6 +244,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:spawn_tile.png
+
+#begin turn_arrow_point.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:turn_arrow_point.png
+
+#begin turn_arrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:turn_arrow.png
 
 #begin west_wall.png
 /importer:TextureImporter

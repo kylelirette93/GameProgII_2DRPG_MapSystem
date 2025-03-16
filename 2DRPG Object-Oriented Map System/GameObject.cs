@@ -15,6 +15,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         public string Tag { get { return _tag; } set { _tag = value; } }
         private List<Component> components = new List<Component>();
         private List<Component> toRemove = new List<Component>();
+
+
+        public event Action<GameObject> OnBeforeDestroy;
         /// <summary>
         /// The game object constructor uses a tag to identify the game object.
         /// </summary>
@@ -63,20 +66,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <typeparam name="T"></typeparam>
         public void RemoveComponent<T>() where T : Component
         {
-            // Collect components to remove.
-            foreach (Component component in components)
-            {
-                if (component is T)
-                {
-                    toRemove.Add(component);
-                }
-            }
-
-            // Remove components outside of the loop to avoid modification during iteration.
-            foreach (Component component in toRemove)
-            {
-                components.Remove(component);
-            }
+            components.RemoveAll(component => component is T);
         }
 
         /// <summary>
@@ -84,6 +74,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public void UpdateComponents()
         {
+            foreach (Component component in toRemove)
+            {
+                components.Remove(component);
+            }
+            toRemove.Clear();
+
             // Update all components.
             foreach (Component component in components)
             {
@@ -91,8 +87,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// Destroy method destroys the game object, removes the turn component and removes it from the object manager.
+        /// </summary>
         public void Destroy()
         {
+            OnBeforeDestroy?.Invoke(this);
             TurnComponent turnComponentInstance = GetComponent<TurnComponent>();
             if (turnComponentInstance != null)
             {
@@ -100,12 +100,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 TurnManager.DequeueParticipant(turnComponentInstance);
             }
 
-            // Destroy all components.
-            while (components.Count > 0)
+            foreach (Component component in components)
             {
-                RemoveComponent<Component>();
+                toRemove.Add(component);
             }
-
             ObjectManager.RemoveGameObject(this);
         }
 

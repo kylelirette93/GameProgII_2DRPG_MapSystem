@@ -15,6 +15,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public static Texture2D whitePixel;
         MapManager mapManager;
         private Scene currentScene;
+        UIManager uiManager;
         /// <summary>
         /// Main game constructor. Initializes the graphics device manager and sets the content root directory.
         /// </summary>
@@ -44,6 +45,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             mapManager = new MapManager();
             currentScene = new Scene();
             currentScene.Initialize(mapManager);
+            uiManager = new UIManager();
+            SoundManager.PlayMusic("mapMusic");
         }
         /// <summary>
         /// Load Content method is responsible for loading all textures.
@@ -55,7 +58,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             whitePixel.SetData(new Color[] { Color.White });
 
             // Load all the textures at once.
-            SpriteManager.LoadContent(Content);
+            AssetManager.LoadContent(Content);
         }
         /// <summary>
         /// Update method is responsible for updating the game state.
@@ -66,6 +69,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             ObjectManager.UpdateAll();
+            currentScene.Update(gameTime);
             base.Update(gameTime);          
         }
         /// <summary>
@@ -78,6 +82,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             _spriteBatch.Begin();
             ObjectManager.DrawAll(_spriteBatch);
+            uiManager.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

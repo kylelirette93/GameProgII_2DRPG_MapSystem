@@ -52,17 +52,17 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Initialize dictionary with tile mappings based on symbols.
             tileMappings = new Dictionary<char, Tile>
             {
-                { 'G', new Tile { IsWalkable = true, Texture = SpriteManager.GetTexture("ground_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'N', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("north_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'S', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("south_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'E', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'W', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'P', new Tile { IsWalkable = true, Texture = SpriteManager.GetTexture("spawn_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { 'X', new Tile { IsExit = true, Texture = SpriteManager.GetTexture("exit_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { '1', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("top_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { '2', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("top_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { '3', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("bottom_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
-                { '4', new Tile { IsWalkable = false, Texture = SpriteManager.GetTexture("bottom_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'G', new Tile { IsWalkable = true, Texture = AssetManager.GetTexture("ground_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'N', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("north_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'S', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("south_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'E', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'W', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'P', new Tile { IsWalkable = true, Texture = AssetManager.GetTexture("spawn_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { 'X', new Tile { IsExit = true, Texture = AssetManager.GetTexture("exit_tile"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '1', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("top_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '2', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("top_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '3', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("bottom_east_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
+                { '4', new Tile { IsWalkable = false, Texture = AssetManager.GetTexture("bottom_west_wall"), SourceRectangle = new Rectangle(0, 0, TileWidth, TileHeight) } },
             };
         }
 
@@ -71,7 +71,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public override void Update()
         {
-            //TODO: IMPLEMENT UPDATE.
+            
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             _mapHeight = height;
             Random random = new Random();          
 
-            // Initialize all tiles to ground
+            // Initialize all tiles to ground from the start.
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -114,13 +114,13 @@ namespace _2DRPG_Object_Oriented_Map_System
                     _tiles[x, y] = new Tile
                     {
                         IsWalkable = true,
-                        Texture = SpriteManager.GetTexture("ground_tile"),
-                        SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight)
+                        Texture = AssetManager.GetTexture("ground_tile"),
+                        SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight),
                     };
                 }
             }
 
-            // Create the outer walls
+            // Create the outer walls.
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -145,7 +145,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
 
 
-            // Randomly seed obstacles.
+            // Randomly seed obstacles, this is weighted based on distance from the center of the map.
             float baseObstacleChance = 0.35f;
             Vector2 center = new Vector2(width / 2f, height / 2f);
             float maxDistance = Vector2.Distance(center, new Vector2(0, 0));
@@ -161,14 +161,14 @@ namespace _2DRPG_Object_Oriented_Map_System
 
                     if (random.NextDouble() < obstacleChance && (x != (int)LastExitTile.X || y != (int)LastExitTile.Y))
                     {
-                        _tiles[x, y].Texture = SpriteManager.GetTexture("obstacle_tile");
+                        _tiles[x, y].Texture = AssetManager.GetTexture("obstacle_tile");
                         _tiles[x, y].IsWalkable = false;
                     }
                 }
             }
 
 
-            // Apply cellular automata rules for smooth obstacles.
+            // Apply cellular automata rules for making the map more interesting.
             for (int i = 0; i < 3; i++)
             {
                 Tile[,] tempTiles = (Tile[,])_tiles.Clone();
@@ -189,29 +189,27 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-        // Helper to set a wall tile
+        // Helper method's for setting tiles based on generation rules.
         private void SetWall(int x, int y, string texture)
         {
-            _tiles[x, y].Texture = SpriteManager.GetTexture(texture);
+            _tiles[x, y].Texture = AssetManager.GetTexture(texture);
             _tiles[x, y].IsWalkable = false;
         }
 
-        // Helper to set an obstacle tile
         private void SetObstacle(Tile[,] map, int x, int y)
         {
-            // Check if obstacle is not on the last exit tile.
             if (x == (int)LastExitTile.X && y == (int)LastExitTile.Y)
             {
                 return;
             }
       
-            map[x, y].Texture = SpriteManager.GetTexture("obstacle_tile");
+            map[x, y].Texture = AssetManager.GetTexture("obstacle_tile");
             map[x, y].IsWalkable = false;
         }
 
         private void SetGround(Tile[,] map, int x, int y)
         {
-            map[x, y].Texture = SpriteManager.GetTexture("ground_tile");
+            map[x, y].Texture = AssetManager.GetTexture("ground_tile");
             map[x, y].IsWalkable = true;
         }
 
@@ -222,25 +220,29 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 for (int dy = -1; dy <= 1; dy++)
                 {
-                    if (dx == 0 && dy == 0) continue; // Skip self
+                    if (dx == 0 && dy == 0) continue; // Skip self.
                     if (!_tiles[x + dx, y + dy].IsWalkable) count++;
                 }
             }
             return count;
         }
 
+        /// <summary>
+        /// Replace's a tile at a specific x and y position with a new tile.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="tile"></param>
         public void SetTile(int x, int y, Tile tile)
         {
-            if (x >= 0 && x < _tiles.GetLength(0) && y >= 0 && y < _tiles.GetLength(1))
-            {
-                _tiles[x, y] = tile;
-            }
-            else
-            {
-                Debug.WriteLine($"Warning: SetTile called with out-of-bounds coordinates: x={x}, y={y}");
-            }
+            _tiles[x, y] = tile;
         }
 
+        /// <summary>
+        /// Clear Path to Exit method is responsible for clearing a path from the player to the exit.
+        /// </summary>
+        /// <param name="playerPosition"></param>
+        /// <param name="exitPosition"></param>
         public void ClearPathToExit(Point playerPosition, Point exitPosition)
         {
             int width = _tiles.GetLength(0);
@@ -252,17 +254,16 @@ namespace _2DRPG_Object_Oriented_Map_System
             SetTile(current.X, current.Y, new Tile
             {
                 IsWalkable = true,
-                Texture = SpriteManager.GetTexture("ground_tile"),
+                Texture = AssetManager.GetTexture("ground_tile"),
                 SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight)
             });
 
             while (current != target)
             {
-               // Debug.WriteLine($"  Before: current={current}, target={target}");
-
                 int nextX = current.X;
                 int nextY = current.Y;
 
+                // Moves the current position towards the target position to create a path.
                 if (current.X < target.X)
                     nextX++;
                 else if (current.X > target.X)
@@ -272,23 +273,22 @@ namespace _2DRPG_Object_Oriented_Map_System
                 else if (current.Y > target.Y)
                     nextY--;
 
+                // Check if the next position is within the map bounds.
                 if (nextX >= 0 && nextX < width && nextY >= 0 && nextY < height)
                 {
+                    // Assign the new position to the current position, creating a path.
                     current.X = nextX;
                     current.Y = nextY;
-
-                    // Debug.WriteLine($"  After: current={current}, target={target}");
 
                     SetTile(current.X, current.Y, new Tile
                     {
                         IsWalkable = true,
-                        Texture = SpriteManager.GetTexture("ground_tile"),
+                        Texture = AssetManager.GetTexture("ground_tile"),
                         SourceRectangle = new Rectangle(0, 0, _tileWidth, _tileHeight)
                     });
                 }
                 else
                 {
-                    // Debug.WriteLine("Path went out of bounds!");
                     break;
                 }
             }
@@ -297,16 +297,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Vector2 FindExitSpawn(Vector2 playerPosition, float minDistance)
         {
             Vector2 exitPosition;
+            bool validExitFound = false;
             do
             {
                 // Generate random coordinates within the map bounds, excluding the edges.
                 exitPosition = new Vector2(
-                    random.Next(2, _mapWidth - 2) * 32,
-                    random.Next(2, _mapHeight - 2) * 32
+                    random.Next(2, _mapWidth - 2) * _tileWidth,
+                    random.Next(2, _mapHeight - 2) * _tileHeight
                 );
                 // Debug.WriteLine($"FindExitSpawn: generated exitPosition={exitPosition}");
             } while (Vector2.Distance(exitPosition, playerPosition) < minDistance);
-
             return exitPosition;
         }
 
@@ -338,7 +338,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 for (int y = 0; y < _tiles.GetLength(1); y++)
                 {
-                    // Check if tile is walkable and certain distance from player.
+                    // Check if the tile is walkable.
                         if (_tiles[x, y].IsWalkable)
                         {
                             return new Vector2(x * _tileWidth, y * _tileHeight);
@@ -364,7 +364,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 throw new Exception($"Unknown tile symbol: {symbol}");
             }
-        }
-    
+        }  
     }
 }
