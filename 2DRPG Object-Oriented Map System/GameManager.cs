@@ -10,6 +10,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class GameManager : Game
     {
+        public GraphicsDeviceManager Graphics { get => _graphics; }
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         public static Texture2D whitePixel;

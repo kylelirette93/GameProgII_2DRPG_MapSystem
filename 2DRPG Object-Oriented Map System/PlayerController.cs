@@ -25,6 +25,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Tilemap tilemap;
         public bool IsTurn { get => isTurn; }
         bool isTurn = false;
+        public int X { get => (int)player.GetComponent<Transform>().Position.X; }
+        public int Y { get => (int)player.GetComponent<Transform>().Position.Y; }
 
         /// <summary>
         /// Initializes the previous state of the keyboard.
@@ -166,6 +168,47 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             isTurn = false;
             TurnManager.EndTurn();
+        }
+
+        /// <summary>
+        /// Class for creating a mock player object for unit testing.
+        /// </summary>
+        /// <param name="player"></param>
+        public void SetPlayer(GameObject player)
+        {
+            this.player = player;
+        }
+
+        public void TryMove(Vector2 direction)
+        {
+            if (player == null)
+            {
+                Debug.WriteLine("Player object is null in TryMove");
+                return; // Or throw an exception
+            }
+
+            Transform transform = player.GetComponent<Transform>();
+            if (transform == null)
+            {
+                Debug.WriteLine("Transform component is null in TryMove");
+                return; // Or throw an exception
+            }
+
+            switch (direction)
+            {
+                case Vector2 v when v == Vector2.UnitX:
+                    transform.Translate(new Vector2(32, 0));
+                    break;
+                case Vector2 v when v == -Vector2.UnitX:
+                    transform.Translate(new Vector2(-32, 0));
+                    break;
+                case Vector2 v when v == Vector2.UnitY:
+                    transform.Translate(new Vector2(0, 32));
+                    break;
+                case Vector2 v when v == -Vector2.UnitY:
+                    transform.Translate(new Vector2(0, -32));
+                    break;
+            }
         }
         public override void TakeTurn()
         {

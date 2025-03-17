@@ -20,6 +20,14 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.AddComponent(new HealthComponent(20));
             return player;
         }
+
+        public static GameObject CreatePlayerTest(MapManager mapManager)
+        {
+            GameObject player = new GameObject("player");
+            player.AddComponent(new Transform());
+            player.AddComponent(new PlayerController("Player"));
+            return player;
+        }
         public static GameObject CreateTilemap(MapManager mapManager)
         {
             GameObject tilemapObject = new GameObject("tilemap");
