@@ -74,7 +74,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class HealthComponent : Component
     {
-        public int Health { get; private set; }
+        public int Health { get; set; }
         public int MaxHealth { get; private set; }
         public int CurrentHealth { get {  return Health; } }
 
@@ -218,6 +218,48 @@ namespace _2DRPG_Object_Oriented_Map_System
                 spriteBatch.Draw(GameObject.GetComponent<Sprite>().Texture, GameObject.GetComponent<Transform>().Position, Color.White);
             }
         }
+    }
+
+    public class ItemComponent : Component
+    {
+        string name;
+        string description;
+
+        public ItemComponent(string name, string description)
+        {
+            this.name = name;
+            this.description = description;
+        }
+
+        public void Remove()
+        {
+            Debug.WriteLine("Used " + name + ".");
+            GameObject.RemoveComponent<Component>();
+        }
+    }
+
+    public class HealingComponent : ItemComponent
+    {
+        private HealthComponent healthComponent;
+        public HealingComponent(string name, string description) : base(name, description)
+        {
+            if (GameObject == null) return;
+            healthComponent = GameObject.GetComponent<HealthComponent>();
+        }
+
+        public void Use()
+        {
+           if (healthComponent != null)
+            {
+                healthComponent.Health += 10;
+                if (healthComponent.Health > healthComponent.MaxHealth)
+                {
+                    healthComponent.Health = healthComponent.MaxHealth;
+                }
+                Remove();
+            }
+        }
+
 
     }
 }
