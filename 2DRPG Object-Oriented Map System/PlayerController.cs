@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -10,7 +11,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// Player Controller is a component that handles player input and movement.
     /// </summary>
 
-    public class PlayerController : TurnComponent
+    public class PlayerController : Component, ITurnTaker
     {
         /// <summary>
         /// Event for when the player reaches the exit tile.
@@ -19,7 +20,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private float movementSpeed = 5f;
         private GameObject player;
         private Transform enemyTransform;
-        private EnemyAI enemyAI;
+        private MeleeEnemyAI enemyAI;
         private KeyboardState previousState;
         private KeyboardState currentState;
         private Tilemap tilemap;
@@ -28,11 +29,13 @@ namespace _2DRPG_Object_Oriented_Map_System
         public int X { get => (int)player.GetComponent<Transform>().Position.X; }
         public int Y { get => (int)player.GetComponent<Transform>().Position.Y; }
 
-        /// <summary>
-        /// Initializes the previous state of the keyboard.
-        /// </summary>
+        public string Id => "Player";
 
-        public PlayerController(string name)
+        /// <summary>
+                /// Initializes the previous state of the keyboard.
+                /// </summary>
+
+        public PlayerController(string name)
         {
             Name = name;
             previousState = Keyboard.GetState();
@@ -51,6 +54,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (enemyTransform == null)
             {
                 enemyTransform = ObjectManager.Find("enemy")?.GetComponent<Transform>();
+            }
+            if (enemyAI == null)
+            {
+                   enemyAI = ObjectManager.Find("enemy")?.GetComponent<MeleeEnemyAI>();
             }
             if (isTurn)
             {
@@ -76,6 +83,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 if (CanMoveTo(newPosition))
                 {
                     player.GetComponent<Transform>()?.Translate(movement);
+                    int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
+                    int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
                     EndTurn();
                 }
             }
@@ -110,10 +119,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                             if (enemyCollider != null && tempPlayerBounds.Intersects(enemyCollider.Bounds))
                             {
                                 var enemyHealth = enemyObject.GetComponent<HealthComponent>();
-                                enemyAI = enemyObject.GetComponent<EnemyAI>();
+                                enemyAI = enemyObject.GetComponent<MeleeEnemyAI>();
                                 enemyHealth?.TakeDamage(1);
-                                enemyAI?.Stun();   
-
+                                enemyAI?.Stun();
                                 EndTurn();
                                 return false;
                             }
@@ -122,15 +130,18 @@ namespace _2DRPG_Object_Oriented_Map_System
                     if (exit != null)
                     {
                         var exitCollider = exit.GetComponent<Collider>();
-
-                        // Check if all enemies are dead and the player is on the exit tile.
-                        if (enemies.Any(enemy => enemy.GetComponent<HealthComponent>()?.CurrentHealth > 0))
-                        {
-                            return CheckTilemapCollision(tilemap, newPosition);
-                        }
                         if (exitCollider != null && tempPlayerBounds.Intersects(exitCollider.Bounds))
                         {
-                            OnExitTile?.Invoke();
+                            // Check if all enemies are dead.
+                            if (!enemies.Any(enemy => enemy.GetComponent<HealthComponent>()?.CurrentHealth > 0))
+                            {
+                                OnExitTile?.Invoke();
+                                return true; // Allow movement if all enemies are dead
+                            }
+                            else
+                            {
+                                return false; // Do not allow movement if enemies are alive
+                            }
                         }
                     }
                 }
@@ -142,7 +153,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 return CheckTilemapCollision(tilemap, newPosition);
             }
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -164,60 +175,24 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             return false;
         }
-        private void EndTurn()
+        public void EndTurn()
         {
             isTurn = false;
-            TurnManager.EndTurn();
         }
-
-        /// <summary>
-        /// Class for creating a mock player object for unit testing.
-        /// </summary>
-        /// <param name="player"></param>
-        public void SetPlayer(GameObject player)
-        {
-            this.player = player;
-        }
-
-        public void TryMove(Vector2 direction)
-        {
-            if (player == null)
-            {
-                Debug.WriteLine("Player object is null in TryMove");
-                return; // Or throw an exception
-            }
-
-            Transform transform = player.GetComponent<Transform>();
-            if (transform == null)
-            {
-                Debug.WriteLine("Transform component is null in TryMove");
-                return; // Or throw an exception
-            }
-
-            switch (direction)
-            {
-                case Vector2 v when v == Vector2.UnitX:
-                    transform.Translate(new Vector2(32, 0));
-                    break;
-                case Vector2 v when v == -Vector2.UnitX:
-                    transform.Translate(new Vector2(-32, 0));
-                    break;
-                case Vector2 v when v == Vector2.UnitY:
-                    transform.Translate(new Vector2(0, 32));
-                    break;
-                case Vector2 v when v == -Vector2.UnitY:
-                    transform.Translate(new Vector2(0, -32));
-                    break;
-            }
-        }
-        public override void TakeTurn()
+    
+        public void TakeTurn()
         {
             if (this == null)             
             {
                 return;
             }
-            isTurn = true;
             // Debug.WriteLine("Player turn.");
+        }
+
+        public void StartTurn()
+        {          
+            isTurn = true;
+            Debug.WriteLine("Player started turn!");
         }
     }
 }

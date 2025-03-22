@@ -7,7 +7,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class InventorySystem
 {
-        private Dictionary<string, Sprite> items = new Dictionary<string, Sprite>();
+        private List<ItemComponent> items = new List<ItemComponent>();
         private int inventorySlots = 5;
 
         /// <summary>
@@ -15,11 +15,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         /// <param name="itemName">The name of the item to add.</param>
         /// <param name="item">The icon for the item to add.</param>
-        public void AddItem(string itemName, Sprite item)
+        public void AddItem(ItemComponent item)
         {
             if (items.Count < inventorySlots)
             {
-                items.Add(itemName, item);
+                items.Add(item);
             }
         }
 
@@ -27,11 +27,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Removes an item from the player's inventory.
         /// </summary>
         /// <param name="itemName">The name of the item to remove from player's inventory.</param>
-        public void RemoveItem(string itemName)
+        public void RemoveItem(ItemComponent item)
         {
-            if (items.ContainsKey(itemName))
+            if (items.Contains(item))
             {
-                items.Remove(itemName);
+                items.Remove(item);
             }
         }
 }

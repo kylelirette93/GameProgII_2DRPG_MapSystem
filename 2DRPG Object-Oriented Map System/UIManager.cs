@@ -17,22 +17,22 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             turnDisplayfont = AssetManager.GetFont("font");
         }
-        
-    public void Draw(SpriteBatch spriteBatch)
-    {
-            string participantName = TurnManager.CurrentParticipant;
-            string DisplayText = "Player's Turn"; // Default value.
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            string participantName = TurnManager.Instance.CurrentTurnId;
+            string displayText = "Player's Turn";
 
             if (participantName != null)
             {
-                DisplayText = participantName + "'s Turn";
+                displayText = participantName + "'s Turn";
             }
             else
             {
-                DisplayText = "Player's Turn";
+                displayText = "Player's Turn";
             }
-            spriteBatch.DrawString(turnDisplayfont, DisplayText, turnDisplayPosition + dropShadowOffset, Color.Black);
-            spriteBatch.DrawString(turnDisplayfont, DisplayText, turnDisplayPosition, Color.White);
-    }
+            spriteBatch.DrawString(turnDisplayfont, displayText, turnDisplayPosition + dropShadowOffset, Color.Black);
+            spriteBatch.DrawString(turnDisplayfont, displayText, turnDisplayPosition, Color.White);
+        }
 }
 }

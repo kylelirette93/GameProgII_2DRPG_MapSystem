@@ -21,6 +21,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         private int _tileWidth = 32;
         private int _tileHeight = 32;
 
+        public int MapWidth { get { return _mapWidth; } }
+        public int MapHeight { get { return _mapHeight; } }
         private int _mapWidth;
         private int _mapHeight;
 

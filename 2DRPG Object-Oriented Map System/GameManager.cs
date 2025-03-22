@@ -57,6 +57,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             whitePixel = new Texture2D(GraphicsDevice, 1, 1);
             whitePixel.SetData(new Color[] { Color.White });
+            Gizmo.Initialize(GraphicsDevice, _spriteBatch);
 
             // Load all the textures at once.
             AssetManager.LoadContent(Content);

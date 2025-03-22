@@ -16,8 +16,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.AddComponent(new Sprite(AssetManager.GetTexture("player")));
             player.AddComponent(new Collider(player.GetComponent<Sprite>().SpriteBounds));
             player.AddComponent(new PlayerController("Player"));
-            TurnManager.SubscribeToDestroy(player);
-            player.AddComponent(new HealthComponent(20));
+            HealthComponent healthComponent = new HealthComponent(20);
+            player.AddComponent(healthComponent);
+            healthComponent.Initialize();         
             return player;
         }
 
@@ -44,8 +45,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             enemy.GetComponent<Transform>().Position = mapManager.FindEnemySpawn(name);
             enemy.AddComponent(new Sprite(AssetManager.GetTexture("enemy")));
             enemy.AddComponent(new Collider(enemy.GetComponent<Sprite>().SpriteBounds));
-            enemy.AddComponent(new EnemyAI(name));
-            enemy.AddComponent(new HealthComponent(5));
+            enemy.AddComponent(new MeleeEnemyAI(name));
+            HealthComponent healthComponent = new HealthComponent(5);
+            enemy.AddComponent(healthComponent);
+            healthComponent.Initialize();
             return enemy;
         }
         // To use for procedural generation.
@@ -79,6 +82,16 @@ namespace _2DRPG_Object_Oriented_Map_System
             exit.AddComponent(new Sprite(AssetManager.GetTexture("exit_tile")));
             exit.AddComponent(new Collider(exit.GetComponent<Sprite>().SpriteBounds));
             return exit;
+        }
+
+        public static GameObject CreateHealingPotion()
+        {
+            GameObject potion = new GameObject("Healing Potion");
+            potion.AddComponent(new Transform());
+            potion.AddComponent(new Sprite(AssetManager.GetTexture("healing_potion")));
+            potion.AddComponent(new Collider(potion.GetComponent<Sprite>().SpriteBounds));
+            potion.AddComponent(new HealingComponent("Healing Potion", "Heals for 2 health."));
+            return potion;
         }
     }
 }

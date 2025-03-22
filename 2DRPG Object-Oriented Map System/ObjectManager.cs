@@ -55,28 +55,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             return gameObjects.Where(obj => obj.Tag.StartsWith(tagPrefix)).ToList();
         }
 
-        /// <summary>
-        /// This method returns all game objects that have a TurnComponent.
-        /// </summary>
-        /// <returns></returns>
-        public static Queue<TurnComponent> ReturnAll()
-        {
-            var turnComponentQueue = new Queue<TurnComponent>(
-                gameObjects
-                    .Select(obj =>
-                    {
-                        var component = obj.GetComponent<TurnComponent>();
-                        //Debug.WriteLine($"Selecting GameObject: {obj.Tag}, TurnComponent: {component}");
-                        return component;
-                    })
-                    .Where(tc =>
-                    {
-                        return tc != null;
-                    })
-            );
-
-            return turnComponentQueue;
-        }
 
         /// <summary>
         /// Find all game objects and return a list of them.

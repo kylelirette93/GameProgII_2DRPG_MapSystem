@@ -8,11 +8,11 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// Scene class is responsible for Initializing the game objects in the scene and handling transitions between scenes.
     /// </summary>
     public class Scene
-{
+    {
         /// <summary>
         /// Read only properties for player and tilemap, the property can only be modified from within the class. 
         /// </summary>
-        
+
         public GameObject Player { get; private set; }
 
         public GameObject Enemy { get; private set; }
@@ -23,6 +23,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         public GameObject Exit { get; private set; }
 
         public GameObject TurnArrow { get; private set; }
+
+        public TurnManager turnManager;
+        
 
 
         /// <summary>
@@ -59,11 +62,17 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             // 6. Update Object Manager and start turn cycle.
             ObjectManager.UpdateAll();
-            TurnManager.StartTurnCycle();
+
+            TurnManager.Instance.AddTurnTaker(Player.GetComponent<PlayerController>());
+            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<MeleeEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<MeleeEnemyAI>());
         }
 
         public void Update(GameTime gameTime)
         {
+
+            TurnManager.Instance.UpdateTurn(gameTime);
+
             if (Player.GetComponent<PlayerController>().IsTurn)  
             TurnArrow.GetComponent<Transform>().Position = Player.GetComponent<Transform>().Position + new Vector2(1, -32);
             else
@@ -89,6 +98,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.AddGameObject(Enemy);
             Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
             ObjectManager.AddGameObject(Enemy2);
+
+            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<MeleeEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<MeleeEnemyAI>());
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
@@ -106,11 +118,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             Tilemap.GetComponent<Tilemap>().ClearPathToExit(playerTilePos, exitTilePos);
 
-            TurnManager.TurnQueue.Clear();
             ObjectManager.UpdateAll();
-            TurnManager.PopulateQueue();
             Debug.WriteLine("After PopulateQueue.");
-            TurnManager.StartTurnCycle();
 
             // Remove the old exit last
             ObjectManager.RemoveGameObject(previousExit);

@@ -93,18 +93,34 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void Destroy()
         {
             OnBeforeDestroy?.Invoke(this);
-            TurnComponent turnComponentInstance = GetComponent<TurnComponent>();
-            if (turnComponentInstance != null)
+
+            ITurnTaker turnTakerComponent = FindITurnTakerComponent();
+
+            if (turnTakerComponent != null)
             {
-                Debug.WriteLine($"Retrieved component: {turnComponentInstance.GetType().Name}");
-                TurnManager.DequeueParticipant(turnComponentInstance);
+                TurnManager.Instance.RemoveTurnTaker(turnTakerComponent);
             }
+            
 
             foreach (Component component in components)
             {
                 toRemove.Add(component);
             }
+
             ObjectManager.RemoveGameObject(this);
+        }
+
+        private ITurnTaker FindITurnTakerComponent()
+        {
+            foreach (Component component in components)
+            {
+                // Check if the component implements ITurnTaker
+                if (component is ITurnTaker turnTaker)
+                {
+                    return turnTaker;
+                }
+            }
+            return null;
         }
 
         /// <summary>

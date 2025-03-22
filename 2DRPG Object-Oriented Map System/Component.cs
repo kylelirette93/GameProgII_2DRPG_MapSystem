@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System;
-using System.Threading.Tasks;
 using System.Diagnostics;
+
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -18,6 +17,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Game object property for the component.
         /// </summary>
         protected GameObject GameObject { get; private set; }
+        protected string Name { get; set; }
 
         /// <summary>
         /// Set Game Object method is responsible for setting the game object for the component.
@@ -26,6 +26,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void SetGameObject(GameObject gameObject)
         {
             GameObject = gameObject;
+        }
+
+        public virtual void Initialize()
+        {
+
         }
 
 
@@ -52,21 +57,6 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         }
     }
-    /// <summary>
-    /// This class is responsible for enforcing an abstract TakeTurn method that all turn components must implement. 
-    /// It also contains a name to differentiate between different turn components.
-    /// </summary>
-    public abstract class TurnComponent : Component
-    {
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-
-        public TurnComponent()
-        {
-            IsActive = true;
-        }
-        public abstract void TakeTurn();
-    }
 
     /// <summary>
     /// This class is responsible for managing the health of a game object. 
@@ -76,7 +66,10 @@ namespace _2DRPG_Object_Oriented_Map_System
     {
         public int Health { get; set; }
         public int MaxHealth { get; private set; }
-        public int CurrentHealth { get {  return Health; } }
+        public int CurrentHealth { get { return Health; } }
+        string animationTextureName;
+
+        private AnimationComponent stunnedAnimation; // Store the AnimationComponent
 
         public HealthComponent(int maxHealth)
         {
@@ -84,27 +77,27 @@ namespace _2DRPG_Object_Oriented_Map_System
             Health = maxHealth;
         }
 
-        public void TakeDamage(int damage)
+        public override void Initialize()
         {
-            Health -= damage;
-            // Debug.WriteLine(this.GameObject + " took " + damage + " damage. Health: " + Health + "/" + MaxHealth + ".");
-            
-            SoundManager.PlaySound("hurtSound");
-            string animationTextureName = "";
-            if (GameObject.Tag == "enemy" || GameObject.Tag == "enemy2")
+            animationTextureName = "";
+            if (GameObject?.Tag == "enemy" || GameObject?.Tag == "enemy2")
             {
                 animationTextureName = "enemy_hurt";
             }
-            else if (GameObject.Tag == "player")
+            else if (GameObject?.Tag == "player")
             {
                 animationTextureName = "player_hurt";
             }
-            bool loop = GameObject.Tag == "enemy" || GameObject.Tag == "enemy2"; // Only enemies loop
-
             Texture2D animationTexture = AssetManager.GetTexture(animationTextureName);
-            AnimationComponent stunnedAnimation = new AnimationComponent(animationTexture, 10, false);
+            stunnedAnimation = new AnimationComponent(animationTexture, 10, false);
             GameObject.AddComponent(stunnedAnimation);
-            stunnedAnimation.PlayAnimation();
+        }
+
+        public void TakeDamage(int damage)
+        {
+            Health -= damage;
+            SoundManager.PlaySound("hurtSound");
+            stunnedAnimation.PlayAnimation(); // Reuse the existing AnimationComponent
 
             if (Health <= 0)
             {
@@ -124,13 +117,13 @@ namespace _2DRPG_Object_Oriented_Map_System
         public int currentFrame = 0;
         public int frameWidth = 32;
         public int frameHeight = 32;
-        public float frameSpeed = 64f; 
+        public float frameSpeed = 64f;
         public bool isPlaying = false;
         private float frameAccumulator = 0f;
         public bool isLooping = false;
 
         // Stopwatch to track time.
-        private Stopwatch stopwatch; 
+        private Stopwatch stopwatch;
 
         /// <summary>
         /// This constructor initializes the animation component with a sprite sheet, number of frames, and whether or not the animation should loop.
@@ -143,7 +136,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             this.spriteSheet = spriteSheet;
             this.frames = frames;
             this.isLooping = isLooping;
-            stopwatch = new Stopwatch(); 
+            stopwatch = new Stopwatch();
         }
 
         /// <summary>
@@ -153,10 +146,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (GameObject?.GetComponent<Sprite>() != null)
             {
-                originalTexture = GameObject.GetComponent<Sprite>().Texture; 
+                originalTexture = GameObject.GetComponent<Sprite>().Texture;
                 isPlaying = true;
                 currentFrame = 0;
-                stopwatch.Restart(); 
+                stopwatch.Restart();
             }
         }
 
@@ -170,7 +163,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 GameObject.GetComponent<Sprite>().Texture = originalTexture;
                 isPlaying = false;
                 originalTexture = null;
-                stopwatch.Stop(); 
+                stopwatch.Stop();
             }
         }
 
@@ -207,7 +200,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (GameObject?.GetComponent<Transform>() != null && isPlaying)
             {
-                Rectangle sourceRectangle = new Rectangle(currentFrame * frameWidth, 0, frameWidth, frameHeight); 
+                Rectangle sourceRectangle = new Rectangle(currentFrame * frameWidth, 0, frameWidth, frameHeight);
 
                 // Draw at the GameObject's position.
                 spriteBatch.Draw(spriteSheet, GameObject.GetComponent<Transform>().Position, sourceRectangle, Color.White);
@@ -234,7 +227,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void Remove()
         {
             Debug.WriteLine("Used " + name + ".");
-            GameObject.RemoveComponent<Component>();
+            GameObject.RemoveComponent<ItemComponent>();
         }
     }
 
