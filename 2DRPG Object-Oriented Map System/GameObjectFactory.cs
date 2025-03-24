@@ -51,6 +51,20 @@ namespace _2DRPG_Object_Oriented_Map_System
             healthComponent.Initialize();
             return enemy;
         }
+
+        public static GameObject CreateRangedEnemy(MapManager mapManager, string name)
+        {
+            GameObject rangedEnemy = new GameObject(name);
+            rangedEnemy.AddComponent(new Transform());
+            rangedEnemy.GetComponent<Transform>().Position = mapManager.FindEnemySpawn(name);
+            rangedEnemy.AddComponent(new Sprite(AssetManager.GetTexture("ranged_enemy")));
+            rangedEnemy.AddComponent(new Collider(rangedEnemy.GetComponent<Sprite>().SpriteBounds));
+            rangedEnemy.AddComponent(new RangedEnemyAI(name));
+            HealthComponent healthComponent = new HealthComponent(5);
+            rangedEnemy.AddComponent(healthComponent);
+            healthComponent.Initialize();
+            return rangedEnemy;
+        }
         // To use for procedural generation.
         public static GameObject GenerateTilemap()
         {
@@ -60,6 +74,17 @@ namespace _2DRPG_Object_Oriented_Map_System
             tilemapObject.AddComponent(new Transform());
             tilemap.GenerateProceduralMap(15, 10);
             return tilemapObject;
+        }
+
+        public static GameObject CreateProjectile(Vector2 position)
+        {
+            GameObject projectile = new GameObject("projectile");
+            projectile.AddComponent(new Transform());
+            projectile.GetComponent<Transform>().Position = position;
+            projectile.AddComponent(new Sprite(AssetManager.GetTexture("projectile")));
+            projectile.AddComponent(new Collider(projectile.GetComponent<Sprite>().SpriteBounds));
+            projectile.AddComponent(new ProjectileComponent());
+            return projectile;
         }
 
         public static GameObject CreateTurnArrow()

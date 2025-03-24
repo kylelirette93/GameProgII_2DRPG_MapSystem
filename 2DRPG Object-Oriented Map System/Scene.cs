@@ -18,6 +18,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         public GameObject Enemy { get; private set; }
         public GameObject Enemy2 { get; private set; }
 
+        public GameObject RangedEnemy { get; private set; }
+
+        public GameObject RangedEnemy2 { get; private set; }
+
         public GameObject Tilemap { get; private set; }
 
         public GameObject Exit { get; private set; }
@@ -25,6 +29,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public GameObject TurnArrow { get; private set; }
 
         public TurnManager turnManager;
+
+        private GameTime gameTime;
         
 
 
@@ -34,6 +40,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="mapManager"></param>
         public void Initialize(MapManager mapManager)
         {
+            this.gameTime = gameTime;
             // 1. Create Tilemap.
             Tilemap = GameObjectFactory.CreateTilemap(mapManager);
             ObjectManager.AddGameObject(Tilemap);
@@ -49,6 +56,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
             ObjectManager.AddGameObject(Enemy2);
 
+            RangedEnemy = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy3");
+            ObjectManager.AddGameObject(RangedEnemy);
+
+            RangedEnemy2 = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy4");
+            ObjectManager.AddGameObject(RangedEnemy2);
+
             // 4. Create Exit.
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
@@ -61,11 +74,13 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.AddGameObject(TurnArrow);
 
             // 6. Update Object Manager and start turn cycle.
-            ObjectManager.UpdateAll();
+            
 
             TurnManager.Instance.AddTurnTaker(Player.GetComponent<PlayerController>());
-            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<MeleeEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<MeleeEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<BaseEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<BaseEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(RangedEnemy.GetComponent<RangedEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(RangedEnemy2.GetComponent<RangedEnemyAI>());
         }
 
         public void Update(GameTime gameTime)
@@ -98,9 +113,16 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.AddGameObject(Enemy);
             Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
             ObjectManager.AddGameObject(Enemy2);
+            RangedEnemy = GameObjectFactory.CreateRangedEnemy(mapManager, "rangedEnemy");
+            ObjectManager.AddGameObject(RangedEnemy);
+            RangedEnemy2 = GameObjectFactory.CreateRangedEnemy(mapManager, "rangedEnemy2");
+            ObjectManager.AddGameObject(RangedEnemy2);
+            
 
-            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<MeleeEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<MeleeEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<BaseEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<BaseEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(RangedEnemy.GetComponent<RangedEnemyAI>());
+            TurnManager.Instance.AddTurnTaker(RangedEnemy2.GetComponent<RangedEnemyAI>());
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
@@ -118,7 +140,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             Tilemap.GetComponent<Tilemap>().ClearPathToExit(playerTilePos, exitTilePos);
 
-            ObjectManager.UpdateAll();
+    
             Debug.WriteLine("After PopulateQueue.");
 
             // Remove the old exit last

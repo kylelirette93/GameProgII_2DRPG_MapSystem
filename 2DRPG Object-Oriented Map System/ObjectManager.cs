@@ -68,7 +68,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Update All method updates all game objects at once.
         /// </summary>
-        public static void UpdateAll()
+        public static void UpdateAll(GameTime gameTime)
         {
             // Remove objects first.
             foreach (var obj in toRemove)
@@ -100,7 +100,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 if (obj != null)
                 {
                     //Debug.WriteLine($"Updating: {obj.Tag}");
-                    obj.Update();
+                    obj.Update(gameTime);
                     //Debug.WriteLine($"Updated: {obj.Tag}");
                 }
                 else

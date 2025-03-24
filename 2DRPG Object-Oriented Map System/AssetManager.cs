@@ -36,6 +36,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             textures["coin"] = content.Load<Texture2D>("coin");
             textures["spawn_tile"] = content.Load<Texture2D>("spawn_tile");
             textures["enemy"] = content.Load<Texture2D>("enemy");
+            textures["projectile"] = content.Load<Texture2D>("projectile");
+            textures["ranged_enemy"] = content.Load<Texture2D>("ranged_enemy");
             textures["obstacle_tile"] = content.Load<Texture2D>("obstacle_tile");
             textures["enemy_hurt"] = content.Load<Texture2D>("enemy_hurt");
             textures["player_hurt"] = content.Load<Texture2D>("player_hurt");

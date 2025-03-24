@@ -41,6 +41,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             
         }
+
     }
 
     /// <summary>
@@ -80,7 +81,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void Initialize()
         {
             animationTextureName = "";
-            if (GameObject?.Tag == "enemy" || GameObject?.Tag == "enemy2")
+            if (GameObject?.Tag == "enemy" || GameObject?.Tag == "enemy2" 
+                || GameObject?.Tag == "enemy3" || GameObject?.Tag == "enemy4")
             {
                 animationTextureName = "enemy_hurt";
             }
@@ -231,7 +233,66 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
-    public class HealingComponent : ItemComponent
+   public class ProjectileComponent : Component
+    {
+        public Vector2 Direction { get; set; }
+        float velocity = 5f;
+        GameObject player;
+        public override void Update()
+        {
+            if (GameObject == null) return;
+
+            var projectileTransform = GameObject.GetComponent<Transform>();
+
+            if (projectileTransform != null)
+            {
+                projectileTransform.Position += Direction * velocity;
+                Point projectileTile = TilePosition(projectileTransform.Position);
+
+                var playerTransform = ObjectManager.Find("player")?.GetComponent<Transform>();
+
+                if (playerTransform != null && projectileTile == TilePosition(playerTransform.Position))
+                {
+                    ObjectManager.Find("player")?.GetComponent<HealthComponent>()?.TakeDamage(1);
+                    GameObject?.Destroy();
+                    GameObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+                    return; // Exit the update method since the object is destroyed.
+                }
+
+                if (!IsWalkable(projectileTile))
+                {
+                    GameObject?.Destroy();
+                    GameObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+                    return; // Exit the update method since the object is destroyed.
+                }
+            }
+            else
+            {
+                GameObject?.Destroy();
+                GameObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+            }
+        }
+
+        private Point TilePosition(Vector2 position)
+        {
+            int tileX = (int)(position.X / 32);
+            int tileY = (int)(position.Y / 32);
+            return new Point(tileX, tileY);
+        }
+
+        private bool IsWalkable(Point tile)
+        {
+            // Check if in bounds.
+            Tilemap tilemap = ObjectManager.Find("tilemap").GetComponent<Tilemap>();
+            if (tile.X < 0 || tile.X >= tilemap.MapWidth || tile.Y < 0 || tile.Y >= tilemap.MapHeight)
+            {
+                return false;
+            }
+            return ObjectManager.Find("tilemap").GetComponent<Tilemap>().Tiles[tile.X, tile.Y].IsWalkable;
+        }
+    }
+
+        public class HealingComponent : ItemComponent
     {
         private HealthComponent healthComponent;
         public HealingComponent(string name, string description) : base(name, description)

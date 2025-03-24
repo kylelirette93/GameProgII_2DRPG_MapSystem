@@ -52,9 +52,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             foreach (Component component in components)
             {
-                if (component is T tComponent)
+                if (typeof(T).IsAssignableFrom(component.GetType()))
                 {
-                    return tComponent;
+                    return (T)component;
                 }
             }
             return null;
@@ -72,7 +72,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Update Components method updates all components attached to the game object.
         /// </summary>
-        public void UpdateComponents()
+        public void UpdateComponents(GameTime gameTime)
         {
             foreach (Component component in toRemove)
             {
@@ -140,10 +140,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Update method calls update component on all components attached to the game object.
         /// </summary>
-        public virtual void Update()
+        public virtual void Update(GameTime gameTime)
         {
             // Updates all components attached to this game object.
-            UpdateComponents();
+            UpdateComponents(gameTime);
         }
     }
 }

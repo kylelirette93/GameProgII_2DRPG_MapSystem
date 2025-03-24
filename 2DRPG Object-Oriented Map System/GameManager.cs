@@ -70,7 +70,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            ObjectManager.UpdateAll();
+            ObjectManager.UpdateAll(gameTime);
             currentScene.Update(gameTime);
             base.Update(gameTime);          
         }

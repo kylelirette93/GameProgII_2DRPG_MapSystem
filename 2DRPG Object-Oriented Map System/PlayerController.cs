@@ -20,7 +20,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private float movementSpeed = 5f;
         private GameObject player;
         private Transform enemyTransform;
-        private MeleeEnemyAI enemyAI;
+        private BaseEnemyAI enemyAI;
         private KeyboardState previousState;
         private KeyboardState currentState;
         private Tilemap tilemap;
