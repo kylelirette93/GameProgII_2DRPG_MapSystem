@@ -9,23 +9,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         GameObject projectile;
         public RangedEnemyAI(string name) : base(name)
         {
-            Debug.WriteLine($"RangedEnemyAI constructor called with name: '{name}'");
-        }
-        public override void UpdateTarget()
-        {
-            base.UpdateTarget();
+            //Debug.WriteLine($"RangedEnemyAI constructor called with name: '{name}'");
         }       
-
-        public override void Stun()
-        {
-            base.Stun();
-        }
-
-        public override void FollowPlayer()
-        {
-            base.FollowPlayer();
-        }
-
 
         public override void Update()
         {
@@ -57,27 +42,30 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 case EnemyState.Follow:
                     Debug.WriteLine("Enemy Turn");
-                    FollowPlayer();
-                    ChangeState(EnemyState.Scan);
+                    if (IsAdjacentToPlayer())
+                    {
+                        ChangeState(EnemyState.Attack);
+                    }
+                    else if (IsInLineOfSight())
+                    {
+                        ChangeState(EnemyState.RangedAttack);
+                    }
+                    else
+                    {
+                        FollowPlayer();
+                        EndTurn();
+                    }
+                    
                     break;
 
-                case EnemyState.Scan:
-                    Debug.WriteLine("Enemy Turn, Scan State");
-                    if (IsInLineOfSight())
-                    {
-                        FireProjectile();
-                    }
+                case EnemyState.RangedAttack:                  
+                    FireProjectile();
                     EndTurn();
-                    ChangeState(EnemyState.Follow);               
                     break;
                 case EnemyState.Attack:
                     Debug.WriteLine("Enemy Turn, Attack State");
-                    if (IsAdjacentToPlayer())
-                    {
-                        DealDamage();
-                    }
+                    DealDamage();
                     EndTurn();
-                    ChangeState(EnemyState.Follow);
                     break;
 
                 case EnemyState.Stunned:
@@ -86,7 +74,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-        protected bool IsInLineOfSight()
+        private bool IsInLineOfSight()
         {
             if (enemy != null && player != null && tilemap != null)
             {
@@ -98,25 +86,22 @@ namespace _2DRPG_Object_Oriented_Map_System
                 bool inSight = (enemyTileY == playerTileY && enemyTileX != playerTileX) ||
                                (enemyTileX == playerTileX && enemyTileY != playerTileY);
 
-                Debug.WriteLine($"Enemy Tile: ({enemyTileX}, {enemyTileY}), Player Tile: ({playerTileX}, {playerTileY}), In Sight: {inSight}");
+                //Debug.WriteLine($"Enemy Tile: ({enemyTileX}, {enemyTileY}), Player Tile: ({playerTileX}, {playerTileY}), In Sight: {inSight}");
 
                 return inSight;
             }
             return false;
         }
 
-
         public void FireProjectile()
         {
-            Debug.WriteLine("FireProjectile() called.");
+            //Debug.WriteLine("FireProjectile() called.");
 
                 CreateProjectile();
                 if (projectile == null)
                 {
-                    FollowPlayer();
                     EndTurn();
-                }
-            
+                }          
         }
 
         public void CreateProjectile()
@@ -128,11 +113,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             Vector2 projectileDirection = playerTransform.Position - enemyTransform.Position;
             projectileDirection.Normalize();
             projectile.GetComponent<ProjectileComponent>().Direction = projectileDirection;
-        }
-
-        public override void DealDamage()
-        {
-            base.DealDamage();
         }
     }
 }

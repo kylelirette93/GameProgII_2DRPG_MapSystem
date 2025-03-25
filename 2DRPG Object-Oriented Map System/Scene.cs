@@ -113,9 +113,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.AddGameObject(Enemy);
             Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
             ObjectManager.AddGameObject(Enemy2);
-            RangedEnemy = GameObjectFactory.CreateRangedEnemy(mapManager, "rangedEnemy");
+            RangedEnemy = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy3");
             ObjectManager.AddGameObject(RangedEnemy);
-            RangedEnemy2 = GameObjectFactory.CreateRangedEnemy(mapManager, "rangedEnemy2");
+            RangedEnemy2 = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy4");
             ObjectManager.AddGameObject(RangedEnemy2);
             
 

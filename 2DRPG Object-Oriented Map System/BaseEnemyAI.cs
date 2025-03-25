@@ -74,7 +74,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public enum EnemyState
         {
             Stunned,
-            Scan,
+            RangedAttack,
             Follow,
             Attack
         }
@@ -83,7 +83,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// This method changes the state of the enemy AI.
         /// </summary>
         /// <param name="state"></param>
-        public void ChangeState(EnemyState state)
+        protected void ChangeState(EnemyState state)
         {
             CurrentState = state;
         }
@@ -331,7 +331,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             foreach (var obj in ObjectManager.FindAll())
             {
-                if (obj.Tag == "enemy" || obj.Tag == "enemy2" || obj.Tag == "enemy3" || obj.Tag == "enemy4")
+                if (obj.Tag.StartsWith("enemy"))
                 {
                     if (obj == enemy)
                     {
