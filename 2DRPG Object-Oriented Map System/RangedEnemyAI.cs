@@ -61,6 +61,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 case EnemyState.RangedAttack:                  
                     FireProjectile();
                     EndTurn();
+                    ChangeState(EnemyState.Follow);
                     break;
                 case EnemyState.Attack:
                     Debug.WriteLine("Enemy Turn, Attack State");
@@ -86,7 +87,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 // Check if they are in the same row or column
                 if (enemyTileY == playerTileY && enemyTileX != playerTileX)
                 {
-                    // Horizontal line of sight
+                    // Horizontal line of sight.
                     int startX = Math.Min(enemyTileX, playerTileX) + 1;
                     int endX = Math.Max(enemyTileX, playerTileX);
 
@@ -94,10 +95,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                     {
                         if (!tilemap.Tiles[x, enemyTileY].IsWalkable)
                         {
-                            return false; // Obstacle in the way
+                            return false; 
                         }
                     }
-                    return true; // Line of sight clear
+                    return true; 
                 }
                 else if (enemyTileX == playerTileX && enemyTileY != playerTileY)
                 {
@@ -109,14 +110,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                     {
                         if (!tilemap.Tiles[enemyTileX, y].IsWalkable)
                         {
-                            return false; // Obstacle in the way
+                            return false; // Obstacle in the way.
                         }
                     }
-                    return true; // Line of sight clear
+                    return true; // Line of sight clear.
                 }
                 else
                 {
-                    return false; // Not in the same row or column
+                    return false; // Not in the same row or column.
                 }
             }
             return false;
@@ -141,6 +142,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             Transform projectileTransform = projectile.GetComponent<Transform>();
             Vector2 projectileDirection = playerTransform.Position - enemyTransform.Position;
             projectileDirection.Normalize();
+            //Debug.WriteLine($"Projectile direction + {projectileDirection}");
             projectile.GetComponent<ProjectileComponent>().Direction = projectileDirection;
         }
     }

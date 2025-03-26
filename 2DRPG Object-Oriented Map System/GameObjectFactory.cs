@@ -16,6 +16,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.AddComponent(new Sprite(AssetManager.GetTexture("player")));
             player.AddComponent(new Collider(player.GetComponent<Sprite>().SpriteBounds));
             player.AddComponent(new PlayerController("Player"));
+            player.AddComponent(new Inventory());
             HealthComponent healthComponent = new HealthComponent(20);
             player.AddComponent(healthComponent);
             healthComponent.Initialize();         
@@ -117,6 +118,13 @@ namespace _2DRPG_Object_Oriented_Map_System
             potion.AddComponent(new Collider(potion.GetComponent<Sprite>().SpriteBounds));
             potion.AddComponent(new HealingComponent("Healing Potion", "Heals for 2 health."));
             return potion;
+        }
+
+        public static GameObject InventorySystem()
+        {
+            GameObject inventorySystem = new GameObject("Inventory System");
+            inventorySystem.AddComponent(new Transform());
+            return inventorySystem;
         }
     }
 }

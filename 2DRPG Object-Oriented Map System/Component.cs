@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -215,7 +218,58 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
-    public class ItemComponent : Component
+    public class Inventory : DrawableComponent
+    {
+        private List<ItemComponent> items = new List<ItemComponent>();
+        Texture2D slotTexture;
+        int inventorySlots = 5;
+        Vector2[] slotPosition = new Vector2[5]
+        {
+            new Vector2(540, 400),
+            new Vector2(580, 400),
+            new Vector2(620, 400),
+            new Vector2(660, 400),
+            new Vector2(700, 400)
+        };
+
+        int slotIndex = 0;
+
+        public Inventory()
+        {
+            slotTexture = AssetManager.GetTexture("default_slot");
+        }
+
+        public void AddItem(ItemComponent item)
+        {
+            if (items.Count < inventorySlots)
+            {
+                items.Add(item);
+            }
+        }
+
+        public void RemoveItem(ItemComponent item)
+        {
+            if (items.Contains(item))
+            {
+                items.Remove(item);
+            }
+        }
+
+        public override void Update()
+        {
+            
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < inventorySlots; i++)
+            {
+                spriteBatch.Draw(slotTexture, slotPosition[i], Color.White);
+            }
+        }
+    }
+
+    public class ItemComponent : DrawableComponent
     {
         string name;
         string description;
@@ -226,6 +280,14 @@ namespace _2DRPG_Object_Oriented_Map_System
             this.description = description;
         }
 
+        void Update()
+        {
+            // Player can pickup the item if they walk over it. 
+        }
+
+        public void Add()
+        {
+        }
         public void Remove()
         {
             Debug.WriteLine("Used " + name + ".");
@@ -233,6 +295,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    
    public class ProjectileComponent : Component
     {
         public Vector2 Direction { get; set; }

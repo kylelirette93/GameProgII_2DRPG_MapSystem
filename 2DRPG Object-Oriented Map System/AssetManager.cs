@@ -43,6 +43,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             textures["player_hurt"] = content.Load<Texture2D>("player_hurt");
             textures["turn_arrow"] = content.Load<Texture2D>("turn_arrow");
             textures["turn_arrow_point"] = content.Load<Texture2D>("turn_arrow_point");
+            textures["default_slot"] = content.Load<Texture2D>("default_slot");
+
             font = content.Load<SpriteFont>("font");
             soundFiles["hurtSound"] = content.Load<SoundEffect>("hurtSound");
             soundFiles["mapMusic"] = content.Load<SoundEffect>("mapMusic");
