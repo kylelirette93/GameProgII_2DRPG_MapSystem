@@ -83,12 +83,41 @@ namespace _2DRPG_Object_Oriented_Map_System
                 int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
                 int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
 
-                bool inSight = (enemyTileY == playerTileY && enemyTileX != playerTileX) ||
-                               (enemyTileX == playerTileX && enemyTileY != playerTileY);
+                // Check if they are in the same row or column
+                if (enemyTileY == playerTileY && enemyTileX != playerTileX)
+                {
+                    // Horizontal line of sight
+                    int startX = Math.Min(enemyTileX, playerTileX) + 1;
+                    int endX = Math.Max(enemyTileX, playerTileX);
 
-                //Debug.WriteLine($"Enemy Tile: ({enemyTileX}, {enemyTileY}), Player Tile: ({playerTileX}, {playerTileY}), In Sight: {inSight}");
+                    for (int x = startX; x < endX; x++)
+                    {
+                        if (!tilemap.Tiles[x, enemyTileY].IsWalkable)
+                        {
+                            return false; // Obstacle in the way
+                        }
+                    }
+                    return true; // Line of sight clear
+                }
+                else if (enemyTileX == playerTileX && enemyTileY != playerTileY)
+                {
+                    // Vertical line of sight
+                    int startY = Math.Min(enemyTileY, playerTileY) + 1;
+                    int endY = Math.Max(enemyTileY, playerTileY);
 
-                return inSight;
+                    for (int y = startY; y < endY; y++)
+                    {
+                        if (!tilemap.Tiles[enemyTileX, y].IsWalkable)
+                        {
+                            return false; // Obstacle in the way
+                        }
+                    }
+                    return true; // Line of sight clear
+                }
+                else
+                {
+                    return false; // Not in the same row or column
+                }
             }
             return false;
         }
