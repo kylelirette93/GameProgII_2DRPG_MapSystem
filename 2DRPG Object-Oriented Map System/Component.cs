@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -223,13 +224,23 @@ namespace _2DRPG_Object_Oriented_Map_System
         private List<ItemComponent> items = new List<ItemComponent>();
         Texture2D slotTexture;
         int inventorySlots = 5;
+        SpriteFont inventoryFont;
+        KeyboardState currentState;
         Vector2[] slotPosition = new Vector2[5]
         {
-            new Vector2(540, 400),
-            new Vector2(580, 400),
-            new Vector2(620, 400),
-            new Vector2(660, 400),
-            new Vector2(700, 400)
+            new Vector2(840, 50),
+            new Vector2(880, 50),
+            new Vector2(920, 50),
+            new Vector2(960, 50),
+            new Vector2(1000, 50)
+        };
+        Vector2[] labelPosition = new Vector2[5]
+        {
+            new Vector2(840, 0),
+            new Vector2(880, 0),
+            new Vector2(920, 0),
+            new Vector2(960, 0),
+            new Vector2(1000, 0)
         };
 
         int slotIndex = 0;
@@ -237,6 +248,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Inventory()
         {
             slotTexture = AssetManager.GetTexture("default_slot");
+            inventoryFont = AssetManager.GetFont("font");
         }
 
         public void AddItem(ItemComponent item)
@@ -255,15 +267,42 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        public void UseItem(int slotNumber)
+        {
+            items[slotNumber].UseItem();
+            RemoveItem(items[slotNumber]);
+        }
+
         public override void Update()
         {
-            
+            currentState = Keyboard.GetState();
+            if (currentState.IsKeyDown(Keys.D1))
+            {
+                UseItem(0);
+            }
+            else if (currentState.IsKeyDown(Keys.D2))
+            {
+                UseItem(1);
+            }
+            else if (currentState.IsKeyDown(Keys.D3))
+            {
+                UseItem(2);
+            }
+            else if (currentState.IsKeyDown(Keys.D4))
+            {
+                UseItem(3);
+            }
+            else if (currentState.IsKeyDown(Keys.D5))
+            {
+                UseItem(4);
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < inventorySlots; i++)
             {
+                spriteBatch.DrawString(inventoryFont, $"[{(i + 1).ToString()}]", labelPosition[i], Color.White);
                 spriteBatch.Draw(slotTexture, slotPosition[i], Color.White);
             }
         }
@@ -280,13 +319,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             this.description = description;
         }
 
-        void Update()
+       public virtual void UseItem()
         {
-            // Player can pickup the item if they walk over it. 
-        }
-
-        public void Add()
-        {
+            // Do something with the item!
         }
         public void Remove()
         {

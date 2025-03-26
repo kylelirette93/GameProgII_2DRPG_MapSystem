@@ -32,7 +32,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         protected override void Initialize()
         {
-            _graphics.PreferredBackBufferWidth = 800;  // Set custom width
+            _graphics.PreferredBackBufferWidth = 1080;  // Set custom width
             _graphics.PreferredBackBufferHeight = 480;  // Set custom height
             _graphics.ApplyChanges();  // Apply the changes
 
@@ -80,7 +80,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.SlateGray);
 
             _spriteBatch.Begin();
             ObjectManager.DrawAll(_spriteBatch);
