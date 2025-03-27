@@ -27,7 +27,15 @@ public class TurnManager
     // Add a turn taker.
     public void AddTurnTaker(ITurnTaker turnTaker)
     {
-        turnQueue.Enqueue(turnTaker);
+        foreach (ITurnTaker turnTaker1 in turnQueue)
+        {
+            if (turnTaker.Id == turnTaker1.Id)
+            {
+                Debug.WriteLine($"Duplicate turn taker found: {turnTaker.Id}");
+                return;
+            }
+        }
+        turnQueue.Enqueue(turnTaker);      
     }
 
     public void RemoveTurnTaker(ITurnTaker turnTaker)
@@ -47,19 +55,20 @@ public class TurnManager
 
             // Start the turn
             Debug.WriteLine($"{currentTurnTaker} is starting its turn.");
-            currentTurnTaker.StartTurn(); // Synchronous call
+            currentTurnTaker.StartTurn(); 
         }
 
         // Check if the current turn taker has finished their turn
         if (currentTurnTaker != null && !currentTurnTaker.IsTurn)
         {
             waitingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (waitingTime > 0.5f)
+            if (waitingTime > 0.01f)
             {
                 // End the current turn and reset the turn state
                 Debug.WriteLine($"{currentTurnTaker} has finished its turn.");
                 isTurnActive = false;
-                turnQueue.Enqueue(currentTurnTaker); // Re-enqueue the turn taker if needed
+
+                turnQueue.Enqueue(currentTurnTaker);
                 currentTurnTaker = null;
                 CurrentTurnId = null;
                 waitingTime = 0f;

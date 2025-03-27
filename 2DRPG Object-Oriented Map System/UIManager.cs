@@ -18,7 +18,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             turnDisplayfont = AssetManager.GetFont("font");
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        /*public void Draw(SpriteBatch spriteBatch)
         {
             string participantName = TurnManager.Instance.CurrentTurnId;
             string displayText = "Player's Turn";
@@ -34,5 +34,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             spriteBatch.DrawString(turnDisplayfont, displayText, turnDisplayPosition + dropShadowOffset, Color.Black);
             spriteBatch.DrawString(turnDisplayfont, displayText, turnDisplayPosition, Color.White);
         }
+        */
 }
 }

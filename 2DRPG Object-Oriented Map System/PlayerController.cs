@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
@@ -127,13 +128,31 @@ namespace _2DRPG_Object_Oriented_Map_System
                             }
                         }
                     }
+
+                    var items = ObjectManager.FindAllObjectsByTag("item").ToList();
+                    foreach (var itemObject in items)
+                    {
+
+                       if (itemObject != null)
+                        {
+                            var itemCollider = itemObject.GetComponent<Collider>();
+                            if (itemCollider != null && tempPlayerBounds.Intersects(itemCollider.Bounds))
+                            {
+                                Debug.WriteLine("Object picked up:" + itemObject);
+                                ObjectManager.Find("player")?.GetComponent<Inventory>().AddItem(itemObject.GetComponent<ItemComponent>());
+                                itemObject.Destroy();
+                                return true;
+                            }
+                        }
+                    }
                     if (exit != null)
                     {
                         var exitCollider = exit.GetComponent<Collider>();
                         if (exitCollider != null && tempPlayerBounds.Intersects(exitCollider.Bounds))
                         {
                             // Check if all enemies are dead.
-                            if (!enemies.Any(enemy => enemy.GetComponent<HealthComponent>()?.CurrentHealth > 0))
+                            if (!enemies.Any(enemy => enemy.GetComponent<HealthComponent>()?.CurrentHealth > 0 &&
+                            enemy.GetComponent<GhostEnemyAI>() == null))
                             {
                                 OnExitTile?.Invoke();
                                 return true; // Allow movement if all enemies are dead

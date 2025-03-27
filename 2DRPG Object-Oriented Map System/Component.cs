@@ -67,11 +67,12 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// This class is responsible for managing the health of a game object. 
     /// It contains a health and max health property, as well as a method to take damage.
     /// </summary>
-    public class HealthComponent : Component
+    public class HealthComponent : DrawableComponent
     {
         public int Health { get; set; }
         public int MaxHealth { get; private set; }
         public int CurrentHealth { get { return Health; } }
+        
         string animationTextureName;
 
         private AnimationComponent stunnedAnimation; // Store the AnimationComponent
@@ -85,8 +86,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void Initialize()
         {
             animationTextureName = "";
-            if (GameObject?.Tag == "enemy" || GameObject?.Tag == "enemy2" 
-                || GameObject?.Tag == "enemy3" || GameObject?.Tag == "enemy4")
+            if (GameObject.Tag.StartsWith("enemy"))
             {
                 animationTextureName = "enemy_hurt";
             }
@@ -109,6 +109,21 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 GameObject.Destroy();
             }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Vector2 healthBarPosition = GameObject.GetComponent<Transform>().Position - new Vector2(10, 10);
+
+            float healthPercentage = (float)Health / MaxHealth;
+            int filledWidth = (int)(healthPercentage * 50);
+
+            // Draw the background of the health bar (black)
+            spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, 50, 5), Color.Black); // using a single pixel texture and stretching it.
+
+            // Draw the filled portion of the health bar (red or green)
+            Color healthColor = healthPercentage > 0.5f ? Color.Green : Color.Red;
+            spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, filledWidth, 5), healthColor); // using a single pixel texture and stretching it.
         }
     }
     /// <summary>
@@ -222,7 +237,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class Inventory : DrawableComponent
     {
         private List<ItemComponent> items = new List<ItemComponent>();
-        Texture2D slotTexture;
+        Texture2D[] slotTextures;
         int inventorySlots = 5;
         SpriteFont inventoryFont;
         KeyboardState currentState;
@@ -247,7 +262,11 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public Inventory()
         {
-            slotTexture = AssetManager.GetTexture("default_slot");
+            slotTextures = new Texture2D[inventorySlots];
+            for (int i = 0; i < inventorySlots; i++)
+            {
+                slotTextures[i] = AssetManager.GetTexture("default_slot");
+            }
             inventoryFont = AssetManager.GetFont("font");
         }
 
@@ -256,6 +275,25 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (items.Count < inventorySlots)
             {
                 items.Add(item);
+                // Get the index of the last item added.
+                int itemIndex = items.Count - 1;
+                for (int i = 0; i < inventorySlots; i++)
+                    if (item.Name == "Healing Potion")
+                    {
+                        slotTextures[itemIndex] = AssetManager.GetTexture("healing_potion");
+                    }
+                    else if (item.Name == "Scroll of Fireball")
+                    {
+                        slotTextures[itemIndex] = AssetManager.GetTexture("scroll_of_fireball");
+                    }
+                    else if (item.Name == "Scroll of Lightning")
+                    {
+                        slotTextures[itemIndex] = AssetManager.GetTexture("scroll_of_lightning");
+                    }
+            }
+            else
+            {
+                Debug.WriteLine("Inventory is full!");
             }
         }
 
@@ -263,14 +301,42 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (items.Contains(item))
             {
+                int index = items.IndexOf(item);
                 items.Remove(item);
+                slotTextures[index] = AssetManager.GetTexture("default_slot");
+
+                for (int i = index; i < items.Count; i++)
+                {
+                    if (items[i] != null)
+                    {
+                        if (items[i].Name == "Healing Potion")
+                        {
+                            slotTextures[i] = AssetManager.GetTexture("healing_potion");
+                        }
+                        else if (items[i].Name == "Scroll of Fireball")
+                        {
+                            slotTextures[i] = AssetManager.GetTexture("scroll_of_fireball");
+                        }
+                        else if (items[i].Name == "Scroll of Lightning")
+                        {
+                            slotTextures[i] = AssetManager.GetTexture("scroll_of_lightning");
+                        }
+                    }
+                }
+                if (items.Count < inventorySlots)
+                {
+                    slotTextures[items.Count] = AssetManager.GetTexture("default_slot");
+                }
             }
         }
 
         public void UseItem(int slotNumber)
         {
-            items[slotNumber].UseItem();
-            RemoveItem(items[slotNumber]);
+            if (slotNumber >= 0 && slotNumber < items.Count && items[slotNumber] != null)
+            {
+                items[slotNumber].UseItem();
+                RemoveItem(items[slotNumber]);
+            }
         }
 
         public override void Update()
@@ -303,13 +369,14 @@ namespace _2DRPG_Object_Oriented_Map_System
             for (int i = 0; i < inventorySlots; i++)
             {
                 spriteBatch.DrawString(inventoryFont, $"[{(i + 1).ToString()}]", labelPosition[i], Color.White);
-                spriteBatch.Draw(slotTexture, slotPosition[i], Color.White);
+                spriteBatch.Draw(slotTextures[i], slotPosition[i], Color.White);
             }
         }
     }
 
     public class ItemComponent : DrawableComponent
     {
+        public string Name { get { return name; } }
         string name;
         string description;
 
@@ -322,6 +389,11 @@ namespace _2DRPG_Object_Oriented_Map_System
        public virtual void UseItem()
         {
             // Do something with the item!
+        }
+
+        public virtual void PickupItem()
+        {
+
         }
         public void Remove()
         {
@@ -399,7 +471,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             healthComponent = GameObject.GetComponent<HealthComponent>();
         }
 
-        public void Use()
+        public override void UseItem()
         {
            if (healthComponent != null)
             {
@@ -413,5 +485,31 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
 
 
+    }
+
+    public class FireballScroll : ItemComponent
+    {
+        public FireballScroll(string name, string description) : base(name, description)
+        {
+
+        }
+
+        public override void UseItem()
+        {
+            // Shoot a fireball.
+        }
+    }
+
+    public class LightningScroll : ItemComponent
+    {
+        public LightningScroll(string name, string description) : base(name, description)
+        {
+
+        }
+
+        public override void UseItem()
+        {
+            // Shoot a lightning bolt, damaging all nearby enemies.
+        }
     }
 }

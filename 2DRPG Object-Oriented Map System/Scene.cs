@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 
@@ -13,14 +15,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Read only properties for player and tilemap, the property can only be modified from within the class. 
         /// </summary>
 
-        public GameObject Player { get; private set; }
-
-        public GameObject Enemy { get; private set; }
-        public GameObject Enemy2 { get; private set; }
-
-        public GameObject RangedEnemy { get; private set; }
-
-        public GameObject RangedEnemy2 { get; private set; }
+        public GameObject Player { get; private set; }     
 
         public GameObject Tilemap { get; private set; }
 
@@ -28,9 +23,9 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public GameObject TurnArrow { get; private set; }
 
-        public TurnManager turnManager;
+        public GameObject Item { get; private set; }
 
-        private GameTime gameTime;
+        private Random random = new Random();
         
 
 
@@ -40,7 +35,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="mapManager"></param>
         public void Initialize(MapManager mapManager)
         {
-            this.gameTime = gameTime;
             // 1. Create Tilemap.
             Tilemap = GameObjectFactory.CreateTilemap(mapManager);
             ObjectManager.AddGameObject(Tilemap);
@@ -49,18 +43,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             Player = GameObjectFactory.CreatePlayer(mapManager);
             ObjectManager.AddGameObject(Player);
 
-            // 3. Create Enemies.
-            Enemy = GameObjectFactory.CreateEnemy(mapManager, "enemy");
-            ObjectManager.AddGameObject(Enemy);
+            Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
+            ObjectManager.AddGameObject(Item);
 
-            Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
-            ObjectManager.AddGameObject(Enemy2);
-
-            RangedEnemy = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy3");
-            ObjectManager.AddGameObject(RangedEnemy);
-
-            RangedEnemy2 = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy4");
-            ObjectManager.AddGameObject(RangedEnemy2);
+            SpawnRandomEnemies(mapManager);
 
             // 4. Create Exit.
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
@@ -74,18 +60,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.AddGameObject(TurnArrow);
 
             // 6. Update Object Manager and start turn cycle.
-            
-
             TurnManager.Instance.AddTurnTaker(Player.GetComponent<PlayerController>());
-            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<BaseEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<BaseEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(RangedEnemy.GetComponent<RangedEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(RangedEnemy2.GetComponent<RangedEnemyAI>());
+            AddEnemyTurns();
         }
 
         public void Update(GameTime gameTime)
         {
-
             TurnManager.Instance.UpdateTurn(gameTime);
 
             if (Player.GetComponent<PlayerController>().IsTurn)  
@@ -108,21 +88,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             Tilemap.RemoveComponent<Tilemap>();
             Tilemap.AddComponent(mapManager.CreateMap());
             Tilemap.GetComponent<Tilemap>().LastExitTile = Exit.GetComponent<Transform>().Position;
-            Debug.WriteLine("Before enemy creation.");
-            Enemy = GameObjectFactory.CreateEnemy(mapManager, "enemy");
-            ObjectManager.AddGameObject(Enemy);
-            Enemy2 = GameObjectFactory.CreateEnemy(mapManager, "enemy2");
-            ObjectManager.AddGameObject(Enemy2);
-            RangedEnemy = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy3");
-            ObjectManager.AddGameObject(RangedEnemy);
-            RangedEnemy2 = GameObjectFactory.CreateRangedEnemy(mapManager, "enemy4");
-            ObjectManager.AddGameObject(RangedEnemy2);
-            
 
-            TurnManager.Instance.AddTurnTaker(Enemy.GetComponent<BaseEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(Enemy2.GetComponent<BaseEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(RangedEnemy.GetComponent<RangedEnemyAI>());
-            TurnManager.Instance.AddTurnTaker(RangedEnemy2.GetComponent<RangedEnemyAI>());
+            Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
+            ObjectManager.AddGameObject(Item);
+
+            SpawnRandomEnemies(mapManager);
+
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
@@ -140,11 +111,70 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             Tilemap.GetComponent<Tilemap>().ClearPathToExit(playerTilePos, exitTilePos);
 
-    
-            Debug.WriteLine("After PopulateQueue.");
 
             // Remove the old exit last
             ObjectManager.RemoveGameObject(previousExit);
+            AddEnemyTurns();
+        }
+
+        private void SpawnRandomEnemies(MapManager mapManager)
+        {
+            int enemyCount = random.Next(2, 4);
+            for (int i = 0; i < enemyCount; i++)
+            {
+                int enemyType = random.Next(3);
+                string enemyName;
+                string textureName;
+
+                switch (enemyType)
+                {
+                    case 0:
+                        enemyName = $"enemy_{Guid.NewGuid()}"; // Unique name
+                        textureName = "enemy";
+                        ObjectManager.AddGameObject(GameObjectFactory.CreateEnemy(mapManager, enemyName, textureName));
+                        Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
+                        break;
+                    case 1:
+                        enemyName = $"enemy2_{Guid.NewGuid()}"; // Unique name
+                        textureName = "ranged_enemy";
+                        ObjectManager.AddGameObject(GameObjectFactory.CreateRangedEnemy(mapManager, enemyName, textureName));
+                        Debug.WriteLine($"Spawned {enemyName} with RangedEnemyAI.");
+                        break;
+                    case 2:
+                        enemyName = $"enemy3_{Guid.NewGuid()}"; // Unique name
+                        textureName = "ghost_enemy";
+                        ObjectManager.AddGameObject(GameObjectFactory.CreateGhostEnemy(mapManager, enemyName, textureName));
+                        Debug.WriteLine($"Spawned {enemyName} with GhostEnemyAI.");
+                        break;
+                    default:
+                        enemyName = $"enemy_{Guid.NewGuid()}"; // Unique name
+                        textureName = "enemy";
+                        ObjectManager.AddGameObject(GameObjectFactory.CreateEnemy(mapManager, enemyName, textureName));
+                        Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
+                        break;
+                }
+                // Debug.WriteLine($"Enemy type: {enemyType}");
+            }
+        }
+
+
+        private void AddEnemyTurns()
+        {
+            foreach (GameObject gameObject in ObjectManager.GameObjects)
+            {
+                if (gameObject.GetComponent<MeleeEnemyAI>() != null)
+                {
+                    TurnManager.Instance.AddTurnTaker(gameObject.GetComponent<MeleeEnemyAI>());
+                }
+                else if (gameObject.GetComponent<RangedEnemyAI>() != null)
+                {
+                    TurnManager.Instance.AddTurnTaker(gameObject.GetComponent<RangedEnemyAI>());
+                }
+                else if (gameObject.GetComponent<GhostEnemyAI>() != null)
+                {
+                    TurnManager.Instance.AddTurnTaker(gameObject.GetComponent<GhostEnemyAI>());
+                }
+            }
         }
     }
 }

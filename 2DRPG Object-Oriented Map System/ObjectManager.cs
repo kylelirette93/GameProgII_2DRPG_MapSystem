@@ -12,6 +12,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     public static class ObjectManager
     {
         // List of game objects to update and draw dynamically.
+        public static List<GameObject> GameObjects { get {  return toAdd; } }
         private static List<GameObject> gameObjects = new List<GameObject>();
         private static List<GameObject> toRemove = new List<GameObject>();
         private static List<GameObject> toAdd = new List<GameObject>();

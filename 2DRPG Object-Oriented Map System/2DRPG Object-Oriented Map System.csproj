@@ -20,15 +20,20 @@
     <None Remove="Content\enemy.png" />
     <None Remove="Content\enemy_hurt.png" />
     <None Remove="Content\font.spritefont" />
+    <None Remove="Content\ghost_enemy.png" />
+    <None Remove="Content\healing_potion.png" />
     <None Remove="Content\Level0.txt" />
     <None Remove="Content\Level1.txt" />
     <None Remove="Content\Level2.txt" />
     <None Remove="Content\mapMusic.wav" />
     <None Remove="Content\obstacle_tile.png" />
+    <None Remove="Content\pixel.png" />
     <None Remove="Content\player.png" />
     <None Remove="Content\player_hurt.png" />
     <None Remove="Content\projectile.png" />
     <None Remove="Content\ranged_enemy.png" />
+    <None Remove="Content\scroll_of_fireball.png" />
+    <None Remove="Content\scroll_of_lightning.png" />
     <None Remove="Content\turn_arrow.png" />
     <None Remove="Content\turn_arrow_point.png" />
     <None Remove="Icon.ico" />
@@ -36,6 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\default_slot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\ghost_enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\healing_potion.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\mapMusic.wav">
@@ -64,6 +75,9 @@
     <Content Include="Content\obstacle_tile.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\pixel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\player.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -74,6 +88,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\ranged_enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\scroll_of_fireball.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\scroll_of_lightning.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\turn_arrow.png">

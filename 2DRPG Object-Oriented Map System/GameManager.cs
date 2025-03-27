@@ -37,7 +37,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             _graphics.ApplyChanges();  // Apply the changes
 
             base.Initialize();
-            InitializeLevel();
         }
 
         private void InitializeLevel()
@@ -61,6 +60,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             // Load all the textures at once.
             AssetManager.LoadContent(Content);
+            InitializeLevel();
         }
         /// <summary>
         /// Update method is responsible for updating the game state.
@@ -84,7 +84,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             _spriteBatch.Begin();
             ObjectManager.DrawAll(_spriteBatch);
-            uiManager.Draw(_spriteBatch);
+            //uiManager.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

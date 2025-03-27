@@ -351,6 +351,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             return Vector2.Zero;
         }
+
+        public Vector2 FindItemSpawn(Vector2 playerPosition, float minDistance)
+        {
+            Vector2 itemPosition;
+            bool validItemSpawnFound = false;
+            do
+            {
+                // Generate random coordinates within the map bounds, excluding the edges.
+                itemPosition = new Vector2(
+                    random.Next(2, _mapWidth - 2) * _tileWidth,
+                    random.Next(2, _mapHeight - 2) * _tileHeight
+                );
+                // Debug.WriteLine($"FindExitSpawn: generated exitPosition={exitPosition}");
+            } while (Vector2.Distance(itemPosition, playerPosition) < minDistance);
+            return itemPosition;
+        }
         /// <summary>
         /// Create's a tile based on the symbol from the file.
         /// </summary>

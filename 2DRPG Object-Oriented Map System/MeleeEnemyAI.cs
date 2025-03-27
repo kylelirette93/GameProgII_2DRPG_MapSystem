@@ -10,6 +10,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     {
         public MeleeEnemyAI(string name) : base(name)
         {
+            Id = Guid.NewGuid().ToString();
         }
     }
 }

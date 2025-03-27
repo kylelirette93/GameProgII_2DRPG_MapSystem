@@ -33,7 +33,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public bool IsTurn => isTurn;
 
-        public string Id => Name;
+        public string Id { get; set; }
 
         /// <summary>
         /// Constructor for the EnemyAI class. Has two names, one for the GameObject and one for the EnemyAI to be managed in turn component. 
@@ -43,6 +43,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public BaseEnemyAI(string name)
         {
             Name = name;
+            Id = Guid.NewGuid().ToString();
             _name = name;
             stunnedCounter = 0;
             pathfinder = new Pathfinder();

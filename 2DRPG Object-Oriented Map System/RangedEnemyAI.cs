@@ -9,6 +9,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         GameObject projectile;
         public RangedEnemyAI(string name) : base(name)
         {
+            Id = Guid.NewGuid().ToString();
             //Debug.WriteLine($"RangedEnemyAI constructor called with name: '{name}'");
         }       
 
