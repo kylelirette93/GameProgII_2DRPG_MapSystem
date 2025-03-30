@@ -115,6 +115,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     if (state.IsKeyDown(Keys.Enter))
                     {
                         CurrentState = GameState.Playing;
+                        CleanupLevel(null);
                         InitializeLevel();
                     }
                     break;
@@ -145,9 +146,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                     break;
                 case GameState.GameOver:
                     uiManager.UpdateGameOverMenu();
-                    CleanupLevel(gameTime);
                     if (state.IsKeyDown(Keys.M))
                     {
+                        CleanupLevel(gameTime);
                         CurrentState = GameState.MainMenu;
                     }
                     break;

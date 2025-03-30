@@ -383,14 +383,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 throw new Exception($"Unknown tile symbol: {symbol}");
             }
-        }  
+        }
 
-        public void ClearMap()         {
-            for (int x = 0; x < _tiles.GetLength(0); x++)
+        public void ClearMap()
+        {
+            if (_tiles != null)
             {
-                for (int y = 0; y < _tiles.GetLength(1); y++)
+                for (int x = 0; x < _tiles.GetLength(0); x++)
                 {
-                    _tiles[x, y] = null;
+                    for (int y = 0; y < _tiles.GetLength(1); y++)
+                    {
+                        if (_tiles[x, y] != null && _tiles[x, y].Texture != null)
+                        {
+                            _tiles[x, y].Texture.Dispose();
+                        }
+                        _tiles[x, y] = null;
+                    }
                 }
             }
         }

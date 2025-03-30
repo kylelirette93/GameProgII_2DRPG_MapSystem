@@ -97,11 +97,20 @@ namespace _2DRPG_Object_Oriented_Map_System
                 {
                     for (int j = 0; j < _currentMap.Tiles.GetLength(1); j++)
                     {
-                        _currentMap.Tiles[i, j] = null;
+                        if (_currentMap != null)
+                        {
+                            // Set each tile to null.
+                            _currentMap.Tiles[i, j] = null;
+                        }
                     }
                 }
             }
-            _currentMap = null;
+            if (_currentMap != null)
+            {
+                // Dispose of the textures, and set the map to null.
+                _currentMap.ClearMap(); 
+                _currentMap = null; 
+            }
             _currentLevelIndex = 0;
         }
 
