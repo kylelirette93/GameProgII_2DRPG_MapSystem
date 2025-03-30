@@ -110,6 +110,11 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
+
+        public static void RemoveAll()
+        {
+            gameObjects.Clear();
+        }
         /// <summary>
         /// Draw All method draws all game objects at once.
         /// </summary>

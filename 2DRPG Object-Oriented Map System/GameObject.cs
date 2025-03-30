@@ -98,7 +98,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Update all components.
             foreach (Component component in components)
             {
-                component.Update();
+                if (component != null)
+                {
+                    component.Update();
+                }
             }
         }
 

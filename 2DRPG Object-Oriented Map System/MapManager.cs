@@ -91,7 +91,17 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void Clear()
         {
-            CurrentMap = null;
+            if (_currentMap != null && _currentMap.Tiles != null)
+            {
+                for (int i = 0; i < _currentMap.Tiles.GetLength(0); i++)
+                {
+                    for (int j = 0; j < _currentMap.Tiles.GetLength(1); j++)
+                    {
+                        _currentMap.Tiles[i, j] = null;
+                    }
+                }
+            }
+            _currentMap = null;
             _currentLevelIndex = 0;
         }
 

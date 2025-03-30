@@ -70,12 +70,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (currentScene != null && mapManager != null)
             {
-                currentScene.Clear();
+                currentScene.Clear(mapManager);
                 currentScene = null;
                 mapManager.Clear();
                 mapManager = null;
                 TurnManager.Instance.TurnQueue.Clear();
-                ObjectManager.UpdateAll(gameTime);
+                foreach (GameObject gameObject in ObjectManager.GameObjects)
+                {
+                    gameObject.Destroy();
+                }
+                ObjectManager.RemoveAll();
                 SoundManager.StopMusic("mapMusic");
             }
             
