@@ -89,6 +89,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             return Vector2.Zero;
         }
 
+        /// <summary>
+        /// This method clear's the current map and sets it to null.
+        /// </summary>
         public void Clear()
         {
             if (_currentMap != null && _currentMap.Tiles != null)

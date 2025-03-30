@@ -137,7 +137,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public static GameObject CreateRandomItem(MapManager mapManager, Vector2 playerPosition, float minDistance)
         {
             Random random = new Random();
-            int randomItem = random.Next(0, 3);
+            int randomItem = random.Next(0, 4);
             switch (randomItem)
             {
                 case 0:
@@ -146,6 +146,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                     return CreateFireballScroll(mapManager, playerPosition, minDistance);
                 case 2:
                     return CreateLightningScroll(mapManager, playerPosition, minDistance);
+                case 3:
+                    return CreateForceScroll(mapManager, playerPosition, minDistance);
                 default:
                     return CreateHealingPotion(mapManager, playerPosition, minDistance);
             }
@@ -185,6 +187,18 @@ namespace _2DRPG_Object_Oriented_Map_System
             scrollOfLightning.AddComponent(new Collider(scrollOfLightning.GetComponent<Sprite>().SpriteBounds));
             scrollOfLightning.AddComponent(new LightningScroll("Scroll of Lightning", "Deals 5 damage."));
             return scrollOfLightning;
+        }
+
+        public static GameObject CreateForceScroll(MapManager mapManager, Vector2 playerPosition, float minDistance) 
+        {
+            Vector2 forceScrollPosition = mapManager.CurrentMap.FindItemSpawn(playerPosition, minDistance);
+            GameObject scrollOfForce = new GameObject("item");
+            scrollOfForce.AddComponent(new Transform());
+            scrollOfForce.GetComponent<Transform>().Position = forceScrollPosition;
+            scrollOfForce.AddComponent(new Sprite(AssetManager.GetTexture("scroll_of_force")));
+            scrollOfForce.AddComponent(new Collider(scrollOfForce.GetComponent<Sprite>().SpriteBounds));
+            scrollOfForce.AddComponent(new ForceScroll("Scroll of Force", "Deals 10 damage."));
+            return scrollOfForce;
         }
 
         public static GameObject InventorySystem()

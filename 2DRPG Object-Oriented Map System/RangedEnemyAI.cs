@@ -88,10 +88,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
                 int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
 
-                // Check if they are in the same row or column
+                // Check if they are in the same row or column.
                 if (enemyTileY == playerTileY && enemyTileX != playerTileX)
                 {
-                    // Horizontal line of sight.
+                    // Check if they are in horizontal line of sight.
                     int startX = Math.Min(enemyTileX, playerTileX) + 1;
                     int endX = Math.Max(enemyTileX, playerTileX);
 
@@ -106,7 +106,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 else if (enemyTileX == playerTileX && enemyTileY != playerTileY)
                 {
-                    // Vertical line of sight
+                    // Check if they are in vertical line of sight.
                     int startY = Math.Min(enemyTileY, playerTileY) + 1;
                     int endY = Math.Max(enemyTileY, playerTileY);
 
@@ -114,19 +114,24 @@ namespace _2DRPG_Object_Oriented_Map_System
                     {
                         if (!tilemap.Tiles[enemyTileX, y].IsWalkable)
                         {
-                            return false; // Obstacle in the way.
+                            // Obstacle in the way.
+                            return false; 
                         }
                     }
-                    return true; // Line of sight clear.
+                    // Line of sight is clear.
+                    return true; 
                 }
                 else
                 {
-                    return false; // Not in the same row or column.
+                    // Not in the same row or column.
+                    return false;
                 }
             }
+            // One of the objects is null.
             return false;
         }
 
+        // Creates a projectile and assigns it to a variable at the class level.
         public void FireProjectile()
         {
             //Debug.WriteLine("FireProjectile() called.")
@@ -140,6 +145,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             ChangeState(EnemyState.Follow);
         }
 
+        /// <summary>
+        /// This method creates a projectile and fires it towards the player.
+        /// </summary>
+        /// <returns></returns>
         public GameObject CreateProjectile()
         {
             GameObject projectile = GameObjectFactory.CreateProjectile(enemy.GetComponent<Transform>().Position);

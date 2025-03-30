@@ -4,13 +4,26 @@ using System.Collections.Generic;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// This class is responsible for pathfinding in the game.
+    /// </summary>
     public class Pathfinder
     {
+        // Multidimensional array to hold the nodes of the map.
         public PathNode[,] nodeMap;
+        // Open list to hold nodes to be evaluated.
         public List<PathNode> openList = new List<PathNode>();
-        public HashSet<PathNode> closedSet = new HashSet<PathNode>(); // Use HashSet for closed list
+        // Closed list to hold nodes that have been evaluated, using a hash set for faster look ups.
+        public HashSet<PathNode> closedSet = new HashSet<PathNode>(); 
+        // Path nodes to hold the starting, current and target nodes.
         public PathNode startingNode, currentNode, targetNode;
 
+        /// <summary>
+        /// This method builds a node map from a tile map.
+        /// </summary>
+        /// <param name="map"></param>
+        /// <param name="excludedPoint">The excluded point is used for enemy's, so they can exclude themselves.</param>
+        /// <returns></returns>
         public PathNode[,] BuildNodeMap(Tile[,] map, Point? excludedPoint = null)
         {
             PathNode[,] nodeMap = new PathNode[map.GetLength(0), map.GetLength(1)];
@@ -34,6 +47,13 @@ namespace _2DRPG_Object_Oriented_Map_System
             return nodeMap;
         }
 
+        /// <summary>
+        /// This method finds a path from a starting point to a goal point.
+        /// </summary>
+        /// <param name="nodeMap"></param>
+        /// <param name="startingFrom"></param>
+        /// <param name="goal"></param>
+        /// <returns></returns>
         public List<Point> FindPath(PathNode[,] nodeMap, Point startingFrom, Point goal)
         {
             if (nodeMap == null)
@@ -41,50 +61,66 @@ namespace _2DRPG_Object_Oriented_Map_System
                 return null;
             }
 
-            this.nodeMap = nodeMap; // Set the node map in the pathfinder
+            // Assign this class's node map to the provided one.
+            this.nodeMap = nodeMap; 
+            // Return a list of points from the pathfinding method.
             return InitializePathfinding(startingFrom, goal);
         }
 
-        public List<Point> ReversePath(List<Point> path)
-        {
-            List<Point> reversedPath = new List<Point>();
-            for (int i = path.Count - 1; i >= 0; i--)
-            {
-                reversedPath.Add(path[i]);
-            }
-            return reversedPath;
-        }
 
+        /// <summary>
+        /// Initializes the pathfinding algorithm, setting the starting node, target node and open list.
+        /// </summary>
+        /// <param name="startingFrom"></param>
+        /// <param name="goal"></param>
+        /// <returns></returns>
         private List<Point> InitializePathfinding(Point startingFrom, Point goal)
         {
+            // Set the starting node and target node to the provided points.
             startingNode = nodeMap[startingFrom.X, startingFrom.Y];
             targetNode = nodeMap[goal.X, goal.Y];
 
+            // Initialize the costs.
             startingNode.GCost = 0;
             startingNode.HCost = CalculateHCost(startingNode, targetNode);
             startingNode.FCost = startingNode.GCost + startingNode.HCost;
+
+            // The starting node has no explored from point, therefore set it to the starting point.
             startingNode.exploredFrom = startingFrom;
 
+            // Clear the lists before starting the algorithm, to avoid any previous data.
             openList.Clear();
             closedSet.Clear();
+
+            // Add the starting node to the open list.
             openList.Add(startingNode);
 
             while (openList.Count > 0)
             {
+                // Get the node with the lowest F cost.
                 currentNode = GetNodeWithLowestFCost(openList);
+
                 if (currentNode.position == targetNode.position)
                 {
+                    // Return the path because the target node has been reached.
                     return ReconstructPath(currentNode);
                 }
+
+                // Switch the current node from the open list to the closed list.
 
                 openList.Remove(currentNode);
                 closedSet.Add(currentNode);
 
+                // Check the neighbours of the current node.
                 foreach (var neighbor in GetNeighbors(currentNode))
                 {
+                    // If the neighbor is not walkable or in closed set, skip it.
                     if (!neighbor.isWalkable || closedSet.Contains(neighbor)) continue;
 
+                    // Calculate the tentative G cost.
                     int tentativeGCost = currentNode.GCost + 1;
+
+                    // Add the neighbor to the list if it's cost is less than the current cost.
                     if (tentativeGCost < neighbor.GCost || !openList.Contains(neighbor))
                     {
                         neighbor.GCost = tentativeGCost;
@@ -99,14 +135,26 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                 }
             }
-            return null; // No path found
+            // If no path is found, return null.
+            return null;
         }
 
+        /// <summary>
+        /// This method calculate's the H cost of current node based on the target node.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="targetNode"></param>
+        /// <returns></returns>
         public int CalculateHCost(PathNode node, PathNode targetNode)
         {
             return Math.Abs(node.position.X - targetNode.position.X) + Math.Abs(node.position.Y - targetNode.position.Y);
         }
 
+        /// <summary>
+        /// This method calculate's the F cost of the current node.
+        /// </summary>
+        /// <param name="openList"></param>
+        /// <returns></returns>
         public PathNode GetNodeWithLowestFCost(List<PathNode> openList)
         {
             if (openList == null || openList.Count == 0)
@@ -124,6 +172,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             return lowestFCostNode;
         }
 
+        /// <summary>
+        /// This method returns the neighbors of a node, based on orthogonal directions.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public List<PathNode> GetNeighbors(PathNode node)
         {
             List<PathNode> neighbors = new List<PathNode>();
@@ -145,6 +198,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             return neighbors;
         }
 
+        /// <summary>
+        /// This method reconstructs the path from the end node to the start node. Used after a path is found to reconstruct the path.
+        /// </summary>
+        /// <param name="endNode"></param>
+        /// <returns></returns>
         public List<Point> ReconstructPath(PathNode endNode)
         {
             List<Point> path = new List<Point>();
@@ -159,13 +217,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 currentNode = nodeMap[currentNode.exploredFrom.X, currentNode.exploredFrom.Y];
             }
-
-            //path.Add(startingNode.position);
             path.Reverse();
             return path;
         }
     }
 
+    /// <summary>
+    /// The Path Node class is used to represent a node in the pathfinding algorithm.
+    /// </summary>
     public class PathNode
     {
         public int HCost, FCost, GCost;
@@ -177,6 +236,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             Reset();
         }
 
+        /// <summary>
+        /// This method reset's the node's cost and explored from point.
+        /// </summary>
         public void Reset()
         {
             HCost = FCost = GCost = 1000000;

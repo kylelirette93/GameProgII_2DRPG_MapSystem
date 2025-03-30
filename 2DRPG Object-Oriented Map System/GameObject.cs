@@ -132,7 +132,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             foreach (Component component in components)
             {
-                // Check if the component implements ITurnTaker
+                // Check if the component implements ITurnTaker.
                 if (component is ITurnTaker turnTaker)
                 {
                     return turnTaker;

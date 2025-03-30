@@ -1,11 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
+using System.Security.AccessControl;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// This class inherits from the base. It handle's ghost enemys that can move through obstacles.
+    /// </summary>
     public class GhostEnemyAI : BaseEnemyAI
     {
+        
         public GhostEnemyAI(string name) : base(name)
         {
             Id = Guid.NewGuid().ToString();
@@ -13,8 +18,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public override void Initialize()
         {
-            base.Initialize();
-            // No need for nodeMap or pathfinder setup
+            base.Initialize();            
         }
 
         public override void UpdateTarget()
@@ -65,6 +69,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             EndTurn();
         }
+
 
         protected override Vector2 FindValidPosition(Vector2 originalPosition)
         {

@@ -39,6 +39,7 @@
     <None Remove="Content\ranged_enemy.png" />
     <None Remove="Content\ranged_enemy_hurt.png" />
     <None Remove="Content\scroll_of_fireball.png" />
+    <None Remove="Content\scroll_of_force.png" />
     <None Remove="Content\scroll_of_lightning.png" />
     <None Remove="Content\turn_arrow.png" />
     <None Remove="Content\turn_arrow_point.png" />
@@ -115,6 +116,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\scroll_of_fireball.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\scroll_of_force.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\scroll_of_lightning.png">

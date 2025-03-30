@@ -4,13 +4,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+/// <summary>
+/// Turn Manager class is responsible for managing the turn-based system.
+/// </summary>
 public class TurnManager
 {
+    /// <summary>
+    /// Create a queue of turn takers.
+    /// </summary>
     public Queue<ITurnTaker> TurnQueue { get => turnQueue; }
     private Queue<ITurnTaker> turnQueue = new Queue<ITurnTaker>();
     private ITurnTaker currentTurnTaker;
     private bool isTurnActive = false;
     float waitingTime = 0f;
+
+    /// <summary>
+    /// The current turn taker's ID.
+    /// </summary>
     public string CurrentTurnId { get; private set; }
 
     public static TurnManager Instance { get; private set; }
@@ -24,7 +34,10 @@ public class TurnManager
         Instance = new TurnManager();
     }
 
-    // Add a turn taker.
+    /// <summary>
+    /// This method add's a turn taker to the queue.
+    /// </summary>
+    /// <param name="turnTaker"></param>
     public void AddTurnTaker(ITurnTaker turnTaker)
     {
         foreach (ITurnTaker turnTaker1 in turnQueue)
@@ -38,37 +51,45 @@ public class TurnManager
         turnQueue.Enqueue(turnTaker);      
     }
 
+    /// <summary>
+    /// This method removes a turn taker from the queue.
+    /// </summary>
+    /// <param name="turnTaker"></param>
     public void RemoveTurnTaker(ITurnTaker turnTaker)
     {
         turnQueue = new Queue<ITurnTaker>(turnQueue.Where(t => !t.Equals(turnTaker)));
     }
 
+    /// <summary>
+    /// This method updates the turn cycle.
+    /// </summary>
+    /// <param name="gameTime"></param>
     public void UpdateTurn(GameTime gameTime)
     {
-        // Only process the next turn if no other turn is active
         if (!isTurnActive && turnQueue.Count > 0)
         {
-            // Get the next turn taker from the queue
+            // Get the next turn taker from the queue if there is no active turn.
             currentTurnTaker = turnQueue.Dequeue();
             isTurnActive = true;
             CurrentTurnId = currentTurnTaker.Id;
 
-            // Start the turn
-            Debug.WriteLine($"{currentTurnTaker} is starting its turn.");
+            // Start the turn taker's turn.
+            //Debug.WriteLine($"{currentTurnTaker} is starting its turn.");
             currentTurnTaker.StartTurn(); 
         }
 
-        // Check if the current turn taker has finished their turn
+        // Check if the current turn taker has finished their turn.
         if (currentTurnTaker != null && !currentTurnTaker.IsTurn)
         {
             waitingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (waitingTime > 0.0f)
+            if (waitingTime > 0.25f)
             {
-                // End the current turn and reset the turn state
-                Debug.WriteLine($"{currentTurnTaker} has finished its turn.");
+                //Debug.WriteLine($"{currentTurnTaker} has finished its turn.");
                 isTurnActive = false;
 
+                // Add the turn taker back to the queue.
                 turnQueue.Enqueue(currentTurnTaker);
+                // Reset the current turn taker so the next turn taker can take its turn.
                 currentTurnTaker = null;
                 CurrentTurnId = null;
                 waitingTime = 0f;

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace _2DRPG_Object_Oriented_Map_System
 {
     /// <summary>
-    /// Game Manager class manages all game entities, updating them & drawing them.
+    /// Object Manager class manages all game entities, updating them & drawing them.
     /// </summary>
     public static class ObjectManager
     {
@@ -110,7 +110,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
-
         public static void RemoveAll()
         {
             gameObjects.Clear();

@@ -35,11 +35,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="mapManager"></param>
         public void Initialize(MapManager mapManager)
         {
-            // 1. Create Tilemap.
             Tilemap = GameObjectFactory.CreateTilemap(mapManager);
             ObjectManager.AddGameObject(Tilemap);
 
-            // 2. Create Player.
             Player = GameObjectFactory.CreatePlayer(mapManager);
             ObjectManager.AddGameObject(Player);
 
@@ -48,18 +46,15 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             SpawnRandomEnemies(mapManager);
 
-            // 4. Create Exit.
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
-            // 5. Setup Player Exit Event
             Player.GetComponent<PlayerController>().OnExitTile += () => HandleExitTile(mapManager);
             Tilemap.GetComponent<Tilemap>().LastExitTile = Exit.GetComponent<Transform>().Position;
 
             TurnArrow = GameObjectFactory.CreateTurnArrow();
             ObjectManager.AddGameObject(TurnArrow);
 
-            // 6. Update Object Manager and start turn cycle.
             TurnManager.Instance.AddTurnTaker(Player.GetComponent<PlayerController>());
             AddEnemyTurns();
         }
@@ -97,10 +92,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
-            // Set the player's position last
             mapManager.SetPlayerStartPosition(Player, previousExit);
 
-            // Clear the path after the new exit is created
             int tileSize = Tilemap.GetComponent<Tilemap>().TileWidth; 
 
             Point playerPixelPos = new Point((int)Player.GetComponent<Transform>().Position.X, (int)Player.GetComponent<Transform>().Position.Y);
@@ -129,25 +122,25 @@ namespace _2DRPG_Object_Oriented_Map_System
                 switch (enemyType)
                 {
                     case 0:
-                        enemyName = $"enemy_{Guid.NewGuid()}"; // Unique name
+                        enemyName = $"enemy_{Guid.NewGuid()}"; 
                         textureName = "enemy";
                         ObjectManager.AddGameObject(GameObjectFactory.CreateEnemy(mapManager, enemyName, textureName));
                         Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
                         break;
                     case 1:
-                        enemyName = $"enemy2_{Guid.NewGuid()}"; // Unique name
+                        enemyName = $"enemy2_{Guid.NewGuid()}"; 
                         textureName = "ranged_enemy";
                         ObjectManager.AddGameObject(GameObjectFactory.CreateRangedEnemy(mapManager, enemyName, textureName));
                         Debug.WriteLine($"Spawned {enemyName} with RangedEnemyAI.");
                         break;
                     case 2:
-                        enemyName = $"enemy3_{Guid.NewGuid()}"; // Unique name
+                        enemyName = $"enemy3_{Guid.NewGuid()}";
                         textureName = "ghost_enemy";
                         ObjectManager.AddGameObject(GameObjectFactory.CreateGhostEnemy(mapManager, enemyName, textureName));
                         Debug.WriteLine($"Spawned {enemyName} with GhostEnemyAI.");
                         break;
                     default:
-                        enemyName = $"enemy_{Guid.NewGuid()}"; // Unique name
+                        enemyName = $"enemy_{Guid.NewGuid()}"; 
                         textureName = "enemy";
                         ObjectManager.AddGameObject(GameObjectFactory.CreateEnemy(mapManager, enemyName, textureName));
                         Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
@@ -157,6 +150,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// This method is responsible for clearing the scene when game over happens.
+        /// </summary>
+        /// <param name="mapManager"></param>
         public void Clear(MapManager mapManager)
         {
             // Clear the scene.
@@ -172,7 +169,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.GameObjects.Clear();
         }
 
-
+        /// <summary>
+        /// This method add's each random enemy to the turn cycle.
+        /// </summary>
         private void AddEnemyTurns()
         {
             foreach (GameObject gameObject in ObjectManager.GameObjects)

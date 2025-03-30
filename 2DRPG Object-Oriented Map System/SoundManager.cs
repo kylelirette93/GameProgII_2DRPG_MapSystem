@@ -11,7 +11,6 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// Sound Manager class is responsible for playing sound effects and music.
     /// </summary>
 
-    
     public static class SoundManager
     {
         /// <summary>
@@ -20,7 +19,14 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="soundName"></param>
         /// <exception cref="Exception"></exception>
         
+        // Dictionary to store instances, so they can be stopped abruptly.
         private static Dictionary<string, SoundEffectInstance> playingMusic = new Dictionary<string, SoundEffectInstance>();
+
+        /// <summary>
+        /// This method retrives a sound effect from the asset manager and plays it.
+        /// </summary>
+        /// <param name="soundName"></param>
+        /// <exception cref="Exception"></exception>
         public static void PlaySound(string soundName)
         {
             if (AssetManager.soundFiles.ContainsKey(soundName))
@@ -34,10 +40,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
 
         /// <summary>
-        /// Play Music method plays a music file from list of sound files. It is looped.
+        /// This method plays a music file from list of sound files. It is looped by default.
         /// </summary>
         /// <param name="musicName"></param>
         /// <exception cref="Exception"></exception>
+        
         public static void PlayMusic(string musicName)
         {
             if (AssetManager.soundFiles.ContainsKey(musicName))
@@ -63,6 +70,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// This method stops a music file from playing, if it is playing.
+        /// </summary>
+        /// <param name="musicName"></param>
+        /// <exception cref="Exception"></exception>
         public static void StopMusic(string musicName)
         {
             if (playingMusic.ContainsKey(musicName))

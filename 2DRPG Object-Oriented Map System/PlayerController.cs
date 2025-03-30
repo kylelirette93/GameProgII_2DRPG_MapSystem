@@ -27,8 +27,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Tilemap tilemap;
         public bool IsTurn { get => isTurn; }
         bool isTurn = false;
-        public int X { get => (int)player.GetComponent<Transform>().Position.X; }
-        public int Y { get => (int)player.GetComponent<Transform>().Position.Y; }
 
         public bool IsShooting { get => isShooting; set => isShooting = value; }
         bool isShooting = false;
@@ -116,12 +114,17 @@ namespace _2DRPG_Object_Oriented_Map_System
                       playerCollider.Bounds.Height
                     );
 
-                    // Create a copy of the enemies list to avoid concurrent modification
+                    // Create a copy of the enemies list to avoid concurrent modification.
                     var enemies = ObjectManager.FindAllObjectsByTag("enemy"); 
                     foreach (var enemyObject in enemies)
                     {
                         if (enemyObject != null)
                         {
+                            EnemyType enemyType = enemyObject.GetComponent<EnemyType>();
+                            if (enemyType.Type == "ghost")
+                            {
+                                continue;
+                            }
                             var enemyCollider = enemyObject.GetComponent<Collider>();
                             if (enemyCollider != null && tempPlayerBounds.Intersects(enemyCollider.Bounds))
                             {
@@ -135,6 +138,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                         }
                     }
 
+                    // Item collision check.
                     var items = ObjectManager.FindAllObjectsByTag("item").ToList();
                     foreach (var itemObject in items)
                     {
@@ -144,13 +148,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                             var itemCollider = itemObject.GetComponent<Collider>();
                             if (itemCollider != null && tempPlayerBounds.Intersects(itemCollider.Bounds))
                             {
-                                Debug.WriteLine("Object picked up:" + itemObject);
+                                //Debug.WriteLine("Object picked up:" + itemObject);
                                 ObjectManager.Find("player")?.GetComponent<Inventory>().AddItem(itemObject.GetComponent<ItemComponent>());
                                 itemObject.Destroy();
                                 return true;
                             }
                         }
                     }
+                    // Exit tile collision check.
                     if (exit != null)
                     {
                         var exitCollider = exit.GetComponent<Collider>();
@@ -160,19 +165,23 @@ namespace _2DRPG_Object_Oriented_Map_System
                             if (!enemies.Any(enemy => enemy.GetComponent<HealthComponent>()?.CurrentHealth > 0 &&
                             enemy.GetComponent<GhostEnemyAI>() == null))
                             {
+                                foreach (var enemy in enemies.Where(enemy => enemy.GetComponent<GhostEnemyAI>() != null).ToList())
+                                {
+                                    enemy.Destroy();
+                                }
+                                // Allow movement if all enemies are dead.
                                 OnExitTile?.Invoke();
-                                return true; // Allow movement if all enemies are dead
+                                return true; 
                             }
                             else
                             {
-                                return false; // Do not allow movement if enemies are alive
+                                // Do not allow movement if enemies are alive.
+                                return false; 
                             }
                         }
                     }
                 }
             }
-
-            // Tilemap collision check
 
             if (tilemap != null)
             {
@@ -213,13 +222,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             // Debug.WriteLine("Player turn.");
         }
-
-        
-
         public void StartTurn()
         {          
             isTurn = true;
-            Debug.WriteLine("Player started turn!");
+            //Debug.WriteLine("Player started turn!");
         }
     }
 }

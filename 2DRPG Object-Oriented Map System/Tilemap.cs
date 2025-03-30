@@ -158,9 +158,11 @@ namespace _2DRPG_Object_Oriented_Map_System
                 {
                     Vector2 tilePos = new Vector2(x, y);
                     float distance = Vector2.Distance(center, tilePos);
-                    float weight = 1 - (distance / maxDistance); // Weight closer to center.
+                   // Weight closer to center.
+                    float weight = 1 - (distance / maxDistance);
 
-                    float obstacleChance = baseObstacleChance * weight; // Weighted chance.
+                    // Weighted chance.
+                    float obstacleChance = baseObstacleChance * weight;
 
                     if (random.NextDouble() < obstacleChance && (x != (int)LastExitTile.X || y != (int)LastExitTile.Y))
                     {

@@ -76,7 +76,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public string animationTextureName;
 
-        private AnimationComponent stunnedAnimation; // Store the AnimationComponent
+        private AnimationComponent stunnedAnimation; 
 
         public HealthComponent(int maxHealth)
         {
@@ -91,6 +91,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (enemyType != null)
             {
+                // Check's which enemy type we should animation. Duct tape last minute solution.
                 if (enemyType.Type == "ranged")
                 {
                     animationTextureName = "ranged_enemy_hurt";
@@ -113,6 +114,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             GameObject.AddComponent(stunnedAnimation);
         }
 
+        /// <summary>
+        /// Responsible for handling damage of a game object, and destroying if dead.
+        /// </summary>
+        /// <param name="damage"></param>
         public void TakeDamage(int damage)
         {
             Health -= damage;
@@ -123,9 +128,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 if (GameObject?.Tag == "player")
                 {
-                    Debug.WriteLine("Destroying:" + GameObject.Tag);
+                    //Debug.WriteLine("Destroying:" + GameObject.Tag);
                     GameObject?.Destroy();
-                    Debug.WriteLine("Game objects still in list: " + ObjectManager.GameObjects.Count);
+                    //Debug.WriteLine("Game objects still in list: " + ObjectManager.GameObjects.Count);
                     GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
                 }
                 else 
@@ -135,26 +140,32 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        
         public override void Draw(SpriteBatch spriteBatch)
         {
+            // Position a health bar just above a game object's head.
             Vector2 healthBarPosition = GameObject.GetComponent<Transform>().Position - new Vector2(10, 10);
 
+            // Calculate the percentage of health remaining, and the width of the health bar.
             float healthPercentage = (float)Health / MaxHealth;
             int filledWidth = (int)(healthPercentage * 50);
 
-            // Draw the background of the health bar (black)
-            spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, 50, 5), Color.Black); // using a single pixel texture and stretching it.
-
-            // Draw the filled portion of the health bar (red or green)
+            // Draw the background and fill portion of the health bar, stretching the filled portion based on health percentage.
+            spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, 50, 5), Color.Black);
             Color healthColor = healthPercentage > 0.5f ? Color.Green : Color.Red;
-            spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, filledWidth, 5), healthColor); // using a single pixel texture and stretching it.
+            spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, filledWidth, 5), healthColor); 
         }
     }
 
+    /// <summary>
+    /// Component responsible for managing the type of an enemy. For animation purposes.
+    /// </summary>
     public class EnemyType : Component
     {
         public string Type { get; set; }
     }
+
+
     /// <summary>
     /// This class is responsible for managing the animation of a game object.
     /// </summary>
@@ -263,6 +274,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    /// <summary>
+    /// Inventory Component is responsible for managing the player's inventory. Drawing the inventory slots and items and using items.
+    /// </summary>
     public class Inventory : DrawableComponent
     {
         private List<ItemComponent> items = new List<ItemComponent>();
@@ -270,6 +284,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         int inventorySlots = 5;
         SpriteFont inventoryFont;
         KeyboardState currentState;
+        // Position of each inventory slot.
         Vector2[] slotPosition = new Vector2[5]
         {
             new Vector2(840, 50),
@@ -278,6 +293,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             new Vector2(960, 50),
             new Vector2(1000, 50)
         };
+        // Number key positions above slots.
         Vector2[] labelPosition = new Vector2[5]
         {
             new Vector2(840, 0),
@@ -294,6 +310,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             slotTextures = new Texture2D[inventorySlots];
             for (int i = 0; i < inventorySlots; i++)
             {
+                // Fills the slots with default textures.
                 slotTextures[i] = AssetManager.GetTexture("default_slot");
             }
             inventoryFont = AssetManager.GetFont("font");
@@ -304,7 +321,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (items.Count < inventorySlots)
             {
                 items.Add(item);
-                // Get the index of the last item added.
+
+                // Get the index of the last item added so the correct slot is updated.
                 int itemIndex = items.Count - 1;
                 for (int i = 0; i < inventorySlots; i++)
                     if (item.Name == "Healing Potion")
@@ -319,6 +337,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                     {
                         slotTextures[itemIndex] = AssetManager.GetTexture("scroll_of_lightning");
                     }
+                else if (item.Name == "Scroll of Force")
+                {
+                    slotTextures[itemIndex] = AssetManager.GetTexture("scroll_of_force");
+                }
             }
             else
             {
@@ -332,10 +354,28 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 int index = items.IndexOf(item);
                 items.Remove(item);
-                slotTextures[index] = AssetManager.GetTexture("default_slot"); // Update only the used slot
 
-                // Update remaining textures after shifting.
-                for (int i = index; i < items.Count; i++)
+                // Shifts the slot textures to the left.
+                for (int i = index; i < inventorySlots - 1; i++)
+                {
+                    if (i < items.Count)
+                    {
+                        slotTextures[i] = slotTextures[i + 1];
+                    }
+                    else
+                    {
+                        slotTextures[i] = AssetManager.GetTexture("default_slot");
+                    }
+                }
+
+                // Update the last slot to default.
+                if (items.Count < inventorySlots)
+                {
+                    slotTextures[items.Count] = AssetManager.GetTexture("default_slot");
+                }
+
+                // Update the item textures based on the new items list.
+                for (int i = 0; i < items.Count; i++)
                 {
                     if (items[i] != null)
                     {
@@ -351,15 +391,19 @@ namespace _2DRPG_Object_Oriented_Map_System
                         {
                             slotTextures[i] = AssetManager.GetTexture("scroll_of_lightning");
                         }
+                        else if (items[i].Name == "Scroll of Force")
+                        {
+                            slotTextures[i] = AssetManager.GetTexture("scroll_of_force");
+                        }
                     }
-                }
-                if (items.Count < inventorySlots)
-                {
-                    slotTextures[items.Count] = AssetManager.GetTexture("default_slot");
                 }
             }
         }
 
+        /// <summary>
+        /// This method is responsible for calling use item method of the item, and removing it from the inventory.
+        /// </summary>
+        /// <param name="slotNumber"></param>
         public void UseItem(int slotNumber)
         {
             if (slotNumber >= 0 && slotNumber < items.Count && items[slotNumber] != null)
@@ -398,13 +442,17 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             for (int i = 0; i < inventorySlots; i++)
             {
+                // Draws the slots and the numbers above them.
                 spriteBatch.DrawString(inventoryFont, $"[{(i + 1).ToString()}]", labelPosition[i], Color.White);
                 spriteBatch.Draw(slotTextures[i], slotPosition[i], Color.White);
             }
         }
     }
 
-    public class ItemComponent : DrawableComponent
+    /// <summary>
+    /// This class is responsible for managing an inventory item.
+    /// </summary>
+    public abstract class ItemComponent : DrawableComponent
     {
         public string Name { get { return name; } }
         string name;
@@ -421,23 +469,28 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Do something with the item!
         }
 
-        public virtual void PickupItem()
-        {
-
-        }
         public void Remove()
         {
-            Debug.WriteLine("Used " + name + ".");
+            //Debug.WriteLine("Used " + name + ".");
             GameObject.RemoveComponent<ItemComponent>();
         }
     }
 
-    
+    /// <summary>
+    /// This class is responsible for managing projectiles fired by the enemy.
+    /// </summary>
    public class ProjectileComponent : Component
     {
+        /// <summary>
+        /// Get's and sets the direction of the projectile.
+        /// </summary>
         public Vector2 Direction { get; set; }
         float velocity = 5f;
         GameObject player;
+
+        /// <summary>
+        /// Necessary for accessing the enemy object, to end the turn after use.
+        /// </summary>
         public string EnemyTag { get; set; }
         public override void Update()
         {
@@ -452,23 +505,26 @@ namespace _2DRPG_Object_Oriented_Map_System
 
                 var playerTransform = ObjectManager.Find("player")?.GetComponent<Transform>();
 
+                // If the projectile hit the player, deal damage and end the turn.
                 if (playerTransform != null && projectileTile == TilePosition(playerTransform.Position))
                 {
                     ObjectManager.Find("player")?.GetComponent<HealthComponent>()?.TakeDamage(1);
 
                     enemyObject = ObjectManager.Find(EnemyTag);
-                    enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+                    enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); 
                     GameObject?.Destroy();                 
-                    return; // Exit the update method since the object is destroyed.
+                    return; 
                 }
 
+                // If projectile hit a wall, destroy it.
                 if (!IsWalkable(projectileTile))
                 {
-                    enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+                    enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); 
                     GameObject?.Destroy();
-                    return; // Exit the update method since the object is destroyed.
+                    return; 
                 }
             }
+            // If the projectile is null, destroy it.
             else
             {
                 enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
@@ -495,18 +551,18 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    /// <summary>
+    /// This class is responsible for managing a potion item.
+    /// </summary>
         public class HealingComponent : ItemComponent
     {
         private HealthComponent healthComponent;
-        public HealingComponent(string name, string description) : base(name, description)
-        {
-            
-        }
-
+        public HealingComponent(string name, string description) : base(name, description) { }
+       
         public override void UseItem()
         {
-            healthComponent = ObjectManager.Find("player")?.GetComponent<HealthComponent>();
-           if (healthComponent != null)
+           healthComponent = ObjectManager.Find("player")?.GetComponent<HealthComponent>();
+            if (healthComponent != null)
             {
                 healthComponent.Health += 10;
                 if (healthComponent.Health > healthComponent.MaxHealth)
@@ -518,6 +574,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    /// <summary>
+    /// This class is responsible for managing the fireball scroll.
+    /// </summary>
     public class FireballScroll : ItemComponent
     {
         public FireballScroll(string name, string description) : base(name, description)
@@ -531,23 +590,26 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (weapon != null)
             {
-                weapon.waitingForDirection = true; // Set waiting flag
+                // Set the flag and create arrow's for directions.
+                weapon.waitingForDirection = true; 
                 weapon.CreateDirectionArrows();
             }
-
             Remove();
         }
     }
 
+    /// <summary>
+    /// This class is responsible for managing the lightning scroll.
+    /// </summary>
     public class LightningScroll : ItemComponent
     {
         public LightningScroll(string name, string description) : base(name, description)
         {
-
         }
 
         public override void UseItem()
         {
+            // Deals damage to each enemy on the map.
             List<GameObject> targetEnemies = ObjectManager.FindAllObjectsByTag("enemy");
             foreach (var enemy in targetEnemies)
             {
@@ -556,6 +618,39 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    /// <summary>
+    /// This class is responsible for managing the force scroll.
+    /// </summary>
+    public class ForceScroll : ItemComponent
+    {
+        public ForceScroll(string name, string description) : base(name, description)
+        {
+        }
+
+        public override void UseItem()
+        {
+            // Apply opposing for to each enemy.
+            var player = ObjectManager.Find("player");
+            var playerTransform = player.GetComponent<Transform>();
+            var enemies = ObjectManager.FindAllObjectsByTag("enemy");
+            foreach (var enemy in enemies)
+            {
+                var enemyTransform = enemy.GetComponent<Transform>();
+                Vector2 direction = enemyTransform.Position - playerTransform.Position;
+                if (direction != Vector2.Zero)
+                {
+                    direction.Normalize();
+                }
+                enemyTransform.Position += direction * 96;
+            }
+            Remove();
+        }
+    }
+
+
+    /// <summary>
+    /// This class is responsible for the the fireball projectile.
+    /// </summary>
     public class PlayerProjectileComponent : Component
     {
         public Vector2 Direction { get; set; }
@@ -570,7 +665,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             Point tilePosition = TilePosition(transform.Position);
 
-            // Check for collisions with enemies
+            // Check for collisions with enemies.
             List<GameObject> enemies = ObjectManager.FindAllObjectsByTag("enemy");
             foreach (var enemy in enemies)
             {
@@ -582,7 +677,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
 
-            // Check for collisions with obstacles
+            // Check for collisions with obstacles.
             if (!IsWalkable(tilePosition))
             {
                 GameObject?.Destroy();
@@ -608,15 +703,25 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
     }
 
+    /// <summary>
+    /// This class is responsible for managing the player's weapon, firing etc.
+    /// </summary>
     public class Weapon : Component
     {
         string name;
+        /// <summary>
+        /// Chosen direction for the weapon, set by the player.
+        /// </summary>
         public Vector2 chosenDirection = Vector2.Zero;
-        private Vector2 selectedDirection = new Vector2(0, -1); // Default upward
+        // Selected direction for the weapon, is adjusted based on input before firing.
+        private Vector2 selectedDirection = new Vector2(0, -1); 
         GameObject fireball;
         bool hasFired = false;
+
         public bool waitingForDirection = false;
+        // Tuple to contain arrow object and direction.
         List<(GameObject arrow, Vector2 direction)> directionArrows = new();
+        // Set the default colors for the direction arrows.
         Color selectedColor = Color.Gray;
         Color defaultColor = Color.White;
 
@@ -625,6 +730,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             this.name = name;
         }
 
+        /// <summary>
+        /// This method is responsible for getting the direction input from the player.
+        /// </summary>
+        /// <returns></returns>
         public Vector2 GetDirectionInput()
         {
             KeyboardState currentState = Keyboard.GetState();
@@ -634,7 +743,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (currentState.IsKeyDown(Keys.S)) return new Vector2(0, 1);
             if (currentState.IsKeyDown(Keys.D)) return new Vector2(1, 0);
 
-            return selectedDirection; // Keep previous direction if no new input
+            // If there's no input, return the last selected direction.
+            return selectedDirection; 
         }
 
         public override void Update()
@@ -644,18 +754,22 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (waitingForDirection)
             {
+                // Disables player movement while waiting for direction.
                 playerController.IsShooting = true;
+
                 Vector2 input = GetDirectionInput();
                 if (input != selectedDirection)
                 {
+                    // If the input changes, update the arrows.
                     selectedDirection = input;
                     UpdateDirectionArrows();
                 }
 
+
                 if (Keyboard.GetState().IsKeyDown(Keys.Space) && selectedDirection != Vector2.Zero)
                 {
+                    // If the player has selected a direction and pressed space, shoot the weapon.
                     chosenDirection = selectedDirection;
-                    
                     playerController.IsShooting = false;
                     ShootWeapon();
                     waitingForDirection = false;
@@ -665,6 +779,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// This method is responsible for creating a fireball and shooting it in the chosen direction.
+        /// </summary>
         public void ShootWeapon()
         {
             Vector2 playerPosition = ObjectManager.Find("player").GetComponent<Transform>().Position;
@@ -679,22 +796,27 @@ namespace _2DRPG_Object_Oriented_Map_System
             ObjectManager.Find("player").GetComponent<PlayerController>().EndTurn();
         }
 
+        /// <summary>
+        /// Create's directional arrows around the player.
+        /// </summary>
         public void CreateDirectionArrows()
         {
+            // Directions player's can choose.
             Vector2[] choices =
             {
-            new Vector2(1, 0),  // Right
-            new Vector2(-1, 0), // Left
-            new Vector2(0, -1), // Up
-            new Vector2(0, 1)   // Down
+            new Vector2(1, 0),  
+            new Vector2(-1, 0), 
+            new Vector2(0, -1), 
+            new Vector2(0, 1)   
         };
             
+            // Rotations for the arrows, based on direction.
             float[] rotations =
         {
-            -MathHelper.PiOver2, // Right: rotate -90 degrees
-            MathHelper.PiOver2,  // Left: rotate +90 degrees
-            MathHelper.Pi,       // Up: rotate 180 degrees
-            0f                   // Down: no rotation
+            -MathHelper.PiOver2, 
+            MathHelper.PiOver2,  
+            MathHelper.Pi,       
+            0f                  
         };
 
 
@@ -708,13 +830,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                 Transform arrowTransform = arrow.GetComponent<Transform>();
                 Sprite sprite = arrow.GetComponent<Sprite>();
 
-                // Corrected offset calculation for downward-facing arrows
+                // Offset, considering the arrow's rotation starts downward.
                 Vector2 offset = Vector2.Zero;
-                if (choices[i].X == 1) offset = new Vector2(0, 32);  // Right: offset left
-                if (choices[i].X == -1) offset = new Vector2(32, 0); // Left: offset right
-                if (choices[i].Y == -1) offset = new Vector2(32, 32);  // Up: offset down
-                if (choices[i].Y == 1) offset = new Vector2(0, 0);   // Down: no offset
+                if (choices[i].X == 1) offset = new Vector2(0, 32);  
+                if (choices[i].X == -1) offset = new Vector2(32, 0); 
+                if (choices[i].Y == -1) offset = new Vector2(32, 32);  
+                if (choices[i].Y == 1) offset = new Vector2(0, 0);   
 
+                // Mulitply position by tile size and add offset.
                 arrowTransform.Position = playerPosition + (choices[i] * 32f) + offset;
                 arrowTransform.Rotation = rotations[i];
 
@@ -723,22 +846,24 @@ namespace _2DRPG_Object_Oriented_Map_System
                 directionArrows.Add((arrow, choices[i]));
                 ObjectManager.AddGameObject(arrow);
             }
-
-
-
         }
 
+        /// <summary>
+        /// This method is responsible for updating the directional arrows around the player.
+        /// </summary>
         public void UpdateDirectionArrows()
         {
             Vector2 playerPosition = ObjectManager.Find("player").GetComponent<Transform>().Position;
 
+            // Iterate through the tuple list and update the arrows.
             foreach (var (arrow, direction) in directionArrows)
             {
+                // Apply the offset when updating arrows.
                 Vector2 offset = Vector2.Zero;
-                if (direction.X == 1) offset = new Vector2(0, 32);  // Right: offset left
-                if (direction.X == -1) offset = new Vector2(32, 0); // Left: offset right
-                if (direction.Y == -1) offset = new Vector2(32, 32);  // Up: offset down
-                if (direction.Y == 1) offset = new Vector2(0, 0);   // Down: no offset
+                if (direction.X == 1) offset = new Vector2(0, 32);  
+                if (direction.X == -1) offset = new Vector2(32, 0); 
+                if (direction.Y == -1) offset = new Vector2(32, 32); 
+                if (direction.Y == 1) offset = new Vector2(0, 0);  
 
                 arrow.GetComponent<Transform>().Position = playerPosition + (direction * 32) + offset;
 
@@ -754,6 +879,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// This method is responsible for removing the arrows after the player has fired the weapon.
+        /// </summary>
         public void RemoveDirectionArrows()
         {
             foreach (var (arrow, _) in directionArrows)

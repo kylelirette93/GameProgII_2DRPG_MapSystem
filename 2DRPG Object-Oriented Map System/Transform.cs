@@ -13,7 +13,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         // Auto-implemented transform.
         public virtual Vector2 Position { get { return _position; } set { _position = value; } }
         private Vector2 _position = new Vector2(256, 256);
-        // Currently not using rotation for anything, but I can in the future.
         public float Rotation { get { return _rotation; } set { _rotation = value; } }
         private float _rotation = 0f;
 
@@ -38,7 +37,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             _position += translation;
         }
 
-        // Currently not using scale logic.
+        // Currently not using this. 
         /// <summary>
         /// Set Scale method is responsible for setting the scale of the game object.
         /// </summary>

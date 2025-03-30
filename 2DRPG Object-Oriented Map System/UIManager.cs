@@ -6,7 +6,7 @@ using System.Net.Mime;
 namespace _2DRPG_Object_Oriented_Map_System
 {
     /// <summary>
-    /// The UIManager class is responsible for rendering text to the screen.
+    /// The UIManager class is responsible for drawing the main menu, pause menu and game over menu.
     /// </summary>
     public class UIManager
     {
@@ -35,21 +35,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void DrawGameOverMenu(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(gameOverMenuBackground, displayPosition, Color.White);
-        }
-
-        public void UpdateMainMenu()
-        {
-
-        }
-
-        public void UpdatePauseMenu()
-        {
-           
-        }
-
-        public void UpdateGameOverMenu()
-        {
-
         }
     }
 }

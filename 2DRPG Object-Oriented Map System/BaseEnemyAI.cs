@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// Base class for enemy AI. Contains pathfinding logic and state machine for enemy AI.
+    /// </summary>
     public abstract class BaseEnemyAI : Component, ITurnTaker
     {
         protected GameObject enemy; 
@@ -49,6 +52,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             pathfinder = new Pathfinder();
         }
 
+        /// <summary>
+        /// This method is responsible for finding a path to the player and updating the current path.
+        /// </summary>
         public virtual void UpdateTarget()
         {
             if (tilemap == null || playerTransform == null || enemyTransform == null && pathfinder == null)
@@ -69,6 +75,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 Debug.WriteLine("No path found");
             }
         }
+
         /// <summary>
         /// Simple state machine for the enemy AI.
         /// </summary>
@@ -156,20 +163,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             else
             {
                 newPosition = FindValidPosition(enemyTransform.Position);
+
+                // Make sure enemy can't move to another enemy's position.
                 if (newPosition != enemyTransform.Position)
                 {
                     enemyTransform.Position = new Vector2((int)newPosition.X, (int)newPosition.Y);
                 }
             }
 
-            Debug.WriteLine($"FollowPlayer: After move, enemyTransform.Position = {enemyTransform.Position}");
+           // Debug.WriteLine($"FollowPlayer: After move, enemyTransform.Position = {enemyTransform.Position}");
 
             currentPathIndex++;
 
-            // Check if the path is complete
+            // Check if the path is complete.
             if (currentPathIndex >= currentPath.Count)
             {
-                Debug.WriteLine("FollowPlayer: Reached the end of the path.");
+                //Debug.WriteLine("FollowPlayer: Reached the end of the path.");
                 currentPath = null;
                 currentPathIndex = 0;
             }
@@ -177,6 +186,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             EndTurn();
         }
 
+        /// <summary>
+        /// This method checks if a new position is valid and updates pathfinding with enemy point.
+        /// </summary>
+        /// <param name="originalPosition"></param>
+        /// <returns></returns>
         protected virtual Vector2 FindValidPosition(Vector2 originalPosition)
         {
             if (currentPath != null && currentPath.Count > 0)
@@ -186,13 +200,13 @@ namespace _2DRPG_Object_Oriented_Map_System
                     (int)(currentPath[currentPathIndex].Y)
                 );
 
-                // Recalculate path, excluding the colliding enemy's position
+                // Recalculate path, excluding the colliding enemy's position.
                 nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles, collidingEnemyPoint); 
                 UpdateTarget(); // Recalculate the path to the player.
 
                 if (currentPath != null && currentPath.Count > 0)
                 {
-                    // Check if the new path's first step is valid
+                    // Move to the new position.
                     Vector2 newPosition = new Vector2(
                         currentPath[0].X * tilemap.TileWidth,
                         currentPath[0].Y * tilemap.TileHeight
@@ -200,12 +214,14 @@ namespace _2DRPG_Object_Oriented_Map_System
 
                     if (!IsEnemyAtPosition(newPosition))
                     {
-                        currentPathIndex = 0; // Reset index for the new path
+                        // Make sure there isn't an enemy at the position.
+                        currentPathIndex = 0; 
                         return newPosition;
                     }
                 }
             }
-            return originalPosition; // If no valid new path is found, return the original position.
+            // If no valid new path is found, return the original position.
+            return originalPosition; 
         }
 
 
@@ -280,6 +296,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 stunnedCounter--;
                 if (stunnedCounter == 0)
                 {
+                    // Start animating if the enemy is stunned.
                     var enemyAnimation = ObjectManager.Find(GameObject.Tag).GetComponent<AnimationComponent>();
                     enemyAnimation.isLooping = false;
                     enemyAnimation.PlayAnimation();
@@ -308,6 +325,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        /// <summary>
+        /// This method retrieves the player's health component and deals damage to the player.
+        /// </summary>
         public virtual void DealDamage()
         {
             var playerHealth = player.GetComponent<HealthComponent>();
@@ -319,15 +339,24 @@ namespace _2DRPG_Object_Oriented_Map_System
             isTurn = false;
         }
 
+        /// <summary>
+        /// This method stuns the enemy for a set number of turns.
+        /// </summary>
+
         public virtual void Stun()
         {
             var enemyAnimation = ObjectManager.Find(GameObject.Tag).GetComponent<AnimationComponent>();
             enemyAnimation.isLooping = true;
             enemyAnimation.PlayAnimation();
-            stunnedCounter = 2; // Reset the stunned counter
+            stunnedCounter = 2; 
             ChangeState(EnemyState.Stunned);
         }
 
+        /// <summary>
+        /// This method checks if an enemy is at a given position. Useful for pathfinding.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         protected bool IsEnemyAtPosition(Vector2 position)
         {
             foreach (var obj in ObjectManager.FindAll())
@@ -336,7 +365,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 {
                     if (obj == enemy)
                     {
-                        continue; // Skip checking against itself.
+                        // Skip itself.
+                        continue; 
                     }
 
                     Transform otherEnemyTransform = obj.GetComponent<Transform>();
@@ -348,6 +378,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             return false;
         }
+
         public void TakeTurn()
         {
             if (isTurn)
@@ -357,6 +388,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             }    
         }
 
+        /// <summary>
+        /// Check's if an enemy is adjacent to the player.
+        /// </summary>
+        /// <returns></returns>
         protected virtual bool IsAdjacentToPlayer()
         {
             if (enemy != null && player != null && tilemap != null)
@@ -367,8 +402,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                 int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
                 int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
 
-                // Check for adjacency to player (orthogonal and diagonal).
-                if (Math.Abs(enemyTileX - playerTileX) <= 1 && Math.Abs(enemyTileY - playerTileY) <= 1)
+                // Check's for orthogonally adjacent tiles.
+                if ((Math.Abs(enemyTileX - playerTileX) == 1 && Math.Abs(enemyTileY - playerTileY) == 0) ||
+             (Math.Abs(enemyTileX - playerTileX) == 0 && Math.Abs(enemyTileY - playerTileY) == 1))
                 {
                     return true;
                 }

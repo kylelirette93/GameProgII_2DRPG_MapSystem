@@ -19,12 +19,18 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Scene currentScene;
         UIManager uiManager;
         bool isPausePressed = false;
+        /// <summary>
+        /// The current Game State.
+        /// </summary>
         public GameState CurrentState { get; set; } = GameState.MainMenu;
         /// <summary>
         /// Main game constructor. Initializes the graphics device manager and sets the content root directory.
         /// </summary>
         public static GameManager Instance { get; private set; }
 
+        /// <summary>
+        /// Made the game manager a singleton, to handle dynamic state changes.
+        /// </summary>
         public GameManager()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -33,6 +39,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             Instance = this;
         }
 
+        /// <summary>
+        /// Enum for the different game states.
+        /// </summary>
         public enum GameState
         {
             MainMenu,
@@ -41,6 +50,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             GameOver
         }
 
+        /// <summary>
+        /// This method is responsible for changing the game state.
+        /// </summary>
+        /// <param name="state"></param>
         public void ChangeState(GameState state)
         {
             CurrentState = state;
@@ -81,9 +94,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 ObjectManager.RemoveAll();
                 SoundManager.StopMusic("mapMusic");
-            }
-            
-            
+            }                      
         }
         /// <summary>
         /// Load Content method is responsible for loading all textures.
@@ -93,7 +104,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             whitePixel = new Texture2D(GraphicsDevice, 1, 1);
             whitePixel.SetData(new Color[] { Color.White });
-            Gizmo.Initialize(GraphicsDevice, _spriteBatch);
 
             // Load all the textures at once.
             AssetManager.LoadContent(Content);
@@ -111,7 +121,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             switch (CurrentState)
             {
                 case GameState.MainMenu:
-                    uiManager.UpdateMainMenu();
                     if (state.IsKeyDown(Keys.Enter))
                     {
                         CurrentState = GameState.Playing;
@@ -132,7 +141,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                     break;
                     case GameState.Paused:
-                    uiManager.UpdatePauseMenu();
                     if (state.IsKeyDown(Keys.P) && !isPausePressed)
                     {
                         CurrentState = GameState.Playing;
@@ -144,7 +152,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                     break;
                 case GameState.GameOver:
-                    uiManager.UpdateGameOverMenu();
                     if (state.IsKeyDown(Keys.M))
                     {
                         CleanupLevel();
@@ -165,7 +172,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             _spriteBatch.Begin();
 
             switch (CurrentState)
-            {
+            { 
                 case GameState.MainMenu:
                     uiManager.DrawMainMenu(_spriteBatch);
                     break;
