@@ -40,8 +40,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["enemy"] = content.Load<Texture2D>("enemy");
                 textures["projectile"] = content.Load<Texture2D>("projectile");
                 textures["ranged_enemy"] = content.Load<Texture2D>("ranged_enemy");
+                textures["ranged_enemy_hurt"] = content.Load<Texture2D>("ranged_enemy_hurt");
                 textures["obstacle_tile"] = content.Load<Texture2D>("obstacle_tile");
                 textures["enemy_hurt"] = content.Load<Texture2D>("enemy_hurt");
+                textures["ghost_enemy_hurt"] = content.Load<Texture2D>("ghost_enemy_hurt");
                 textures["player_hurt"] = content.Load<Texture2D>("player_hurt");
                 textures["turn_arrow"] = content.Load<Texture2D>("turn_arrow");
                 textures["turn_arrow_point"] = content.Load<Texture2D>("turn_arrow_point");

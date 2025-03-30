@@ -66,7 +66,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             SoundManager.PlayMusic("mapMusic");
         }
 
-        private void CleanupLevel(GameTime gameTime)
+        private void CleanupLevel()
         {
             if (currentScene != null && mapManager != null)
             {
@@ -115,7 +115,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                     if (state.IsKeyDown(Keys.Enter))
                     {
                         CurrentState = GameState.Playing;
-                        CleanupLevel(null);
                         InitializeLevel();
                     }
                     break;
@@ -148,7 +147,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     uiManager.UpdateGameOverMenu();
                     if (state.IsKeyDown(Keys.M))
                     {
-                        CleanupLevel(gameTime);
+                        CleanupLevel();
                         CurrentState = GameState.MainMenu;
                     }
                     break;

@@ -73,8 +73,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public int Health { get; set; }
         public int MaxHealth { get; private set; }
         public int CurrentHealth { get { return Health; } }
-        
-        string animationTextureName;
+
+        public string animationTextureName;
 
         private AnimationComponent stunnedAnimation; // Store the AnimationComponent
 
@@ -87,9 +87,22 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void Initialize()
         {
             animationTextureName = "";
-            if (GameObject.Tag.StartsWith("enemy"))
+            EnemyType enemyType = GameObject?.GetComponent<EnemyType>();
+
+            if (enemyType != null)
             {
-                animationTextureName = "enemy_hurt";
+                if (enemyType.Type == "ranged")
+                {
+                    animationTextureName = "ranged_enemy_hurt";
+                }
+                else if (enemyType.Type == "melee")
+                {
+                    animationTextureName = "enemy_hurt";
+                }
+                else if (enemyType.Type == "ghost")                 
+                {
+                    animationTextureName = "ghost_enemy_hurt";
+                }
             }
             else if (GameObject?.Tag == "player")
             {
@@ -136,6 +149,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             Color healthColor = healthPercentage > 0.5f ? Color.Green : Color.Red;
             spriteBatch.Draw(AssetManager.GetTexture("pixel"), new Rectangle((int)healthBarPosition.X, (int)healthBarPosition.Y, filledWidth, 5), healthColor); // using a single pixel texture and stretching it.
         }
+    }
+
+    public class EnemyType : Component
+    {
+        public string Type { get; set; }
     }
     /// <summary>
     /// This class is responsible for managing the animation of a game object.

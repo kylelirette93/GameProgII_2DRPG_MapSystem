@@ -23,6 +23,7 @@
     <None Remove="Content\font.spritefont" />
     <None Remove="Content\GameOverMenu.png" />
     <None Remove="Content\ghost_enemy.png" />
+    <None Remove="Content\ghost_enemy_hurt.png" />
     <None Remove="Content\healing_potion.png" />
     <None Remove="Content\Level0.txt" />
     <None Remove="Content\Level1.txt" />
@@ -36,6 +37,7 @@
     <None Remove="Content\player_hurt.png" />
     <None Remove="Content\projectile.png" />
     <None Remove="Content\ranged_enemy.png" />
+    <None Remove="Content\ranged_enemy_hurt.png" />
     <None Remove="Content\scroll_of_fireball.png" />
     <None Remove="Content\scroll_of_lightning.png" />
     <None Remove="Content\turn_arrow.png" />
@@ -54,6 +56,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\ghost_enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\ghost_enemy_hurt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\healing_potion.png">
@@ -104,6 +109,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\ranged_enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\ranged_enemy_hurt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\scroll_of_fireball.png">

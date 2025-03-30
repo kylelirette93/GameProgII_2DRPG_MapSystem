@@ -40,6 +40,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             enemy.AddComponent(new Sprite(AssetManager.GetTexture(textureName)));
             enemy.AddComponent(new Collider(enemy.GetComponent<Sprite>().SpriteBounds));
             enemy.AddComponent(new MeleeEnemyAI(name));
+            EnemyType type = new EnemyType();
+            type.Type = "melee";
+            enemy.AddComponent(type);
             HealthComponent healthComponent = new HealthComponent(5);
             enemy.AddComponent(healthComponent);
             healthComponent.Initialize();
@@ -54,6 +57,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             rangedEnemy.AddComponent(new Sprite(AssetManager.GetTexture(textureName)));
             rangedEnemy.AddComponent(new Collider(rangedEnemy.GetComponent<Sprite>().SpriteBounds));
             rangedEnemy.AddComponent(new RangedEnemyAI(name));
+            EnemyType type = new EnemyType();
+            type.Type = "ranged";
+            rangedEnemy.AddComponent(type);
             HealthComponent healthComponent = new HealthComponent(5);
             rangedEnemy.AddComponent(healthComponent);
             healthComponent.Initialize();
@@ -68,6 +74,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             ghostEnemy.AddComponent(new Sprite(AssetManager.GetTexture(textureName)));
             ghostEnemy.AddComponent(new Collider(ghostEnemy.GetComponent<Sprite>().SpriteBounds));
             ghostEnemy.AddComponent(new GhostEnemyAI(name));
+            EnemyType type = new EnemyType();
+            type.Type = "ghost";
+            ghostEnemy.AddComponent(type);
             HealthComponent healthComponent = new HealthComponent(5);
             ghostEnemy.AddComponent(healthComponent);
             healthComponent.Initialize();
