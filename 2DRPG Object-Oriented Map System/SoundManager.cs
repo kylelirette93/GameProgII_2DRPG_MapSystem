@@ -10,13 +10,17 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// <summary>
     /// Sound Manager class is responsible for playing sound effects and music.
     /// </summary>
+
+    
     public static class SoundManager
-{
+    {
         /// <summary>
         /// Play Sound method plays a sound effect from list of sound files.
         /// </summary>
         /// <param name="soundName"></param>
         /// <exception cref="Exception"></exception>
+        
+        private static Dictionary<string, SoundEffectInstance> playingMusic = new Dictionary<string, SoundEffectInstance>();
         public static void PlaySound(string soundName)
         {
             if (AssetManager.soundFiles.ContainsKey(soundName))
@@ -38,14 +42,40 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (AssetManager.soundFiles.ContainsKey(musicName))
             {
-               SoundEffectInstance instance = AssetManager.soundFiles[musicName].CreateInstance();
-               instance.IsLooped = true;
-               instance.Play();
+                if (!playingMusic.ContainsKey(musicName))
+                {
+                    SoundEffectInstance instance = AssetManager.soundFiles[musicName].CreateInstance();
+                    instance.IsLooped = true;
+                    instance.Play();
+                    playingMusic[musicName] = instance; 
+                }
+                else
+                {
+                    if (playingMusic[musicName].State != SoundState.Playing)
+                    {
+                        playingMusic[musicName].Play();
+                    }
+                }
             }
             else
             {
                 throw new Exception($"Music {musicName} not found.");
             }
         }
-}
+
+        public static void StopMusic(string musicName)
+        {
+            if (playingMusic.ContainsKey(musicName))
+            {
+                if (playingMusic[musicName].State == SoundState.Playing)
+                {
+                    playingMusic[musicName].Stop(); // Stop the stored instance
+                }
+            }
+            else
+            {
+                throw new Exception($"Music {musicName} not found or not playing.");
+            }
+        }
+    }
 }

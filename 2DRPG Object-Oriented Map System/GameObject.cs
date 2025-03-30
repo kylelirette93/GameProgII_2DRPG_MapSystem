@@ -107,7 +107,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public void Destroy()
         {
-            OnBeforeDestroy?.Invoke(this);
+            //OnBeforeDestroy?.Invoke(this);
 
             ITurnTaker turnTakerComponent = FindITurnTakerComponent();
 

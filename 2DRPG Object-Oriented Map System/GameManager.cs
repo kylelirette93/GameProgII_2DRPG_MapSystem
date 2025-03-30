@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -16,15 +18,19 @@ namespace _2DRPG_Object_Oriented_Map_System
         MapManager mapManager;
         private Scene currentScene;
         UIManager uiManager;
+        bool isPausePressed = false;
         public GameState CurrentState { get; set; } = GameState.MainMenu;
         /// <summary>
         /// Main game constructor. Initializes the graphics device manager and sets the content root directory.
         /// </summary>
+        public static GameManager Instance { get; private set; }
+
         public GameManager()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Instance = this;
         }
 
         public enum GameState
@@ -33,6 +39,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             Playing,
             Paused,
             GameOver
+        }
+
+        public void ChangeState(GameState state)
+        {
+            CurrentState = state;
         }
 
         /// <summary>
@@ -49,12 +60,26 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private void InitializeLevel()
         {
-            // Load maps, create new scene, initialize current scene.
             mapManager = new MapManager();
             currentScene = new Scene();
             currentScene.Initialize(mapManager);
-            uiManager = new UIManager();
             SoundManager.PlayMusic("mapMusic");
+        }
+
+        private void CleanupLevel(GameTime gameTime)
+        {
+            if (currentScene != null && mapManager != null)
+            {
+                currentScene.Clear();
+                currentScene = null;
+                mapManager.Clear();
+                mapManager = null;
+                TurnManager.Instance.TurnQueue.Clear();
+                ObjectManager.UpdateAll(gameTime);
+                SoundManager.StopMusic("mapMusic");
+            }
+            
+            
         }
         /// <summary>
         /// Load Content method is responsible for loading all textures.
@@ -68,7 +93,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             // Load all the textures at once.
             AssetManager.LoadContent(Content);
-            InitializeLevel();
+            uiManager = new UIManager();
         }
         /// <summary>
         /// Update method is responsible for updating the game state.
@@ -76,10 +101,53 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-            ObjectManager.UpdateAll(gameTime);
-            currentScene.Update(gameTime);
+            KeyboardState state = Keyboard.GetState();
+            if (state.IsKeyDown(Keys.Q)) Exit();
+
+            switch (CurrentState)
+            {
+                case GameState.MainMenu:
+                    uiManager.UpdateMainMenu();
+                    if (state.IsKeyDown(Keys.Enter))
+                    {
+                        CurrentState = GameState.Playing;
+                        InitializeLevel();
+                    }
+                    break;
+                case GameState.Playing:
+                    ObjectManager.UpdateAll(gameTime);
+                    currentScene.Update(gameTime);
+                    if (state.IsKeyDown(Keys.P) && !isPausePressed)
+                    {
+                        CurrentState = GameState.Paused;
+                        isPausePressed = true;
+                    }
+                    if (state.IsKeyUp(Keys.P))
+                    {
+                        isPausePressed = false;
+                    }
+                    break;
+                    case GameState.Paused:
+                    uiManager.UpdatePauseMenu();
+                    if (state.IsKeyDown(Keys.P) && !isPausePressed)
+                    {
+                        CurrentState = GameState.Playing;
+                        isPausePressed = true;
+                    }
+                    if (state.IsKeyUp(Keys.P))
+                    {
+                        isPausePressed = false;
+                    }
+                    break;
+                case GameState.GameOver:
+                    uiManager.UpdateGameOverMenu();
+                    CleanupLevel(gameTime);
+                    if (state.IsKeyDown(Keys.M))
+                    {
+                        CurrentState = GameState.MainMenu;
+                    }
+                    break;
+            }
             base.Update(gameTime);          
         }
         /// <summary>
@@ -91,10 +159,23 @@ namespace _2DRPG_Object_Oriented_Map_System
             GraphicsDevice.Clear(Color.SlateGray);
 
             _spriteBatch.Begin();
-            ObjectManager.DrawAll(_spriteBatch);
-            //uiManager.Draw(_spriteBatch);
-            _spriteBatch.End();
 
+            switch (CurrentState)
+            {
+                case GameState.MainMenu:
+                    uiManager.DrawMainMenu(_spriteBatch);
+                    break;
+                case GameState.Playing:
+                    ObjectManager.DrawAll(_spriteBatch);
+                    break;
+                case GameState.Paused:
+                    uiManager.DrawPauseMenu(_spriteBatch);
+                    break;
+                case GameState.GameOver:
+                    uiManager.DrawGameOverMenu(_spriteBatch);
+                    break;
+            }
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Net.Mime;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -8,32 +9,47 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// The UIManager class is responsible for rendering text to the screen.
     /// </summary>
     public class UIManager
-{
-        private SpriteFont turnDisplayfont;
-        private Vector2 turnDisplayPosition = new Vector2(300, 350);
-        private Vector2 dropShadowOffset = new Vector2(2, 2);
-        
+    {
+        private Vector2 displayPosition = new Vector2(0, 0);
+        Texture2D mainMenuBackground;
+        Texture2D pauseMenuBackground;
+        Texture2D gameOverMenuBackground;
+
         public UIManager()
         {
-            turnDisplayfont = AssetManager.GetFont("font");
+            mainMenuBackground = AssetManager.GetTexture("MainMenu");
+            pauseMenuBackground = AssetManager.GetTexture("PauseMenu");
+            gameOverMenuBackground = AssetManager.GetTexture("GameOverMenu");
         }
 
-        /*public void Draw(SpriteBatch spriteBatch)
+        public void DrawMainMenu(SpriteBatch spriteBatch)
         {
-            string participantName = TurnManager.Instance.CurrentTurnId;
-            string displayText = "Player's Turn";
-
-            if (participantName != null)
-            {
-                displayText = participantName + "'s Turn";
-            }
-            else
-            {
-                displayText = "Player's Turn";
-            }
-            spriteBatch.DrawString(turnDisplayfont, displayText, turnDisplayPosition + dropShadowOffset, Color.Black);
-            spriteBatch.DrawString(turnDisplayfont, displayText, turnDisplayPosition, Color.White);
+            spriteBatch.Draw(mainMenuBackground, displayPosition, Color.White);
         }
-        */
-}
+
+        public void DrawPauseMenu(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(pauseMenuBackground, displayPosition, Color.White);
+        }
+
+        public void DrawGameOverMenu(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(gameOverMenuBackground, displayPosition, Color.White);
+        }
+
+        public void UpdateMainMenu()
+        {
+
+        }
+
+        public void UpdatePauseMenu()
+        {
+           
+        }
+
+        public void UpdateGameOverMenu()
+        {
+
+        }
+    }
 }

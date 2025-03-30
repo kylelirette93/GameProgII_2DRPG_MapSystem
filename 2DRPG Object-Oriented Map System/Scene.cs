@@ -157,6 +157,20 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
+        public void Clear()
+        {
+            // Clear the scene.
+            foreach (var gameObject in ObjectManager.GameObjects)
+            {
+                ObjectManager.RemoveGameObject(gameObject);
+            }
+            Player = null;
+            Tilemap = null;
+            Exit = null;
+            TurnArrow = null;
+            Item = null;
+        }
+
 
         private void AddEnemyTurns()
         {

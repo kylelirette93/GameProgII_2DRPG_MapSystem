@@ -13,7 +13,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Vector2 SpawnPoint { get; set; }
         private List<string> _levelPaths;
         private int _currentLevelIndex;
-        public Tilemap CurrentMap { get { return _currentMap; } }
+        public Tilemap CurrentMap { get { return _currentMap; } set { _currentMap = value; } }
         private Tilemap _currentMap;
         private Vector2 _lastExitTile;
 
@@ -87,6 +87,12 @@ namespace _2DRPG_Object_Oriented_Map_System
                 return _currentMap.FindEnemySpawn(name);
             }
             return Vector2.Zero;
+        }
+
+        public void Clear()
+        {
+            CurrentMap = null;
+            _currentLevelIndex = 0;
         }
 
 

@@ -108,7 +108,17 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (Health <= 0)
             {
-                GameObject.Destroy();
+                if (GameObject?.Tag == "player")
+                {
+                    Debug.WriteLine("Destroying:" + GameObject.Tag);
+                    GameObject?.Destroy();
+                    Debug.WriteLine("Game objects still in list: " + ObjectManager.GameObjects.Count);
+                    GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
+                }
+                else 
+                {
+                    GameObject.Destroy();
+                }
             }
         }
 

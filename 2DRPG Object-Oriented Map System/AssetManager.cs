@@ -52,6 +52,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["scroll_of_lightning"] = content.Load<Texture2D>("scroll_of_lightning");
                 textures["pixel"] = content.Load<Texture2D>("pixel");
                 textures["fireball"] = content.Load<Texture2D>("fireball");
+                textures["MainMenu"] = content.Load<Texture2D>("MainMenu");
+                textures["PauseMenu"] = content.Load<Texture2D>("PauseMenu");
+                textures["GameOverMenu"] = content.Load<Texture2D>("GameOverMenu");
 
                 font = content.Load<SpriteFont>("font");
                 soundFiles["hurtSound"] = content.Load<SoundEffect>("hurtSound");

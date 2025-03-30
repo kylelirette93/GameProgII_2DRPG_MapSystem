@@ -214,6 +214,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Debug.WriteLine("Player turn.");
         }
 
+        
+
         public void StartTurn()
         {          
             isTurn = true;
