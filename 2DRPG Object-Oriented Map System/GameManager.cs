@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -17,6 +16,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         MapManager mapManager;
         private Scene currentScene;
         UIManager uiManager;
+        public GameState CurrentState { get; set; } = GameState.MainMenu;
         /// <summary>
         /// Main game constructor. Initializes the graphics device manager and sets the content root directory.
         /// </summary>
@@ -25,6 +25,14 @@ namespace _2DRPG_Object_Oriented_Map_System
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+        }
+
+        public enum GameState
+        {
+            MainMenu,
+            Playing,
+            Paused,
+            GameOver
         }
 
         /// <summary>

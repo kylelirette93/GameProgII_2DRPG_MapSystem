@@ -19,7 +19,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.AddComponent(new Inventory());
             HealthComponent healthComponent = new HealthComponent(20);
             player.AddComponent(healthComponent);
-            healthComponent.Initialize();         
+            healthComponent.Initialize();
+            player.AddComponent(new Weapon("fireball"));
             return player;
         }
         public static GameObject CreateTilemap(MapManager mapManager)
@@ -94,14 +95,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             return projectile;
         }
 
+        public static GameObject CreateFireball(Vector2 position)
+        {
+            GameObject fireball = new GameObject("fireball");
+            fireball.AddComponent(new Transform());
+            fireball.GetComponent<Transform>().Position = position;
+            fireball.AddComponent(new Sprite(AssetManager.GetTexture("fireball")));
+            fireball.AddComponent(new Collider(fireball.GetComponent<Sprite>().SpriteBounds));
+            fireball.AddComponent(new PlayerProjectileComponent());
+            return fireball;
+        }
+
         public static GameObject CreateTurnArrow()
         {
             GameObject turnArrow = new GameObject("turnArrow");
             turnArrow.AddComponent(new Transform());
             turnArrow.AddComponent(new Sprite(AssetManager.GetTexture("turn_arrow")));
-            AnimationComponent arrowAnimation = new(AssetManager.GetTexture("turn_arrow_point"), 10, true);
-            turnArrow.AddComponent(arrowAnimation);
-            arrowAnimation.PlayAnimation();
             return turnArrow;
         }
 

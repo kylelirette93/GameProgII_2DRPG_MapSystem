@@ -60,6 +60,21 @@ namespace _2DRPG_Object_Oriented_Map_System
             return null;
         }
 
+        public List<T> GetComponents<T>() where T : Component
+        {
+            List<T> results = new List<T>();
+
+            foreach (Component component in components)
+            {
+                if (component is T tComponent)
+                {
+                    results.Add(tComponent);
+                }
+            }
+
+            return results;
+        }
+
         /// <summary>
         /// Remove Component method removes a component from the game object.
         /// </summary>

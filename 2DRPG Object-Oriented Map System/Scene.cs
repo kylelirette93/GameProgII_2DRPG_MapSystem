@@ -68,7 +68,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             TurnManager.Instance.UpdateTurn(gameTime);
 
-            if (Player.GetComponent<PlayerController>().IsTurn)  
+            if (Player.GetComponent<PlayerController>().IsTurn && !Player.GetComponent<PlayerController>().IsShooting)  
             TurnArrow.GetComponent<Transform>().Position = Player.GetComponent<Transform>().Position + new Vector2(1, -32);
             else
             {

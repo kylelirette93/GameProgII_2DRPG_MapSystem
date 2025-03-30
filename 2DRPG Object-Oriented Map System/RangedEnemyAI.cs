@@ -39,6 +39,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                     CurrentState = EnemyState.Follow;
                 }
             }
+            bool lineOfSight = IsInLineOfSight();
+            bool adjacent = IsAdjacentToPlayer();
             switch (CurrentState)
             {
                 case EnemyState.Follow:
@@ -59,10 +61,11 @@ namespace _2DRPG_Object_Oriented_Map_System
                     
                     break;
 
-                case EnemyState.RangedAttack:                  
-                    FireProjectile();
-                    EndTurn();
-                    ChangeState(EnemyState.Follow);
+                case EnemyState.RangedAttack:
+                    if (projectile == null)
+                    {
+                        FireProjectile();
+                    }
                     break;
                 case EnemyState.Attack:
                     Debug.WriteLine("Enemy Turn, Attack State");
@@ -126,16 +129,18 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void FireProjectile()
         {
-            //Debug.WriteLine("FireProjectile() called.");
-
-                CreateProjectile();
-                if (projectile == null)
-                {
-                    EndTurn();
-                }          
+            //Debug.WriteLine("FireProjectile() called.")
+            projectile = CreateProjectile();
         }
 
-        public void CreateProjectile()
+        public void EndTurn()
+        {
+            projectile = null;
+            base.EndTurn(); 
+            ChangeState(EnemyState.Follow);
+        }
+
+        public GameObject CreateProjectile()
         {
             GameObject projectile = GameObjectFactory.CreateProjectile(enemy.GetComponent<Transform>().Position);
             ObjectManager.AddGameObject(projectile);
@@ -145,6 +150,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             projectileDirection.Normalize();
             //Debug.WriteLine($"Projectile direction + {projectileDirection}");
             projectile.GetComponent<ProjectileComponent>().Direction = projectileDirection;
+            projectile.GetComponent<ProjectileComponent>().EnemyTag = enemy.Tag;
+            return projectile;
         }
     }
 }

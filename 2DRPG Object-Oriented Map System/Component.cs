@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -303,8 +304,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 int index = items.IndexOf(item);
                 items.Remove(item);
-                slotTextures[index] = AssetManager.GetTexture("default_slot");
+                slotTextures[index] = AssetManager.GetTexture("default_slot"); // Update only the used slot
 
+                // Update remaining textures after shifting.
                 for (int i = index; i < items.Count; i++)
                 {
                     if (items[i] != null)
@@ -408,9 +410,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Vector2 Direction { get; set; }
         float velocity = 5f;
         GameObject player;
+        public string EnemyTag { get; set; }
         public override void Update()
         {
-            if (GameObject == null) return;
+            var enemyObject = ObjectManager.Find(EnemyTag);
 
             var projectileTransform = GameObject.GetComponent<Transform>();
 
@@ -424,22 +427,24 @@ namespace _2DRPG_Object_Oriented_Map_System
                 if (playerTransform != null && projectileTile == TilePosition(playerTransform.Position))
                 {
                     ObjectManager.Find("player")?.GetComponent<HealthComponent>()?.TakeDamage(1);
-                    GameObject?.Destroy();
-                    GameObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+
+                    enemyObject = ObjectManager.Find(EnemyTag);
+                    enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+                    GameObject?.Destroy();                 
                     return; // Exit the update method since the object is destroyed.
                 }
 
                 if (!IsWalkable(projectileTile))
                 {
+                    enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
                     GameObject?.Destroy();
-                    GameObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
                     return; // Exit the update method since the object is destroyed.
                 }
             }
             else
             {
+                enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
                 GameObject?.Destroy();
-                GameObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
             }
         }
 
@@ -467,12 +472,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         private HealthComponent healthComponent;
         public HealingComponent(string name, string description) : base(name, description)
         {
-            if (GameObject == null) return;
-            healthComponent = GameObject.GetComponent<HealthComponent>();
+            
         }
 
         public override void UseItem()
         {
+            healthComponent = ObjectManager.Find("player")?.GetComponent<HealthComponent>();
            if (healthComponent != null)
             {
                 healthComponent.Health += 10;
@@ -483,20 +488,26 @@ namespace _2DRPG_Object_Oriented_Map_System
                 Remove();
             }
         }
-
-
     }
 
     public class FireballScroll : ItemComponent
     {
         public FireballScroll(string name, string description) : base(name, description)
         {
-
         }
 
         public override void UseItem()
         {
-            // Shoot a fireball.
+            var player = ObjectManager.Find("player");
+            var weapon = player.GetComponent<Weapon>();
+
+            if (weapon != null)
+            {
+                weapon.waitingForDirection = true; // Set waiting flag
+                weapon.CreateDirectionArrows();
+            }
+
+            Remove();
         }
     }
 
@@ -509,7 +520,219 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public override void UseItem()
         {
-            // Shoot a lightning bolt, damaging all nearby enemies.
+            List<GameObject> targetEnemies = ObjectManager.FindAllObjectsByTag("enemy");
+            foreach (var enemy in targetEnemies)
+            {
+                enemy.GetComponent<HealthComponent>().TakeDamage(2);
+            }
+        }
+    }
+
+    public class PlayerProjectileComponent : Component
+    {
+        public Vector2 Direction { get; set; }
+        public float Velocity { get; set; } = 5f;
+
+        public override void Update()
+        {
+            if (GameObject == null) return;
+
+            var transform = GameObject.GetComponent<Transform>();
+            transform.Position += Direction * Velocity;
+
+            Point tilePosition = TilePosition(transform.Position);
+
+            // Check for collisions with enemies
+            List<GameObject> enemies = ObjectManager.FindAllObjectsByTag("enemy");
+            foreach (var enemy in enemies)
+            {
+                if (TilePosition(enemy.GetComponent<Transform>().Position) == tilePosition)
+                {
+                    enemy.GetComponent<HealthComponent>()?.TakeDamage(3);
+                    GameObject?.Destroy();
+                    return;
+                }
+            }
+
+            // Check for collisions with obstacles
+            if (!IsWalkable(tilePosition))
+            {
+                GameObject?.Destroy();
+                return;
+            }
+        }
+
+        private Point TilePosition(Vector2 position)
+        {
+            int tileX = (int)(position.X / 32);
+            int tileY = (int)(position.Y / 32);
+            return new Point(tileX, tileY);
+        }
+
+        private bool IsWalkable(Point tile)
+        {
+            Tilemap tilemap = ObjectManager.Find("tilemap").GetComponent<Tilemap>();
+            if (tile.X < 0 || tile.X >= tilemap.MapWidth || tile.Y < 0 || tile.Y >= tilemap.MapHeight)
+            {
+                return false;
+            }
+            return tilemap.Tiles[tile.X, tile.Y].IsWalkable;
+        }
+    }
+
+    public class Weapon : Component
+    {
+        string name;
+        public Vector2 chosenDirection = Vector2.Zero;
+        private Vector2 selectedDirection = new Vector2(0, -1); // Default upward
+        GameObject fireball;
+        bool hasFired = false;
+        public bool waitingForDirection = false;
+        List<(GameObject arrow, Vector2 direction)> directionArrows = new();
+        Color selectedColor = Color.Gray;
+        Color defaultColor = Color.White;
+
+        public Weapon(string name)
+        {
+            this.name = name;
+        }
+
+        public Vector2 GetDirectionInput()
+        {
+            KeyboardState currentState = Keyboard.GetState();
+
+            if (currentState.IsKeyDown(Keys.W)) return new Vector2(0, -1);
+            if (currentState.IsKeyDown(Keys.A)) return new Vector2(-1, 0);
+            if (currentState.IsKeyDown(Keys.S)) return new Vector2(0, 1);
+            if (currentState.IsKeyDown(Keys.D)) return new Vector2(1, 0);
+
+            return selectedDirection; // Keep previous direction if no new input
+        }
+
+        public override void Update()
+        {
+            if (GameObject == null) return;
+            var playerController = GameObject.GetComponent<PlayerController>();
+
+            if (waitingForDirection)
+            {
+                playerController.IsShooting = true;
+                Vector2 input = GetDirectionInput();
+                if (input != selectedDirection)
+                {
+                    selectedDirection = input;
+                    UpdateDirectionArrows();
+                }
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Space) && selectedDirection != Vector2.Zero)
+                {
+                    chosenDirection = selectedDirection;
+                    
+                    playerController.IsShooting = false;
+                    ShootWeapon();
+                    waitingForDirection = false;
+                    RemoveDirectionArrows();
+                    playerController.EndTurn();
+                }
+            }
+        }
+
+        public void ShootWeapon()
+        {
+            Vector2 playerPosition = ObjectManager.Find("player").GetComponent<Transform>().Position;
+            fireball = GameObjectFactory.CreateFireball(playerPosition);
+            if (fireball != null && playerPosition != null) {
+                fireball.GetComponent<Transform>().Position = playerPosition;
+                PlayerProjectileComponent projectileComponent = fireball.GetComponent<PlayerProjectileComponent>();
+                projectileComponent.Direction = chosenDirection;
+            } 
+            ObjectManager.AddGameObject(fireball);
+            hasFired = true;
+            ObjectManager.Find("player").GetComponent<PlayerController>().EndTurn();
+        }
+
+        public void CreateDirectionArrows()
+        {
+            Vector2[] choices =
+            {
+            new Vector2(1, 0),  // Right
+            new Vector2(-1, 0), // Left
+            new Vector2(0, -1), // Up
+            new Vector2(0, 1)   // Down
+        };
+            
+            float[] rotations =
+        {
+            -MathHelper.PiOver2, // Right: rotate -90 degrees
+            MathHelper.PiOver2,  // Left: rotate +90 degrees
+            MathHelper.Pi,       // Up: rotate 180 degrees
+            0f                   // Down: no rotation
+        };
+
+
+
+
+            Vector2 playerPosition = ObjectManager.Find("player").GetComponent<Transform>().Position;
+
+            for (int i = 0; i < choices.Length; i++)
+            {
+                GameObject arrow = GameObjectFactory.CreateTurnArrow();
+                Transform arrowTransform = arrow.GetComponent<Transform>();
+                Sprite sprite = arrow.GetComponent<Sprite>();
+
+                // Corrected offset calculation for downward-facing arrows
+                Vector2 offset = Vector2.Zero;
+                if (choices[i].X == 1) offset = new Vector2(0, 32);  // Right: offset left
+                if (choices[i].X == -1) offset = new Vector2(32, 0); // Left: offset right
+                if (choices[i].Y == -1) offset = new Vector2(32, 32);  // Up: offset down
+                if (choices[i].Y == 1) offset = new Vector2(0, 0);   // Down: no offset
+
+                arrowTransform.Position = playerPosition + (choices[i] * 32f) + offset;
+                arrowTransform.Rotation = rotations[i];
+
+                sprite.Color = defaultColor;
+
+                directionArrows.Add((arrow, choices[i]));
+                ObjectManager.AddGameObject(arrow);
+            }
+
+
+
+        }
+
+        public void UpdateDirectionArrows()
+        {
+            Vector2 playerPosition = ObjectManager.Find("player").GetComponent<Transform>().Position;
+
+            foreach (var (arrow, direction) in directionArrows)
+            {
+                Vector2 offset = Vector2.Zero;
+                if (direction.X == 1) offset = new Vector2(0, 32);  // Right: offset left
+                if (direction.X == -1) offset = new Vector2(32, 0); // Left: offset right
+                if (direction.Y == -1) offset = new Vector2(32, 32);  // Up: offset down
+                if (direction.Y == 1) offset = new Vector2(0, 0);   // Down: no offset
+
+                arrow.GetComponent<Transform>().Position = playerPosition + (direction * 32) + offset;
+
+                Sprite sprite = arrow.GetComponent<Sprite>();
+                if (direction == selectedDirection)
+                {
+                    sprite.Color = selectedColor;
+                }
+                else
+                {
+                    sprite.Color = defaultColor;
+                }
+            }
+        }
+
+        public void RemoveDirectionArrows()
+        {
+            foreach (var (arrow, _) in directionArrows)
+            {
+                arrow?.Destroy();
+            }
+            directionArrows.Clear();
         }
     }
 }

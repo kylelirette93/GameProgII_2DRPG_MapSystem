@@ -40,12 +40,18 @@ namespace _2DRPG_Object_Oriented_Map_System
                 direction.Normalize();
             }
 
-            Vector2 newPosition = enemyTransform.Position + direction * 32; // Move 32 pixels in direction of player.
+            Vector2 newPosition = enemyTransform.Position + direction * 32;
+
+            // Round to nearest tile boundary
+            newPosition = new Vector2(
+                (int)(Math.Round(newPosition.X / tilemap.TileWidth) * tilemap.TileWidth),
+                (int)(Math.Round(newPosition.Y / tilemap.TileHeight) * tilemap.TileHeight)
+            );
 
             Point newPoint = new Point((int)(newPosition.X / tilemap.TileWidth), (int)(newPosition.Y / tilemap.TileHeight));
             Point playerPoint = new Point((int)(playerTransform.Position.X / tilemap.TileWidth), (int)(playerTransform.Position.Y / tilemap.TileHeight));
 
-            if (newPoint != playerPoint) // Prevent moving into player's tile
+            if (newPoint != playerPoint)
             {
                 enemyTransform.Position = newPosition;
             }

@@ -30,6 +30,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         public int X { get => (int)player.GetComponent<Transform>().Position.X; }
         public int Y { get => (int)player.GetComponent<Transform>().Position.Y; }
 
+        public bool IsShooting { get => isShooting; set => isShooting = value; }
+        bool isShooting = false;
+
         public string Id => "Player";
 
         /// <summary>
@@ -58,7 +61,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             if (enemyAI == null)
             {
-                   enemyAI = ObjectManager.Find("enemy")?.GetComponent<MeleeEnemyAI>();
+                   enemyAI = ObjectManager.Find("enemy")?.GetComponent<BaseEnemyAI>();
             }
             if (isTurn)
             {
@@ -67,30 +70,33 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         private void HandleInput()
         {
-            // Create a movement vector.
-            Vector2 movement = Vector2.Zero;
-            // Update the current state of the keyboard.
-            currentState = Keyboard.GetState();
-            // Compare the current state with the previous state to check for key presses.
-            if (currentState.IsKeyDown(Keys.W) && !previousState.IsKeyDown(Keys.W)) movement.Y -= 32;
-            if (currentState.IsKeyDown(Keys.S) && !previousState.IsKeyDown(Keys.S)) movement.Y += 32;
-            if (currentState.IsKeyDown(Keys.A) && !previousState.IsKeyDown(Keys.A)) movement.X -= 32;
-            if (currentState.IsKeyDown(Keys.D) && !previousState.IsKeyDown(Keys.D)) movement.X += 32;
-
-            if (movement != Vector2.Zero && player != null)
+            if (!IsShooting)
             {
-                // Normalize the movement vector.
-                Vector2 newPosition = player.GetComponent<Transform>().Position + movement;
-                if (CanMoveTo(newPosition))
+                // Create a movement vector.
+                Vector2 movement = Vector2.Zero;
+                // Update the current state of the keyboard.
+                currentState = Keyboard.GetState();
+                // Compare the current state with the previous state to check for key presses.
+                if (currentState.IsKeyDown(Keys.W) && !previousState.IsKeyDown(Keys.W)) movement.Y -= 32;
+                if (currentState.IsKeyDown(Keys.S) && !previousState.IsKeyDown(Keys.S)) movement.Y += 32;
+                if (currentState.IsKeyDown(Keys.A) && !previousState.IsKeyDown(Keys.A)) movement.X -= 32;
+                if (currentState.IsKeyDown(Keys.D) && !previousState.IsKeyDown(Keys.D)) movement.X += 32;
+
+                if (movement != Vector2.Zero && player != null)
                 {
-                    player.GetComponent<Transform>()?.Translate(movement);
-                    int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
-                    int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
-                    EndTurn();
+                    // Normalize the movement vector.
+                    Vector2 newPosition = player.GetComponent<Transform>().Position + movement;
+                    if (CanMoveTo(newPosition))
+                    {
+                        player.GetComponent<Transform>()?.Translate(movement);
+                        int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
+                        int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
+                        EndTurn();
+                    }
                 }
+                // Assign the current state to the previous state, this is used to check for key presses.
+                previousState = currentState;
             }
-            // Assign the current state to the previous state, this is used to check for key presses.
-            previousState = currentState;
         }
         private bool CanMoveTo(Vector2 newPosition)
         {
@@ -111,7 +117,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     );
 
                     // Create a copy of the enemies list to avoid concurrent modification
-                    var enemies = ObjectManager.FindAllObjectsByTag("enemy").ToList(); 
+                    var enemies = ObjectManager.FindAllObjectsByTag("enemy"); 
                     foreach (var enemyObject in enemies)
                     {
                         if (enemyObject != null)
@@ -120,7 +126,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                             if (enemyCollider != null && tempPlayerBounds.Intersects(enemyCollider.Bounds))
                             {
                                 var enemyHealth = enemyObject.GetComponent<HealthComponent>();
-                                enemyAI = enemyObject.GetComponent<MeleeEnemyAI>();
+                                enemyAI = enemyObject.GetComponent<BaseEnemyAI>();
                                 enemyHealth?.TakeDamage(1);
                                 enemyAI?.Stun();
                                 EndTurn();

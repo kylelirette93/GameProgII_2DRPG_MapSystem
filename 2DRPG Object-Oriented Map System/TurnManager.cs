@@ -62,7 +62,7 @@ public class TurnManager
         if (currentTurnTaker != null && !currentTurnTaker.IsTurn)
         {
             waitingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (waitingTime > 0.01f)
+            if (waitingTime > 0.0f)
             {
                 // End the current turn and reset the turn state
                 Debug.WriteLine($"{currentTurnTaker} has finished its turn.");

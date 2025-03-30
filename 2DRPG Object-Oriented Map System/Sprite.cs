@@ -14,6 +14,12 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Texture2D Texture { get { return _texture; } set { _texture = value; } }
         private Vector2 _position;
         public Vector2 Position { get { return _position; } set { _position = value; } }
+
+        private float _rotation;
+        public float Rotation { get { return _rotation; } set { _rotation = value; } }
+
+        private Vector2 _scale;
+        public Vector2 Scale { get { return _scale; } set { _scale = value; } } 
         public Rectangle SpriteBounds { get { return _spriteBounds; } set { _spriteBounds = value; } }
         private Rectangle _spriteBounds;
         public Color Color { get { return _color; } set { _color = value; } }
@@ -37,6 +43,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             // Update the sprite and it's bounds based on transform position.
             _position = GameObject.GetComponent<Transform>().Position;
+            _rotation = GameObject.GetComponent<Transform>().Rotation;
+            _scale = GameObject.GetComponent<Transform>().Scale;
             _spriteBounds.Location = _position.ToPoint();
         }
         /// <summary>
@@ -45,8 +53,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
+
             // Draw the sprite at the object's position.
-            spriteBatch.Draw(_texture, _position, null, _color);
+            spriteBatch.Draw(_texture, _position, null, _color, _rotation, Vector2.Zero, _scale, SpriteEffects.None, 0f);
         }     
 }
 }

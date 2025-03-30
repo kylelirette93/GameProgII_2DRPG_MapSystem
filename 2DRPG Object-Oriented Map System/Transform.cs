@@ -56,6 +56,5 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             _scale += new Vector2(amount, amount);
         }
-
     }
 }
