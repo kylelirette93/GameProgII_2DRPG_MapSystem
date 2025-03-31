@@ -57,7 +57,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["MainMenu"] = content.Load<Texture2D>("MainMenu");
                 textures["PauseMenu"] = content.Load<Texture2D>("PauseMenu");
                 textures["GameOverMenu"] = content.Load<Texture2D>("GameOverMenu");
-                textures["scroll_of_force"] = content.Load<Texture2D>("scroll_of_force"); 
+                textures["scroll_of_force"] = content.Load<Texture2D>("scroll_of_force");
+                textures["button"] = content.Load<Texture2D>("button");
 
                 font = content.Load<SpriteFont>("font");
 

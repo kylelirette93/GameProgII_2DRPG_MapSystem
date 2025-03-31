@@ -121,6 +121,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             switch (CurrentState)
             {
                 case GameState.MainMenu:
+                    uiManager.UpdateMainMenu(gameTime);
                     if (state.IsKeyDown(Keys.Enter))
                     {
                         CurrentState = GameState.Playing;

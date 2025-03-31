@@ -15,6 +15,7 @@
     <None Remove="app.manifest" />
     <None Remove="Content\bin\DesktopGL\Level0.txt" />
     <None Remove="Content\bin\DesktopGL\Level1.txt" />
+    <None Remove="Content\button.png" />
     <None Remove="Content\Content.mgcb" />
     <None Remove="Content\default_slot.png" />
     <None Remove="Content\enemy.png" />
@@ -47,6 +48,9 @@
     <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\button.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\default_slot.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
