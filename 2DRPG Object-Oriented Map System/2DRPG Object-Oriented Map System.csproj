@@ -32,7 +32,6 @@
     <None Remove="Content\MainMenu.png" />
     <None Remove="Content\mapMusic.wav" />
     <None Remove="Content\obstacle_tile.png" />
-    <None Remove="Content\PauseMenu.png" />
     <None Remove="Content\pixel.png" />
     <None Remove="Content\player.png" />
     <None Remove="Content\player_hurt.png" />
@@ -96,9 +95,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\obstacle_tile.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\PauseMenu.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\pixel.png">

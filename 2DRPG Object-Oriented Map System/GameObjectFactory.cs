@@ -82,6 +82,23 @@ namespace _2DRPG_Object_Oriented_Map_System
             healthComponent.Initialize();
             return ghostEnemy;
         }
+
+        public static GameObject CreateBossEnemy(MapManager mapManager, string textureName)
+        {
+            GameObject bossEnemy = new GameObject("Boss");
+            bossEnemy.AddComponent(new Transform());
+            bossEnemy.GetComponent<Transform>().Position = mapManager.FindEnemySpawn("Boss");
+            bossEnemy.AddComponent(new Sprite(AssetManager.GetTexture(textureName)));
+            bossEnemy.AddComponent(new Collider(bossEnemy.GetComponent<Sprite>().SpriteBounds));
+            bossEnemy.AddComponent(new BossEnemyAI("Boss"));
+            EnemyType type = new EnemyType();
+            type.Type = "boss";
+            bossEnemy.AddComponent(type);
+            HealthComponent healthComponent = new HealthComponent(25);
+            bossEnemy.AddComponent(healthComponent);
+            healthComponent.Initialize();
+            return bossEnemy;
+        }
         // To use for procedural generation.
         public static GameObject GenerateTilemap()
         {

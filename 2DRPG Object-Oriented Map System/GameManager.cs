@@ -136,23 +136,12 @@ namespace _2DRPG_Object_Oriented_Map_System
                         CurrentState = GameState.Paused;
                         isPausePressed = true;
                     }
-                    if (state.IsKeyUp(Keys.P))
-                    {
-                        isPausePressed = false;
-                    }
                     break;
-                    case GameState.Paused:
-                    if (state.IsKeyDown(Keys.P) && !isPausePressed)
-                    {
-                        CurrentState = GameState.Playing;
-                        isPausePressed = true;
-                    }
-                    if (state.IsKeyUp(Keys.P))
-                    {
-                        isPausePressed = false;
-                    }
+                case GameState.Paused:
+                    uiManager.UpdatePauseMenu(gameTime);
                     break;
                 case GameState.GameOver:
+                    uiManager.UpdateQuitMenu(gameTime);
                     if (state.IsKeyDown(Keys.M))
                     {
                         CleanupLevel();
@@ -160,7 +149,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                     break;
             }
-            base.Update(gameTime);          
+            base.Update(gameTime);
         }
         /// <summary>
         /// Draw method is responsible for drawing the game state.
@@ -189,6 +178,23 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             _spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        public void Play()
+        {
+            CurrentState = GameState.Playing;
+            InitializeLevel();
+        }
+
+        public void MainMenu()
+        {
+            CurrentState = GameState.MainMenu;
+        }
+
+        public void Resume()         
+        {
+            CurrentState = GameState.Playing;
+            isPausePressed = false;
         }
     }
 }

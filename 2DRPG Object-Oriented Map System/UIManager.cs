@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
-using System.Net.Mime;
+using System.Collections.Generic;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -18,13 +17,17 @@ namespace _2DRPG_Object_Oriented_Map_System
         Texture2D mainMenuBackground;
         Texture2D pauseMenuBackground;
         Texture2D gameOverMenuBackground;
-        Texture2D button;
-        SpriteFont buttonText;
-        const string playText = "Play Game";
-        const string quitText = "Quit Game";
-        Vector2 buttonOffset = new Vector2(20, 2);
-        UIButton PlayButton;
-        UIButton QuitButton;
+        Texture2D buttonTexture;
+        SpriteFont buttonTextFont;
+        const string playText = "PLAY GAME";
+        const string returnText = "MAIN MENU";
+        const string resumeText = "CONTINUE";
+        const string quitText = "QUIT GAME";
+        Vector2 buttonOffset = new Vector2(5, 2);
+        UIButton playButton;
+        UIButton returnButton;
+        UIButton resumeButton;
+        UIButton quitButton;
 
         Color defaultColor = Color.White;
         Color highlightedColor = Color.Gray;
@@ -33,74 +36,131 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             mainMenuBackground = AssetManager.GetTexture("MainMenu");
             pauseMenuBackground = AssetManager.GetTexture("PauseMenu");
-            gameOverMenuBackground = AssetManager.GetTexture("GameOverMenu");            
-            button = AssetManager.GetTexture("button");
-            buttonText = AssetManager.GetFont("font");
-            PlayButton = new UIButton(button, playButtonPosition);
-            QuitButton = new UIButton(button, quitButtonPosition);
+            gameOverMenuBackground = AssetManager.GetTexture("GameOverMenu");
+            buttonTexture = AssetManager.GetTexture("button");
+            buttonTextFont = AssetManager.GetFont("font");
+            playButton = new UIButton(buttonTexture, buttonTextFont, playText, playButtonPosition, buttonOffset);
+            returnButton = new UIButton(buttonTexture, buttonTextFont, returnText, playButtonPosition, buttonOffset);
+            resumeButton = new UIButton(buttonTexture, buttonTextFont, resumeText, playButtonPosition, buttonOffset);
+            quitButton = new UIButton(buttonTexture, buttonTextFont, quitText, quitButtonPosition, buttonOffset);
         }
 
         public void DrawMainMenu(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(mainMenuBackground, displayPosition, Color.White);
-            PlayButton.DrawButton(spriteBatch);
-            spriteBatch.DrawString(buttonText, playText, playButtonPosition + buttonOffset, Color.White);
-            spriteBatch.Draw(button, quitButtonPosition, Color.White);
-            QuitButton.DrawButton(spriteBatch);
-            spriteBatch.DrawString(buttonText, quitText, quitButtonPosition + buttonOffset, Color.White);
+            playButton.Draw(spriteBatch);
+            quitButton.Draw(spriteBatch);
         }
 
         public void DrawPauseMenu(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(pauseMenuBackground, displayPosition, Color.White);
+            resumeButton.Draw(spriteBatch);
+            quitButton.Draw(spriteBatch);
         }
 
         public void DrawGameOverMenu(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(gameOverMenuBackground, displayPosition, Color.White);
+            returnButton.Draw(spriteBatch);
+            quitButton.Draw(spriteBatch);
         }
 
         public void UpdateMainMenu(GameTime gameTime)
         {
-            MouseState mouseState = new MouseState();
+            UpdateMouseState(new List<UIButton> { playButton, quitButton });
+        }
 
-            if (mouseState.Position.ToVector2() == playButtonPosition)
+        public void UpdatePauseMenu(GameTime gameTime)
+        {
+            UpdateMouseState(new List<UIButton> { resumeButton, quitButton });
+        }
+
+        public void UpdateQuitMenu(GameTime gameTime)
+        {
+            UpdateMouseState(new List<UIButton> { returnButton, quitButton });
+        }
+
+        private void UpdateMouseState(List<UIButton> buttons)
+        {
+            MouseState mouseState = Mouse.GetState();
+            Vector2 mousePosition = mouseState.Position.ToVector2();
+
+            foreach (var button in buttons)
             {
-                Debug.WriteLine("Play button highlighted");
+                button.Update(mousePosition);
+
+                if (button.IsWithinBounds(mousePosition))
+                {
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        if (button == playButton)
+                        {
+                            GameManager.Instance.Play();
+                        }
+                        else if (button == returnButton)
+                        {
+                            GameManager.Instance.MainMenu();
+                        }
+                        else if (button == resumeButton)
+                        {
+                            GameManager.Instance.Resume();
+                        }
+                        else if (button == quitButton)
+                        {
+                            GameManager.Instance.Exit();
+                        }
+                    }
+                }
             }
         }
     }
 
+
+
     public class UIButton
     {
-        Texture2D buttonTexture;
-        public string buttonText;
-        Vector2 buttonPosition;
-        Color currentColor;
-        Color defaultColor = Color.White;
-        Color highlightedColor = Color.Gray;
+        private Texture2D texture;
+        private SpriteFont font;
+        private string text;
+        private Vector2 position;
+        private Vector2 textOffset;
+        private Color defaultColor = Color.White;
+        private Color highlightedColor = Color.Gray;
+        private Color currentColor;
 
-        public UIButton(Texture2D buttonTexture, Vector2 buttonPosition)
+        public UIButton(Texture2D texture, SpriteFont font, string text, Vector2 position, Vector2 textOffset)
         {
-            this.buttonTexture = buttonTexture;
-            this.buttonPosition = buttonPosition;
+            this.texture = texture;
+            this.font = font;
+            this.text = text;
+            this.position = position;
+            this.textOffset = textOffset;
+            this.currentColor = defaultColor;
         }
+
         public bool IsWithinBounds(Vector2 mousePosition)
         {
-            // Check if the mouse position is within bounds.
-            if (mousePosition.X > buttonPosition.X + buttonPosition.X / 2 &&
-                mousePosition.X < buttonPosition.X - buttonPosition.X / 2 &&
-                mousePosition.Y > buttonPosition.Y + buttonPosition.Y / 2 &&
-                mousePosition.Y < buttonPosition.Y - buttonPosition.Y / 2)
-            {
-                return true;
-            }
-            return false;
+            Rectangle buttonRectangle = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
+            return buttonRectangle.Contains(mousePosition);
         }
 
-        public void DrawButton(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(buttonTexture, buttonPosition, currentColor);
+            spriteBatch.Draw(texture, position, currentColor);
+            spriteBatch.DrawString(font, text, position + textOffset, currentColor);
+        }
+
+        public void Update(Vector2 mousePosition)
+        {
+            if (IsWithinBounds(mousePosition))
+            {
+                currentColor = highlightedColor;
+            }
+            else
+            {
+                currentColor = defaultColor;
+            }
         }
     }
 }
