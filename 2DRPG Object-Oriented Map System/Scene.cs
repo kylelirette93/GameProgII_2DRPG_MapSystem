@@ -25,6 +25,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public GameObject Item { get; private set; }
 
+        public GameObject Boss { get; private set; }
+
         private Random random = new Random();
         
 
@@ -89,7 +91,12 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             SpawnRandomEnemies(mapManager);
 
-            Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
+            if (mapManager.CurrentLevelIndex > 3)
+            {
+                Boss = GameObjectFactory.CreateBossEnemy(mapManager);
+            }
+
+                Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
             mapManager.SetPlayerStartPosition(Player, previousExit);

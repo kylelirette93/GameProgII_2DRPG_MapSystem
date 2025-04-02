@@ -82,7 +82,7 @@ public class TurnManager
         if (currentTurnTaker != null && !currentTurnTaker.IsTurn)
         {
             waitingTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (waitingTime > 0.25f)
+            if (waitingTime > 0.0f)
             {
                 //Debug.WriteLine($"{currentTurnTaker} has finished its turn.");
                 isTurnActive = false;
@@ -95,5 +95,11 @@ public class TurnManager
                 waitingTime = 0f;
             }
         }
+    }
+
+    public void ClearTurnTakers()
+    {
+        turnQueue.Clear();
+        currentTurnTaker = null;
     }
 }

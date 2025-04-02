@@ -77,18 +77,18 @@ namespace _2DRPG_Object_Oriented_Map_System
             EnemyType type = new EnemyType();
             type.Type = "ghost";
             ghostEnemy.AddComponent(type);
-            HealthComponent healthComponent = new HealthComponent(5);
+            HealthComponent healthComponent = new HealthComponent(1);
             ghostEnemy.AddComponent(healthComponent);
             healthComponent.Initialize();
             return ghostEnemy;
         }
 
-        public static GameObject CreateBossEnemy(MapManager mapManager, string textureName)
+        public static GameObject CreateBossEnemy(MapManager mapManager)
         {
             GameObject bossEnemy = new GameObject("Boss");
             bossEnemy.AddComponent(new Transform());
             bossEnemy.GetComponent<Transform>().Position = mapManager.FindEnemySpawn("Boss");
-            bossEnemy.AddComponent(new Sprite(AssetManager.GetTexture(textureName)));
+            bossEnemy.AddComponent(new Sprite(AssetManager.GetTexture("Boss")));
             bossEnemy.AddComponent(new Collider(bossEnemy.GetComponent<Sprite>().SpriteBounds));
             bossEnemy.AddComponent(new BossEnemyAI("Boss"));
             EnemyType type = new EnemyType();

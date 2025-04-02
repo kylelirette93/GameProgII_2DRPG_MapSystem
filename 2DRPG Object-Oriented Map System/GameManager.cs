@@ -19,6 +19,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Scene currentScene;
         UIManager uiManager;
         bool isPausePressed = false;
+        int timer = 0;
         /// <summary>
         /// The current Game State.
         /// </summary>
@@ -87,7 +88,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 currentScene = null;
                 mapManager.Clear();
                 mapManager = null;
-                TurnManager.Instance.TurnQueue.Clear();
+                TurnManager.Instance.ClearTurnTakers();
                 foreach (GameObject gameObject in ObjectManager.GameObjects)
                 {
                     gameObject.Destroy();
@@ -142,11 +143,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                     break;
                 case GameState.GameOver:
                     uiManager.UpdateQuitMenu(gameTime);
-                    if (state.IsKeyDown(Keys.M))
-                    {
-                        CleanupLevel();
-                        CurrentState = GameState.MainMenu;
-                    }
                     break;
             }
             base.Update(gameTime);
@@ -188,6 +184,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void MainMenu()
         {
+            CleanupLevel();
             CurrentState = GameState.MainMenu;
         }
 

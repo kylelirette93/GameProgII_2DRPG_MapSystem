@@ -12,6 +12,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
         public Vector2 SpawnPoint { get; set; }
         private List<string> _levelPaths;
+
+        public int CurrentLevelIndex { get { return _currentLevelIndex; } }
         private int _currentLevelIndex;
         public Tilemap CurrentMap { get { return _currentMap; } set { _currentMap = value; } }
         private Tilemap _currentMap;
@@ -74,7 +76,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 _currentMap.LoadFromFile(_levelPaths[_currentLevelIndex]);
             }
             else
-            {           
+            {   
+                //TODO: Load Boss level here.
                 _currentMap.GenerateProceduralMap(_mapHeight, _mapWidth);
             }
             return _currentMap;

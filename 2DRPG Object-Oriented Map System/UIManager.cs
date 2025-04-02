@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Threading;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -28,6 +29,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         UIButton returnButton;
         UIButton resumeButton;
         UIButton quitButton;
+        List<UIButton> CurrentButtons = new List<UIButton>();
 
         Color defaultColor = Color.White;
         Color highlightedColor = Color.Gray;
@@ -68,49 +70,67 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void UpdateMainMenu(GameTime gameTime)
         {
-            UpdateMouseState(new List<UIButton> { playButton, quitButton });
+            CurrentButtons.Clear();
+            CurrentButtons.Add(playButton);
+            CurrentButtons.Add(quitButton);
+            UpdateMouseState(CurrentButtons);
         }
 
         public void UpdatePauseMenu(GameTime gameTime)
         {
-            UpdateMouseState(new List<UIButton> { resumeButton, quitButton });
+            CurrentButtons.Clear();
+            CurrentButtons.Add(resumeButton);
+            CurrentButtons.Add(quitButton);
+            UpdateMouseState(CurrentButtons);
         }
 
         public void UpdateQuitMenu(GameTime gameTime)
         {
-            UpdateMouseState(new List<UIButton> { returnButton, quitButton });
+            CurrentButtons.Clear();
+            CurrentButtons.Add(returnButton);
+            CurrentButtons.Add(quitButton);
+            UpdateMouseState(CurrentButtons);
         }
 
         private void UpdateMouseState(List<UIButton> buttons)
         {
+            
             MouseState mouseState = Mouse.GetState();
             Vector2 mousePosition = mouseState.Position.ToVector2();
 
             foreach (var button in buttons)
             {
-                button.Update(mousePosition);
+                button.Update(mousePosition);               
 
-                if (button.IsWithinBounds(mousePosition))
+                if (button.IsWithinBounds(mousePosition) && !button.WasPressedThisFrame)
                 {
                     if (mouseState.LeftButton == ButtonState.Pressed)
                     {
                         if (button == playButton)
                         {
+                            playButton.WasPressedThisFrame = true;
                             GameManager.Instance.Play();
                         }
                         else if (button == returnButton)
                         {
+                            returnButton.WasPressedThisFrame = true;
                             GameManager.Instance.MainMenu();
                         }
                         else if (button == resumeButton)
                         {
+                            resumeButton.WasPressedThisFrame = true;
                             GameManager.Instance.Resume();
                         }
                         else if (button == quitButton)
                         {
+                            quitButton.WasPressedThisFrame = true;
                             GameManager.Instance.Exit();
                         }
                     }
+                }
+                else if (mouseState.LeftButton == ButtonState.Released)
+                {
+                    button.WasPressedThisFrame = false;
                 }
             }
         }
@@ -128,6 +148,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Color defaultColor = Color.White;
         private Color highlightedColor = Color.Gray;
         private Color currentColor;
+        public bool WasPressedThisFrame = false;
+
 
         public UIButton(Texture2D texture, SpriteFont font, string text, Vector2 position, Vector2 textOffset)
         {
