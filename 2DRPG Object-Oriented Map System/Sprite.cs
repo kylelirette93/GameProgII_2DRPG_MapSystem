@@ -24,7 +24,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Rectangle _spriteBounds;
         public Color Color { get { return _color; } set { _color = value; } }
         private Color _color = Color.White;
-        
+        public bool IsVisible { get; set; } = true;        
 
         /// <summary>
         /// Sprite constructor is responsible for setting the texture and sprite bounds.
@@ -53,9 +53,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-
-            // Draw the sprite at the object's position.
-            spriteBatch.Draw(_texture, _position, null, _color, _rotation, Vector2.Zero, _scale, SpriteEffects.None, 0f);
+            if (IsVisible)
+            {
+                // Draw the sprite at the object's position.
+                spriteBatch.Draw(_texture, _position, null, _color, _rotation, Vector2.Zero, _scale, SpriteEffects.None, 0f);
+            }
         }     
 }
 }

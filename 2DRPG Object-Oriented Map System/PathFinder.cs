@@ -76,6 +76,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <returns></returns>
         private List<Point> InitializePathfinding(Point startingFrom, Point goal)
         {
+            // Check if startingFrom and goal are within nodeMap bounds.
+            if (startingFrom.X < 0 || startingFrom.X >= nodeMap.GetLength(0) ||
+                startingFrom.Y < 0 || startingFrom.Y >= nodeMap.GetLength(1) ||
+                goal.X < 0 || goal.X >= nodeMap.GetLength(0) ||
+                goal.Y < 0 || goal.Y >= nodeMap.GetLength(1))
+            {
+                // Handle out-of-bounds error (e.g., return null, throw an exception, log an error).
+                Console.WriteLine("Error: Starting or goal point is out of map bounds.");
+                return null; // Or throw an exception.
+            }
             // Set the starting node and target node to the provided points.
             startingNode = nodeMap[startingFrom.X, startingFrom.Y];
             targetNode = nodeMap[goal.X, goal.Y];

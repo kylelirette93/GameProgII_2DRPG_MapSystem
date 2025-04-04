@@ -57,17 +57,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public virtual void UpdateTarget()
         {
-            if (tilemap == null || playerTransform == null || enemyTransform == null && pathfinder == null)
+            if (tilemap == null || playerTransform == null || enemyTransform == null)
             {
                 Debug.WriteLine("Can't find target, somethings null!");
-                return; // Handle null cases
+                return;
             }
-            enemyPosition = new Point((int)(enemyTransform.Position.X / tilemap.TileWidth),
-                (int)(enemyTransform.Position.Y / tilemap.TileHeight));
-            playerPosition = new Point((int)(playerTransform.Position.X / tilemap.TileWidth),
-                (int)(playerTransform.Position.Y / tilemap.TileHeight));
 
-            currentPath = pathfinder.FindPath(nodeMap, enemyPosition, playerPosition); 
+            enemyPosition = new Point((int)(enemyTransform.Position.X / tilemap.TileWidth), (int)(enemyTransform.Position.Y / tilemap.TileHeight));
+            playerPosition = new Point((int)(playerTransform.Position.X / tilemap.TileWidth), (int)(playerTransform.Position.Y / tilemap.TileHeight));
+
+            currentPath = pathfinder.FindPath(nodeMap, enemyPosition, playerPosition);
             currentPathIndex = 0;
 
             if (currentPath == null)
@@ -79,13 +78,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Simple state machine for the enemy AI.
         /// </summary>
-        public enum EnemyState
-        {
-            Stunned,
-            RangedAttack,
-            Follow,
-            Attack
-        }
+        public enum EnemyState { Stunned, RangedAttack, Follow, Attack }
 
         /// <summary>
         /// This method changes the state of the enemy AI.
@@ -127,58 +120,80 @@ namespace _2DRPG_Object_Oriented_Map_System
         public virtual void FollowPlayer()
         {
             UpdateTarget();
+
             if (currentPath == null || currentPathIndex >= currentPath.Count)
             {
-                Debug.WriteLine("FollowPlayer: No valid path or reached the end of the path.");
                 EndTurn();
                 return;
             }
 
             Point nextPoint = currentPath[currentPathIndex];
-            Point playerTile = new Point(
-                (int)(playerTransform.Position.X / tilemap.TileWidth),
-                (int)(playerTransform.Position.Y / tilemap.TileHeight)
-            );
+            Vector2 newPosition = new Vector2(nextPoint.X * tilemap.TileWidth, nextPoint.Y * tilemap.TileHeight);
 
-            Debug.WriteLine($"FollowPlayer: Next point: {nextPoint}, Player tile: {playerTile}, Current index: {currentPathIndex}");
+            // Boundary Check BEFORE assigning new position
+            if (newPosition.X < 0 || newPosition.X >= tilemap.TileWidth * tilemap.MapWidth ||
+                newPosition.Y < 0 || newPosition.Y >= tilemap.TileHeight * tilemap.MapHeight)
+            {
+                // Handle out-of-bounds situation (e.g., recalculate path, random move)
+                newPosition = FindValidPosition(enemyTransform.Position); // Try to find another position
+                if (newPosition == enemyTransform.Position)
+                {
+                    // if no valid position is found, stop movement.
+                    EndTurn();
+                    return;
+                }
+            }
 
-            // Check if the next tile is the player's tile
             if (IsAdjacentToPlayer())
             {
-                Debug.WriteLine("FollowPlayer: Is adjacent, attacking.");
                 ChangeState(EnemyState.Attack);
-                var playerHealth = player.GetComponent<HealthComponent>();
-                playerHealth?.TakeDamage(1);
+                DealDamage();
                 nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles);
                 return;
             }
 
-            Vector2 newPosition = new Vector2(nextPoint.X * tilemap.TileWidth, nextPoint.Y * tilemap.TileHeight);
-
             if (!IsEnemyAtPosition(newPosition))
             {
-                // Move to the next tile.             
-                enemyTransform.Position = new Vector2((int)newPosition.X, (int)newPosition.Y);
+                enemyTransform.Position = newPosition;
+                ClampPosition();
             }
             else
             {
-                newPosition = FindValidPosition(enemyTransform.Position);
-
-                // Make sure enemy can't move to another enemy's position.
-                if (newPosition != enemyTransform.Position)
+                Vector2 validPosition = FindValidPosition(enemyTransform.Position);
+                if (validPosition != enemyTransform.Position)
                 {
-                    enemyTransform.Position = new Vector2((int)newPosition.X, (int)newPosition.Y);
+                    enemyTransform.Position = validPosition;
+                    ClampPosition();
+                }
+                else
+                {
+                    // If no valid position is found, recalculate path, random move, or wait.
+                    //Example: Recalculate path
+                    UpdateTarget();
+                    if (currentPath == null || currentPath.Count == 0)
+                    {
+                        EndTurn();
+                        return;
+                    }
+                    nextPoint = currentPath[0];
+                    newPosition = new Vector2(nextPoint.X * tilemap.TileWidth, nextPoint.Y * tilemap.TileHeight);
+                    if (newPosition.X < 0 || newPosition.X >= tilemap.TileWidth * tilemap.MapWidth ||
+                        newPosition.Y < 0 || newPosition.Y >= tilemap.TileHeight * tilemap.MapHeight)
+                    {
+                        EndTurn();
+                        return;
+                    }
+                    enemyTransform.Position = newPosition;
+                    ClampPosition();
+
+                    currentPathIndex = 1;
                 }
             }
 
-           // Debug.WriteLine($"FollowPlayer: After move, enemyTransform.Position = {enemyTransform.Position}");
-
             currentPathIndex++;
 
-            // Check if the path is complete.
             if (currentPathIndex >= currentPath.Count)
             {
-                //Debug.WriteLine("FollowPlayer: Reached the end of the path.");
                 currentPath = null;
                 currentPathIndex = 0;
             }
@@ -195,33 +210,22 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (currentPath != null && currentPath.Count > 0)
             {
-                Point collidingEnemyPoint = new Point(
-                    (int)(currentPath[currentPathIndex].X),
-                    (int)(currentPath[currentPathIndex].Y)
-                );
-
-                // Recalculate path, excluding the colliding enemy's position.
-                nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles, collidingEnemyPoint); 
-                UpdateTarget(); // Recalculate the path to the player.
+                Point collidingEnemyPoint = currentPath[currentPathIndex];
+                nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles, collidingEnemyPoint);
+                UpdateTarget();
 
                 if (currentPath != null && currentPath.Count > 0)
                 {
-                    // Move to the new position.
-                    Vector2 newPosition = new Vector2(
-                        currentPath[0].X * tilemap.TileWidth,
-                        currentPath[0].Y * tilemap.TileHeight
-                    );
+                    Vector2 newPosition = new Vector2(currentPath[0].X * tilemap.TileWidth, currentPath[0].Y * tilemap.TileHeight);
 
                     if (!IsEnemyAtPosition(newPosition))
                     {
-                        // Make sure there isn't an enemy at the position.
-                        currentPathIndex = 0; 
+                        currentPathIndex = 0;
                         return newPosition;
                     }
                 }
             }
-            // If no valid new path is found, return the original position.
-            return originalPosition; 
+            return originalPosition;
         }
 
 
@@ -229,9 +233,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// This method is called when the player exits a tile, to recalculate the enemy spawn position.
         /// </summary>
         protected virtual void CalculateEnemySpawn()
-            {
-                enemyTransform.Position = GetSpawnPosition(playerTransform.Position, 256);
-            }
+        {
+            enemyTransform.Position = GetSpawnPosition(playerTransform.Position, 256);
+        }
 
         /// <summary>
         /// This method calculates a spawn position for the enemy, based on the player's position and a minimum distance.
@@ -239,27 +243,70 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="playerPosition"></param>
         /// <param name="minDistance"></param>
         /// <returns></returns>
-            public virtual Vector2 GetSpawnPosition(Vector2 playerPosition, float minDistance)
+        public virtual Vector2 GetSpawnPosition(Vector2 playerPosition, float minDistance)
+        {
+            Vector2 spawnPosition = new Vector2();
+            bool validPosition = false;
+
+            while (!validPosition)
             {
-                Vector2 spawnPosition = new Vector2();
-                bool validPosition = false;
+                int tileX = _random.Next(1, 768 / 32);
+                int tileY = _random.Next(1, 448 / 32);
+                spawnPosition = new Vector2(tileX * 32, tileY * 32);
 
-                while (!validPosition)
+                if (Vector2.Distance(spawnPosition, playerPosition) >= minDistance && IsWalkableTile(tileX, tileY))
                 {
-                // Generate a random tile position. Based on the tile position, calculate the spawn position.
-                    int tileX = _random.Next(1, 768 / 32); 
-                    int tileY = _random.Next(1, 448 / 32); 
-                    spawnPosition = new Vector2(tileX * 32, tileY * 32);
-
-                    // Check if the spawn position is far enough from the player and is walkable.
-                    if (Vector2.Distance(spawnPosition, playerPosition) >= minDistance && IsWalkableTile(tileX, tileY))
-                    {
-                        validPosition = true;
-                    }
+                    validPosition = true;
                 }
-
-                return spawnPosition;
             }
+            ClampPosition();
+            return spawnPosition;
+        }
+
+        public void ClampPosition()
+        {
+            Vector2 currentPosition = enemyTransform.Position;
+
+            float minX = 0;
+            float minY = 0;
+            float maxX = tilemap.Tiles.GetLength(0) * tilemap.TileWidth;
+            float maxY = tilemap.Tiles.GetLength(1) * tilemap.TileHeight;
+
+            // Check if the enemy is outside the map bounds.
+            if (currentPosition.X < minX || currentPosition.X > maxX ||
+                currentPosition.Y < minY || currentPosition.Y > maxY)
+            {
+                TurnManager.Instance.RemoveTurnTaker(this);
+                enemy.Destroy();
+                Debug.WriteLine($"Enemy {_name} destroyed due to being out of map bounds.");
+                return; // Exit the method to prevent further processing.
+            }
+
+            // Clamp x and y coordinates to the map bounds.
+            currentPosition.X = Math.Clamp(currentPosition.X, minX, maxX);
+            currentPosition.Y = Math.Clamp(currentPosition.Y, minY, maxY);
+
+            // Nudge enemy's position if its on a wall.
+            if (currentPosition.X == minX)
+            {
+                currentPosition.X += 1;
+            }
+            else if (currentPosition.X == maxX)
+            {
+                currentPosition.X -= 1;
+            }
+
+            if (currentPosition.Y == minY)
+            {
+                currentPosition.Y += 1; 
+            }
+            else if (currentPosition.Y == maxY)
+            {
+                currentPosition.Y -= 1; 
+            }
+
+            enemyTransform.Position = currentPosition;
+        }
 
         /// <summary>
         /// This method checks if a tile is walkable.
@@ -267,58 +314,46 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="tileX"></param>
         /// <param name="tileY"></param>
         /// <returns></returns>
-            protected virtual bool IsWalkableTile(int tileX, int tileY)
+        protected virtual bool IsWalkableTile(int tileX, int tileY)
+        {
+            if (tilemap != null && tileX >= 0 && tileX < tilemap.Tiles.GetLength(0) && tileY >= 0 && tileY < tilemap.Tiles.GetLength(1))
             {
-            // Check if the tile is within bounds and is walkable.
-                if (tilemap != null && tileX >= 0 && tileX < tilemap.Tiles.GetLength(0) && tileY >= 0 && tileY < tilemap.Tiles.GetLength(1))
-                {
-                    Tile tile = tilemap.Tiles[tileX, tileY];
-                    return tile.IsWalkable;
-                }
-                return false;
+                return tilemap.Tiles[tileX, tileY].IsWalkable;
             }
+            return false;
+        }
 
-        
-           
+
+
         public override void Update()
-        {          
+        {
             if (!_initialized)
             {
                 Initialize();
                 _initialized = true;
             }
-            if (!isTurn)
-            {
-                return;
-            }
+
+            if (!isTurn) return;
+
             if (CurrentState == EnemyState.Stunned && stunnedCounter > 0)
             {
                 stunnedCounter--;
                 if (stunnedCounter == 0)
                 {
-                    // Start animating if the enemy is stunned.
-                    var enemyAnimation = ObjectManager.Find(GameObject.Tag).GetComponent<AnimationComponent>();
-                    enemyAnimation.isLooping = false;
-                    enemyAnimation.PlayAnimation();
                     CurrentState = EnemyState.Follow;
                 }
             }
+
             switch (CurrentState)
             {
                 case EnemyState.Follow:
-                    Debug.WriteLine("Enemy Turn");
                     FollowPlayer();
                     break;
-
                 case EnemyState.Attack:
-                    if (IsAdjacentToPlayer())
-                    {
-                        DealDamage();
-                    }
+                    if (IsAdjacentToPlayer()) DealDamage();
                     ChangeState(EnemyState.Follow);
-                    EndTurn();                 
+                    EndTurn();
                     break;
-
                 case EnemyState.Stunned:
                     EndTurn();
                     break;
@@ -330,25 +365,19 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
         public virtual void DealDamage()
         {
-            var playerHealth = player.GetComponent<HealthComponent>();
-            playerHealth?.TakeDamage(1);
+            player.GetComponent<HealthComponent>()?.TakeDamage(1);
         }
 
         public void EndTurn()
         {
             isTurn = false;
         }
-
         /// <summary>
         /// This method stuns the enemy for a set number of turns.
         /// </summary>
-
         public virtual void Stun()
         {
-            var enemyAnimation = ObjectManager.Find(GameObject.Tag).GetComponent<AnimationComponent>();
-            enemyAnimation.isLooping = true;
-            enemyAnimation.PlayAnimation();
-            stunnedCounter = 2; 
+            stunnedCounter = 2;
             ChangeState(EnemyState.Stunned);
         }
 
@@ -361,19 +390,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             foreach (var obj in ObjectManager.FindAll())
             {
-                if (obj.Tag.StartsWith("enemy"))
+                if (obj.Tag.StartsWith("enemy") && obj != enemy && obj.GetComponent<Transform>().Position == position)
                 {
-                    if (obj == enemy)
-                    {
-                        // Skip itself.
-                        continue; 
-                    }
-
-                    Transform otherEnemyTransform = obj.GetComponent<Transform>();
-                    if (otherEnemyTransform.Position == position)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
@@ -394,23 +413,17 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <returns></returns>
         protected virtual bool IsAdjacentToPlayer()
         {
-            if (enemy != null && player != null && tilemap != null)
-            {
-                // Calculate tile positions.
-                int enemyTileX = (int)(enemyTransform.Position.X / tilemap.TileWidth);
-                int enemyTileY = (int)(enemyTransform.Position.Y / tilemap.TileHeight);
-                int playerTileX = (int)(player.GetComponent<Transform>().Position.X / tilemap.TileWidth);
-                int playerTileY = (int)(player.GetComponent<Transform>().Position.Y / tilemap.TileHeight);
+            if (enemy == null || player == null || tilemap == null) return false;
 
-                // Check's for orthogonally adjacent tiles.
-                if ((Math.Abs(enemyTileX - playerTileX) == 1 && Math.Abs(enemyTileY - playerTileY) == 0) ||
-             (Math.Abs(enemyTileX - playerTileX) == 0 && Math.Abs(enemyTileY - playerTileY) == 1))
-                {
-                    return true;
-                }
-            }
-            return false;
+            int enemyTileX = (int)(enemyTransform.Position.X / tilemap.TileWidth);
+            int enemyTileY = (int)(enemyTransform.Position.Y / tilemap.TileHeight);
+            int playerTileX = (int)(playerTransform.Position.X / tilemap.TileWidth);
+            int playerTileY = (int)(playerTransform.Position.Y / tilemap.TileHeight);
+
+            return (Math.Abs(enemyTileX - playerTileX) == 1 && Math.Abs(enemyTileY - playerTileY) == 0) ||
+                   (Math.Abs(enemyTileX - playerTileX) == 0 && Math.Abs(enemyTileY - playerTileY) == 1);
         }
+
         public void StartTurn()
         {          
             isTurn = true;

@@ -15,6 +15,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.AddComponent(new Transform());
             player.AddComponent(new Sprite(AssetManager.GetTexture("player")));
             player.AddComponent(new Collider(player.GetComponent<Sprite>().SpriteBounds));
+            AnimationComponent playerAnimation = new AnimationComponent(AssetManager.GetTexture("player_idle"), 6, true);
+            player.AddComponent(playerAnimation);
             player.AddComponent(new PlayerController("Player"));
             player.AddComponent(new Inventory());
             HealthComponent healthComponent = new HealthComponent(20);
@@ -91,6 +93,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             bossEnemy.AddComponent(new Sprite(AssetManager.GetTexture("Boss")));
             bossEnemy.AddComponent(new Collider(bossEnemy.GetComponent<Sprite>().SpriteBounds));
             bossEnemy.AddComponent(new BossEnemyAI("Boss"));
+            bossEnemy.AddComponent(new DisplayIcon(bossEnemy.GetComponent<Transform>().Position - new Vector2(100, 100)));
+            bossEnemy.GetComponent<DisplayIcon>().SetIcon(AssetManager.GetTexture("boss_idle_icon"));
             EnemyType type = new EnemyType();
             type.Type = "boss";
             bossEnemy.AddComponent(type);
@@ -119,6 +123,16 @@ namespace _2DRPG_Object_Oriented_Map_System
             projectile.AddComponent(new Collider(projectile.GetComponent<Sprite>().SpriteBounds));
             projectile.AddComponent(new ProjectileComponent());
             return projectile;
+        }
+
+        public static GameObject CreateLightningStrike()
+        {
+            GameObject lightningStrike = new GameObject("lightningstrike");
+            lightningStrike.AddComponent(new Transform());
+            lightningStrike.AddComponent(new Sprite(AssetManager.GetTexture("groundstrike")));
+            AnimationComponent lightningAnimation = new AnimationComponent(AssetManager.GetTexture("lightningstrike"), 6, false);
+            lightningStrike.AddComponent(lightningAnimation);
+            return lightningStrike;
         }
 
         public static GameObject CreateFireball(Vector2 position)

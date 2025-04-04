@@ -104,6 +104,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 {
                     animationTextureName = "ghost_enemy_hurt";
                 }
+                else if (enemyType.Type == "boss")
+                {
+                    animationTextureName = "boss_hurt";
+                }
             }
             else if (GameObject?.Tag == "player")
             {
@@ -178,7 +182,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public int currentFrame = 0;
         public int frameWidth = 32;
         public int frameHeight = 32;
-        public float frameSpeed = 64f;
+        public float frameSpeed = 128f;
         public bool isPlaying = false;
         private float frameAccumulator = 0f;
         public bool isLooping = false;
@@ -208,6 +212,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (GameObject?.GetComponent<Sprite>() != null)
             {
                 originalTexture = GameObject.GetComponent<Sprite>().Texture;
+                GameObject.GetComponent<Sprite>().IsVisible = false;
                 isPlaying = true;
                 currentFrame = 0;
                 stopwatch.Restart();
@@ -222,6 +227,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (GameObject?.GetComponent<Sprite>() != null && originalTexture != null)
             {
                 GameObject.GetComponent<Sprite>().Texture = originalTexture;
+                GameObject.GetComponent<Sprite>().IsVisible = true;
                 isPlaying = false;
                 originalTexture = null;
                 stopwatch.Stop();
@@ -262,15 +268,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (GameObject?.GetComponent<Transform>() != null && isPlaying)
             {
                 Rectangle sourceRectangle = new Rectangle(currentFrame * frameWidth, 0, frameWidth, frameHeight);
-
-                // Draw at the GameObject's position.
                 spriteBatch.Draw(spriteSheet, GameObject.GetComponent<Transform>().Position, sourceRectangle, Color.White);
             }
-            else if (GameObject?.GetComponent<Transform>() != null && GameObject?.GetComponent<Sprite>() != null && !isPlaying)
-            {
-                // Draw the original texture at the GameObject's position.
-                spriteBatch.Draw(GameObject.GetComponent<Sprite>().Texture, GameObject.GetComponent<Transform>().Position, Color.White);
-            }
+            // No else condition needed here, as the sprite will be invisible.
         }
     }
 
@@ -280,6 +280,8 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class Inventory : DrawableComponent
     {
         private List<ItemComponent> items = new List<ItemComponent>();
+        private ItemComponent itemToRemove = null;
+        bool itemUsed = false;
         Texture2D[] slotTextures;
         int inventorySlots = 5;
         SpriteFont inventoryFont;
@@ -352,11 +354,47 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (items.Contains(item))
             {
-                int index = items.IndexOf(item);
-                items.Remove(item);
+                itemToRemove = item;
+            }
+        }
 
-                // Shifts the slot textures to the left.
-                for (int i = index; i < inventorySlots - 1; i++)
+               
+        
+
+        /// <summary>
+        /// This method is responsible for calling use item method of the item, and removing it from the inventory.
+        /// </summary>
+        /// <param name="slotNumber"></param>
+        public void UseItem(int slotNumber)
+        {
+            if (slotNumber >= 0 && slotNumber < items.Count && items[slotNumber] != null && !itemUsed)
+            {
+                items[slotNumber].UseItem();
+                itemToRemove = items[slotNumber];
+                itemUsed = true;
+            }
+        }
+
+        public override void Update()
+        {
+            KeyboardState previousState = currentState;
+            currentState = Keyboard.GetState();
+            if (currentState.IsKeyDown(Keys.D1) && previousState.IsKeyUp(Keys.D1)) UseItem(0);
+            else if (currentState.IsKeyDown(Keys.D2) && previousState.IsKeyUp(Keys.D2)) UseItem(1);
+            else if (currentState.IsKeyDown(Keys.D3) && previousState.IsKeyUp(Keys.D3)) UseItem(2);
+            else if (currentState.IsKeyDown(Keys.D4) && previousState.IsKeyUp(Keys.D4)) UseItem(3);
+            else if (currentState.IsKeyDown(Keys.D5) && previousState.IsKeyUp(Keys.D5)) UseItem(4);
+
+            // Delayed texture shift
+            if (itemToRemove != null)
+            {
+                int index = items.IndexOf(itemToRemove);
+                items.Remove(itemToRemove);
+                itemToRemove = null;
+
+                // Shift textures
+                int originalItemCount = items.Count + 1;
+                for (int i = index; i < originalItemCount; i++)
                 {
                     if (i < items.Count)
                     {
@@ -368,73 +406,12 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                 }
 
-                // Update the last slot to default.
-                if (items.Count < inventorySlots)
+                // Update last slot
+                for (int i = items.Count; i < inventorySlots; i++)
                 {
-                    slotTextures[items.Count] = AssetManager.GetTexture("default_slot");
+                    slotTextures[i] = AssetManager.GetTexture("default_slot");
                 }
-
-                // Update the item textures based on the new items list.
-                for (int i = 0; i < items.Count; i++)
-                {
-                    if (items[i] != null)
-                    {
-                        if (items[i].Name == "Healing Potion")
-                        {
-                            slotTextures[i] = AssetManager.GetTexture("healing_potion");
-                        }
-                        else if (items[i].Name == "Scroll of Fireball")
-                        {
-                            slotTextures[i] = AssetManager.GetTexture("scroll_of_fireball");
-                        }
-                        else if (items[i].Name == "Scroll of Lightning")
-                        {
-                            slotTextures[i] = AssetManager.GetTexture("scroll_of_lightning");
-                        }
-                        else if (items[i].Name == "Scroll of Force")
-                        {
-                            slotTextures[i] = AssetManager.GetTexture("scroll_of_force");
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method is responsible for calling use item method of the item, and removing it from the inventory.
-        /// </summary>
-        /// <param name="slotNumber"></param>
-        public void UseItem(int slotNumber)
-        {
-            if (slotNumber >= 0 && slotNumber < items.Count && items[slotNumber] != null)
-            {
-                items[slotNumber].UseItem();
-                RemoveItem(items[slotNumber]);
-            }
-        }
-
-        public override void Update()
-        {
-            currentState = Keyboard.GetState();
-            if (currentState.IsKeyDown(Keys.D1))
-            {
-                UseItem(0);
-            }
-            else if (currentState.IsKeyDown(Keys.D2))
-            {
-                UseItem(1);
-            }
-            else if (currentState.IsKeyDown(Keys.D3))
-            {
-                UseItem(2);
-            }
-            else if (currentState.IsKeyDown(Keys.D4))
-            {
-                UseItem(3);
-            }
-            else if (currentState.IsKeyDown(Keys.D5))
-            {
-                UseItem(4);
+                itemUsed = false;
             }
         }
 
@@ -442,9 +419,30 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             for (int i = 0; i < inventorySlots; i++)
             {
-                // Draws the slots and the numbers above them.
                 spriteBatch.DrawString(inventoryFont, $"[{(i + 1).ToString()}]", labelPosition[i], Color.White);
-                spriteBatch.Draw(slotTextures[i], slotPosition[i], Color.White);
+                if (i < items.Count && items[i] != null)
+                {
+                    if (items[i].Name == "Healing Potion")
+                    {
+                        spriteBatch.Draw(AssetManager.GetTexture("healing_potion"), slotPosition[i], Color.White);
+                    }
+                    else if (items[i].Name == "Scroll of Fireball")
+                    {
+                        spriteBatch.Draw(AssetManager.GetTexture("scroll_of_fireball"), slotPosition[i], Color.White);
+                    }
+                    else if (items[i].Name == "Scroll of Lightning")
+                    {
+                        spriteBatch.Draw(AssetManager.GetTexture("scroll_of_lightning"), slotPosition[i], Color.White);
+                    }
+                    else if (items[i].Name == "Scroll of Force")
+                    {
+                        spriteBatch.Draw(AssetManager.GetTexture("scroll_of_force"), slotPosition[i], Color.White);
+                    }
+                }
+                else
+                {
+                    spriteBatch.Draw(AssetManager.GetTexture("default_slot"), slotPosition[i], Color.White);
+                }
             }
         }
     }
@@ -614,6 +612,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             foreach (var enemy in targetEnemies)
             {
                 enemy.GetComponent<HealthComponent>().TakeDamage(2);
+                GameObject lightningStrike = GameObjectFactory.CreateLightningStrike();
+                ObjectManager.AddGameObject(lightningStrike);
+                lightningStrike.GetComponent<Transform>().Position = enemy.GetComponent<Transform>().Position;
+                lightningStrike.GetComponent<AnimationComponent>().PlayAnimation();
+                SoundManager.PlaySound("lightning");
             }
         }
     }
@@ -630,6 +633,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void UseItem()
         {
             // Apply opposing for to each enemy.
+            var tilemap = ObjectManager.Find("tilemap").GetComponent<Tilemap>();
             var player = ObjectManager.Find("player");
             var playerTransform = player.GetComponent<Transform>();
             var enemies = ObjectManager.FindAllObjectsByTag("enemy");
@@ -642,6 +646,15 @@ namespace _2DRPG_Object_Oriented_Map_System
                     direction.Normalize();
                 }
                 enemyTransform.Position += direction * 96;
+                enemyTransform.Position = new Vector2(
+            Math.Clamp(enemyTransform.Position.X, 0, tilemap.MapWidth * tilemap.TileWidth),
+            Math.Clamp(enemyTransform.Position.Y, 0, tilemap.MapHeight * tilemap.TileHeight)
+        );
+                if (enemy.GetComponent<BaseEnemyAI>() != null)
+                {
+                    enemy.GetComponent<BaseEnemyAI>().ClampPosition();
+                }
+
             }
             Remove();
         }
@@ -672,6 +685,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 if (TilePosition(enemy.GetComponent<Transform>().Position) == tilePosition)
                 {
                     enemy.GetComponent<HealthComponent>()?.TakeDamage(3);
+                    var enemyAI = enemy.GetComponent<BaseEnemyAI>();
+                    TurnManager.Instance.RemoveTurnTaker(enemyAI);
                     GameObject?.Destroy();
                     return;
                 }
@@ -790,9 +805,11 @@ namespace _2DRPG_Object_Oriented_Map_System
                 fireball.GetComponent<Transform>().Position = playerPosition;
                 PlayerProjectileComponent projectileComponent = fireball.GetComponent<PlayerProjectileComponent>();
                 projectileComponent.Direction = chosenDirection;
+                
             } 
             ObjectManager.AddGameObject(fireball);
             hasFired = true;
+            SoundManager.PlaySound("fireshot");
             ObjectManager.Find("player").GetComponent<PlayerController>().EndTurn();
         }
 

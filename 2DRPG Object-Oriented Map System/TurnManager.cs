@@ -14,6 +14,7 @@ public class TurnManager
     /// </summary>
     public Queue<ITurnTaker> TurnQueue { get => turnQueue; }
     private Queue<ITurnTaker> turnQueue = new Queue<ITurnTaker>();
+    public ITurnTaker CurrentTurnTaker { get; set; }
     private ITurnTaker currentTurnTaker;
     private bool isTurnActive = false;
     float waitingTime = 0f;
@@ -100,6 +101,5 @@ public class TurnManager
     public void ClearTurnTakers()
     {
         turnQueue.Clear();
-        currentTurnTaker = null;
     }
 }

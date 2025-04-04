@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -11,10 +12,26 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class BossEnemyAI : RangedEnemyAI
     {
         private int nextAction;
+        private int currentAction;
         private int chargeDistance = 3;
+        public BossActions CurrentAction;
+        DisplayIcon displayIcon;
+
+        Stopwatch timer = new Stopwatch();
+        bool waitingForNextTurn = false;
+        private int turnDelay = 2000;
+
         public BossEnemyAI(string name) : base(name)
         {
             nextAction = new Random().Next(4);
+        }
+
+        public enum BossActions
+        {
+            Idle,
+            Move,
+            Shoot,
+            Charge
         }
 
         public override void Update()
@@ -24,35 +41,62 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 return;
             }
-            HandleBossActions();
+            if (!waitingForNextTurn)
+            {
+                DisplayNextAction();
+                currentAction = nextAction;
+                HandleBossActions();
+                waitingForNextTurn = true;
+                timer.Restart();
+            }
+            else
+            {
+                if (timer.ElapsedMilliseconds > turnDelay)
+                {
+                    waitingForNextTurn = false;
+                    EndTurn();
+                    nextAction = new Random().Next(4);
+                }
+            }
         }
 
-        private void HandleBossActions()
+        private void DisplayNextAction()
         {
+            displayIcon = ObjectManager.Find("Boss").GetComponent<DisplayIcon>();
             switch (nextAction)
             {
-                case 0: // Nothing
-                    Debug.WriteLine("Boss: Doing Nothing");
-                    EndTurn();
+                case (int)BossActions.Idle:
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_idle_icon"));
                     break;
-                case 1: // Move
-                    Debug.WriteLine("Boss: Moving");
-                    MoveTowardsPlayer();
-                    EndTurn();
+                case (int)BossActions.Move:
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_move_icon"));
                     break;
-                case 2: // Shoot
-                    Debug.WriteLine("Boss: Shooting");
-                    FireProjectile();
-                    EndTurn();
+                case (int)BossActions.Shoot:
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_shoot_icon"));
                     break;
-                case 3: // Charge
-                    Debug.WriteLine("Boss: Charging");
-                    ChargeTowardsPlayer();
-                    EndTurn();
+                case (int)BossActions.Charge:
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_charge_icon"));
                     break;
             }
-            nextAction = new Random().Next(4);
-            EndTurn();
+        }
+        private void HandleBossActions()
+        {
+            CurrentAction = (BossActions)currentAction; // Use the stored current action
+
+            switch (CurrentAction)
+            {
+                case BossActions.Idle: // Idle
+                    break;
+                case BossActions.Move: // Move
+                    MoveTowardsPlayer();
+                    break;
+                case BossActions.Shoot: // Shoot
+                    FireProjectile();
+                    break;
+                case BossActions.Charge: // Charge
+                    ChargeTowardsPlayer();
+                    break;
+            }
         }
 
         private void MoveTowardsPlayer()
@@ -61,9 +105,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         private void ChargeTowardsPlayer()
         {
-            Vector2 chargeDirection = playerTransform.Position - enemyTransform.Position;
-            chargeDirection.Normalize();
-
+            Vector2 chargeDirection = GetClosestDirection();
             for (int i = 0; i < chargeDistance; i++)
             {
                 Vector2 nextPosition = enemyTransform.Position + chargeDirection * tilemap.TileWidth;
@@ -81,8 +123,35 @@ namespace _2DRPG_Object_Oriented_Map_System
                 if (IsAdjacentToPlayer())
                 {
                     DealDamage();
+                    SoundManager.PlaySound("charge");
                     break;
                 }
+            }
+            ShakeMap();
+           
+        }
+
+        private Vector2 GetClosestDirection()
+        {
+            Vector2 direction = playerTransform.Position - enemyTransform.Position;
+            direction.Normalize();
+
+            if (Math.Abs(direction.X) > Math.Abs(direction.Y))
+            {
+                return new Vector2(Math.Sign(direction.X), 0);
+            }
+            else
+            {
+                return new Vector2(0, Math.Sign(direction.Y));
+            }
+        }
+
+        private void ShakeMap()
+        {
+            Tilemap tilemap = ObjectManager.Find("tilemap").GetComponent<Tilemap>();
+            if (tilemap != null)
+            {
+                tilemap.Shake();
             }
         }
     }

@@ -16,17 +16,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// </summary>
 
         public GameObject Player { get; private set; }     
-
         public GameObject Tilemap { get; private set; }
-
         public GameObject Exit { get; private set; }
-
         public GameObject TurnArrow { get; private set; }
-
         public GameObject Item { get; private set; }
-
         public GameObject Boss { get; private set; }
-
         private Random random = new Random();
         
 
@@ -57,6 +51,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             TurnArrow = GameObjectFactory.CreateTurnArrow();
             ObjectManager.AddGameObject(TurnArrow);
 
+            ClearToExit();
+            
             TurnManager.Instance.AddTurnTaker(Player.GetComponent<PlayerController>());
             AddEnemyTurns();
         }
@@ -91,32 +87,41 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             SpawnRandomEnemies(mapManager);
 
-            if (mapManager.CurrentLevelIndex > 3)
-            {
-                Boss = GameObjectFactory.CreateBossEnemy(mapManager);
-            }
-
-                Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
+            Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
             ObjectManager.AddGameObject(Exit);
 
             mapManager.SetPlayerStartPosition(Player, previousExit);
 
-            int tileSize = Tilemap.GetComponent<Tilemap>().TileWidth; 
+            ClearToExit();
 
-            Point playerPixelPos = new Point((int)Player.GetComponent<Transform>().Position.X, (int)Player.GetComponent<Transform>().Position.Y);
-            Point exitPixelPos = new Point((int)Exit.GetComponent<Transform>().Position.X, (int)Exit.GetComponent<Transform>().Position.Y);
-
-            Point playerTilePos = new Point(playerPixelPos.X / tileSize, playerPixelPos.Y / tileSize);
-            Point exitTilePos = new Point(exitPixelPos.X / tileSize, exitPixelPos.Y / tileSize);
-
-            Tilemap.GetComponent<Tilemap>().ClearPathToExit(playerTilePos, exitTilePos);
-
-
+            TurnManager.Instance.ClearTurnTakers();
             // Remove the old exit last
             ObjectManager.RemoveGameObject(previousExit);
             AddEnemyTurns();
         }
 
+        private void ClearToExit()
+        {
+            int tileSize = Tilemap.GetComponent<Tilemap>().TileWidth;
+
+            Point playerPixelPos = new Point((int)Player.GetComponent<Transform>().Position.X, (int)Player.GetComponent<Transform>().Position.Y);
+            Point enemyPixelPos = new Point(0, 0);
+            foreach (var enemy in ObjectManager.GameObjects)
+            {
+                if (enemy.GetComponent<MeleeEnemyAI>() != null)
+                {
+                    enemyPixelPos = new Point((int)enemy.GetComponent<Transform>().Position.X, (int)enemy.GetComponent<Transform>().Position.Y);
+                }
+            }
+            Point exitPixelPos = new Point((int)Exit.GetComponent<Transform>().Position.X, (int)Exit.GetComponent<Transform>().Position.Y);
+            Point playerTilePos = new Point(playerPixelPos.X / tileSize, playerPixelPos.Y / tileSize);
+            Point enemyTilePos = new Point(enemyPixelPos.X / tileSize, enemyPixelPos.Y / tileSize);
+            Point exitTilePos = new Point(exitPixelPos.X / tileSize, exitPixelPos.Y / tileSize);
+
+            Tilemap.GetComponent<Tilemap>().ClearPathToExit(playerTilePos, exitTilePos);
+            Tilemap.GetComponent<Tilemap>().ClearPathToExit(enemyTilePos, exitTilePos);
+            Tilemap.GetComponent<Tilemap>().ClearPathToExit(enemyTilePos, playerTilePos);
+        }
         private void SpawnRandomEnemies(MapManager mapManager)
         {
             int enemyCount = random.Next(2, 4);

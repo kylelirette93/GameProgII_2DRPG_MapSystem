@@ -48,7 +48,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             MainMenu,
             Playing,
             Paused,
-            GameOver
+            GameOver,
+            Boss
         }
 
         /// <summary>
@@ -73,11 +74,11 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
 
         private void InitializeLevel()
-        {
+        {           
             mapManager = new MapManager();
             currentScene = new Scene();
             currentScene.Initialize(mapManager);
-            SoundManager.PlayMusic("mapMusic");
+            //SoundManager.PlayMusic("mapMusic");
         }
 
         private void CleanupLevel()
@@ -88,14 +89,23 @@ namespace _2DRPG_Object_Oriented_Map_System
                 currentScene = null;
                 mapManager.Clear();
                 mapManager = null;
-                TurnManager.Instance.ClearTurnTakers();
+
+                // Destroy all game objects
                 foreach (GameObject gameObject in ObjectManager.GameObjects)
                 {
                     gameObject.Destroy();
                 }
+
+                // Clear the ObjectManager
                 ObjectManager.RemoveAll();
-                SoundManager.StopMusic("mapMusic");
-            }                      
+
+                // Nullify references to prevent lingering objects
+                ObjectManager.GameObjects.Clear();
+
+                // Clear the TurnManager
+                TurnManager.Instance.CurrentTurnTaker = null;
+                TurnManager.Instance.ClearTurnTakers();
+            }
         }
         /// <summary>
         /// Load Content method is responsible for loading all textures.
@@ -171,6 +181,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 case GameState.GameOver:
                     uiManager.DrawGameOverMenu(_spriteBatch);
                     break;
+                case GameState.Boss:
+                    break;
             }
             _spriteBatch.End();
             base.Draw(gameTime);
@@ -178,14 +190,21 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void Play()
         {
-            CurrentState = GameState.Playing;
             InitializeLevel();
+            CurrentState = GameState.Playing;
         }
 
         public void MainMenu()
         {
             CleanupLevel();
             CurrentState = GameState.MainMenu;
+        }
+
+        public void InitiateBoss()
+        {
+            CleanupLevel();
+            CurrentState = GameState.Boss;
+            Cutscene bossCutscene = new Cutscene(GraphicsDevice);
         }
 
         public void Resume()         

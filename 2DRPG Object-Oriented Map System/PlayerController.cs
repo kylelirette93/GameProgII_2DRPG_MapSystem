@@ -33,6 +33,10 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public string Id => "Player";
 
+        AnimationComponent playerAnimation;
+        Texture2D animationTexture;
+
+
         /// <summary>
                 /// Initializes the previous state of the keyboard.
                 /// </summary>
@@ -52,6 +56,8 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (player == null)
             {
                 player = ObjectManager.Find("player");
+                playerAnimation = player?.GetComponent<AnimationComponent>();
+                playerAnimation.PlayAnimation();
             }
             if (enemyTransform == null)
             {
@@ -167,6 +173,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                             {
                                 foreach (var enemy in enemies.Where(enemy => enemy.GetComponent<GhostEnemyAI>() != null).ToList())
                                 {
+                                    TurnManager.Instance.RemoveTurnTaker(enemyAI); 
                                     enemy.Destroy();
                                 }
                                 // Allow movement if all enemies are dead.

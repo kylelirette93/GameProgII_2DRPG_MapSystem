@@ -15,6 +15,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public int CurrentLevelIndex { get { return _currentLevelIndex; } }
         private int _currentLevelIndex;
+        public int CurrentLevel { get { return currentLevel; } }
+        int currentLevel;
         public Tilemap CurrentMap { get { return _currentMap; } set { _currentMap = value; } }
         private Tilemap _currentMap;
         private Vector2 _lastExitTile;
@@ -30,16 +32,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Initializes the map manager, loads map files and sets current level index.
         /// </summary>
         public MapManager()
-        {          
+        {
             // Initialize map manager and list of level paths.
-            _currentLevelIndex = 0;
-            _levelPaths = new List<string>();
-            LoadMaps();
+            //_currentLevelIndex = 0;
+            //_levelPaths = new List<string>();
+            currentLevel = 1;
         }
         /// <summary>
         ///  Loads map files by scanning for files at predefined paths.
         /// </summary>
-        public void LoadMaps()
+        /*public void LoadMaps()
         {
             // Add three levels to the list, because I made three levels.
             for (int i = 0; i < 3; i++)
@@ -47,20 +49,22 @@ namespace _2DRPG_Object_Oriented_Map_System
                 string levelPath = $"Content/Level{i}.txt";
                 if (File.Exists(levelPath))
                 {
-                    _levelPaths.Add(levelPath);
+                   /_levelPaths.Add(levelPath);
                 }
                 else
                 {
                     Console.WriteLine($"Warning: Level file {levelPath} does not exist.");
                 }
             }
-        }
+        }*/
+
         /// <summary>
         /// Next Map method increments the current level index.
         /// </summary>
         public void NextMap()
         {
-            _currentLevelIndex++;
+            //_currentLevelIndex++;
+            currentLevel++;
         }
 
         /// <summary>
@@ -71,14 +75,15 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Tilemap CreateMap()
         {
             _currentMap = new Tilemap();
-            if (_currentLevelIndex < _levelPaths.Count)
+            string bossLevel = $"Content/boss.txt";
+            if (currentLevel < 3)
             {
-                _currentMap.LoadFromFile(_levelPaths[_currentLevelIndex]);
+                _currentMap.GenerateProceduralMap(_mapHeight, _mapWidth);
             }
             else
             {   
                 //TODO: Load Boss level here.
-                _currentMap.GenerateProceduralMap(_mapHeight, _mapWidth);
+                _currentMap.LoadFromFile(bossLevel);
             }
             return _currentMap;
         }
@@ -87,7 +92,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (_currentMap != null)
             {
-                return _currentMap.FindEnemySpawn(name);
+                return _currentMap.FindSpawn(name);
             }
             return Vector2.Zero;
         }

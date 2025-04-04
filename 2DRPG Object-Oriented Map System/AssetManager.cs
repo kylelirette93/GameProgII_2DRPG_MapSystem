@@ -59,12 +59,24 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["GameOverMenu"] = content.Load<Texture2D>("GameOverMenu");
                 textures["scroll_of_force"] = content.Load<Texture2D>("scroll_of_force");
                 textures["button"] = content.Load<Texture2D>("button");
-                textures["Boss"] = content.Load<Texture2D>("Boss");
+                textures["Boss"] = content.Load<Texture2D>("boss");
+                textures["boss_hurt"] = content.Load<Texture2D>("boss_hurt");
+                textures["boss_charge_icon"] = content.Load<Texture2D>("boss_charge_icon");
+                textures["boss_move_icon"] = content.Load<Texture2D>("boss_move_icon");
+                textures["boss_shoot_icon"] = content.Load<Texture2D>("boss_shoot_icon");
+                textures["boss_idle_icon"] = content.Load<Texture2D>("boss_idle_icon");
+                textures["player_idle"] = content.Load<Texture2D>("player_idle");
+                textures["lightningstrike"] = content.Load<Texture2D>("lightningstrike");
+                textures["groundstrike"] = content.Load<Texture2D>("groundstrike");
 
                 font = content.Load<SpriteFont>("font");
 
                 soundFiles["hurtSound"] = content.Load<SoundEffect>("hurtSound");
                 soundFiles["mapMusic"] = content.Load<SoundEffect>("mapMusic");
+                soundFiles["charge"] = content.Load<SoundEffect>("charge");
+                soundFiles["fireshot"] = content.Load<SoundEffect>("fireshot");
+                soundFiles["lightning"] = content.Load<SoundEffect>("lightning");
+
             }
         }
 
