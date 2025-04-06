@@ -139,7 +139,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 else 
                 {
+                    var enemyAI = GameObject?.GetComponent<BaseEnemyAI>();
+                    TurnManager.Instance.RemoveTurnTaker(enemyAI);
                     GameObject.Destroy();
+
                 }
             }
         }
@@ -608,6 +611,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void UseItem()
         {
             // Deals damage to each enemy on the map.
+            var boss = ObjectManager.Find("Boss");
+            if (boss != null)
+            {
+                boss.GetComponent<HealthComponent>()?.TakeDamage(2);
+                GameObject lightningStrike = GameObjectFactory.CreateLightningStrike();
+                ObjectManager.AddGameObject(lightningStrike);
+                lightningStrike.GetComponent<Transform>().Position = boss.GetComponent<Transform>().Position;
+                lightningStrike.GetComponent<AnimationComponent>().PlayAnimation();
+                SoundManager.PlaySound("lightning");
+            }
             List<GameObject> targetEnemies = ObjectManager.FindAllObjectsByTag("enemy");
             foreach (var enemy in targetEnemies)
             {
@@ -637,6 +650,21 @@ namespace _2DRPG_Object_Oriented_Map_System
             var player = ObjectManager.Find("player");
             var playerTransform = player.GetComponent<Transform>();
             var enemies = ObjectManager.FindAllObjectsByTag("enemy");
+            var boss = ObjectManager.Find("Boss");
+            if (boss != null)
+            {
+                var bossTransform = boss.GetComponent<Transform>();
+                Vector2 direction = bossTransform.Position - playerTransform.Position;
+                if (direction != Vector2.Zero)
+                {
+                    direction.Normalize();
+                }
+                bossTransform.Position += direction * 96;
+                bossTransform.Position = new Vector2(
+                    Math.Clamp(bossTransform.Position.X, 0, tilemap.MapWidth * tilemap.TileWidth),
+                    Math.Clamp(bossTransform.Position.Y, 0, tilemap.MapHeight * tilemap.TileHeight)
+                );
+            }
             foreach (var enemy in enemies)
             {
                 var enemyTransform = enemy.GetComponent<Transform>();
@@ -679,15 +707,23 @@ namespace _2DRPG_Object_Oriented_Map_System
             Point tilePosition = TilePosition(transform.Position);
 
             // Check for collisions with enemies.
+            var boss = ObjectManager.Find("Boss");
+            if (boss != null && TilePosition(boss.GetComponent<Transform>().Position) == tilePosition)
+            {
+                var bossHealth = boss.GetComponent<HealthComponent>();
+                bossHealth?.TakeDamage(3);
+                GameObject?.Destroy();
+                return;
+            }
             List<GameObject> enemies = ObjectManager.FindAllObjectsByTag("enemy");
             foreach (var enemy in enemies)
             {
                 if (TilePosition(enemy.GetComponent<Transform>().Position) == tilePosition)
                 {
-                    enemy.GetComponent<HealthComponent>()?.TakeDamage(3);
-                    var enemyAI = enemy.GetComponent<BaseEnemyAI>();
-                    TurnManager.Instance.RemoveTurnTaker(enemyAI);
+                    var enemyHealth = enemy.GetComponent<HealthComponent>();
+                    enemyHealth?.TakeDamage(3);
                     GameObject?.Destroy();
+                    
                     return;
                 }
             }

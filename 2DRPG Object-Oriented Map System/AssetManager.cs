@@ -14,7 +14,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         public static Dictionary<string, SoundEffect> soundFiles = new Dictionary<string, SoundEffect>();
         private static SpriteFont font;
-
+        private static SpriteFont minecraft;
         /// <summary>
         /// Load Content method is responsible for loading all textures, sound files, fonts etc.
         /// </summary>
@@ -55,6 +55,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["pixel"] = content.Load<Texture2D>("pixel");
                 textures["fireball"] = content.Load<Texture2D>("fireball");
                 textures["MainMenu"] = content.Load<Texture2D>("MainMenu");
+                textures["menu"] = content.Load<Texture2D>("menu");
                 textures["PauseMenu"] = content.Load<Texture2D>("PauseMenu");
                 textures["GameOverMenu"] = content.Load<Texture2D>("GameOverMenu");
                 textures["scroll_of_force"] = content.Load<Texture2D>("scroll_of_force");
@@ -70,6 +71,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["groundstrike"] = content.Load<Texture2D>("groundstrike");
 
                 font = content.Load<SpriteFont>("font");
+                minecraft = content.Load<SpriteFont>("Minecraft");
 
                 soundFiles["hurtSound"] = content.Load<SoundEffect>("hurtSound");
                 soundFiles["mapMusic"] = content.Load<SoundEffect>("mapMusic");

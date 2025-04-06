@@ -167,21 +167,21 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public static GameObject CreateRandomItem(MapManager mapManager, Vector2 playerPosition, float minDistance)
         {
-            Random random = new Random();
-            int randomItem = random.Next(0, 4);
-            switch (randomItem)
-            {
-                case 0:
-                    return CreateHealingPotion(mapManager, playerPosition, minDistance);
-                case 1:
-                    return CreateFireballScroll(mapManager, playerPosition, minDistance);
-                case 2:
-                    return CreateLightningScroll(mapManager, playerPosition, minDistance);
-                case 3:
-                    return CreateForceScroll(mapManager, playerPosition, minDistance);
-                default:
-                    return CreateHealingPotion(mapManager, playerPosition, minDistance);
-            }
+                Random random = new Random();
+                int randomItem = random.Next(0, 4);
+                switch (randomItem)
+                {
+                    case 0:
+                        return CreateHealingPotion(mapManager, playerPosition, minDistance);
+                    case 1:
+                        return CreateFireballScroll(mapManager, playerPosition, minDistance);
+                    case 2:
+                        return CreateLightningScroll(mapManager, playerPosition, minDistance);
+                    case 3:
+                        return CreateForceScroll(mapManager, playerPosition, minDistance);
+                    default:
+                        return CreateHealingPotion(mapManager, playerPosition, minDistance);
+                }
         }
 
         public static GameObject CreateHealingPotion(MapManager mapManager, Vector2 playerPosition, float minDistance)
@@ -193,6 +193,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             potion.AddComponent(new Sprite(AssetManager.GetTexture("healing_potion")));
             potion.AddComponent(new Collider(potion.GetComponent<Sprite>().SpriteBounds));
             potion.AddComponent(new HealingComponent("Healing Potion", "Heals for 2 health."));
+
             return potion;
         }
 

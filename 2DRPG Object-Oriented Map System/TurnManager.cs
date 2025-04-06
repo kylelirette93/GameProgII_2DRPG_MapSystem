@@ -16,6 +16,7 @@ public class TurnManager
     private Queue<ITurnTaker> turnQueue = new Queue<ITurnTaker>();
     public ITurnTaker CurrentTurnTaker { get; set; }
     private ITurnTaker currentTurnTaker;
+    public bool IsTurnActive { get => isTurnActive; set => isTurnActive = value;  }
     private bool isTurnActive = false;
     float waitingTime = 0f;
 

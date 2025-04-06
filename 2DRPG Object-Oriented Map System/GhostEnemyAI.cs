@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
-using System.Security.AccessControl;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {

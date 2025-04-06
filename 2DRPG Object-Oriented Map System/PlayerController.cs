@@ -22,6 +22,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private GameObject player;
         private Transform enemyTransform;
         private BaseEnemyAI enemyAI;
+        private BossEnemyAI bossAI;
         private KeyboardState previousState;
         private KeyboardState currentState;
         private Tilemap tilemap;
@@ -66,6 +67,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (enemyAI == null)
             {
                    enemyAI = ObjectManager.Find("enemy")?.GetComponent<BaseEnemyAI>();
+            }
+            if (bossAI == null)
+            {
+                bossAI = ObjectManager.Find("boss")?.GetComponent<BossEnemyAI>();
             }
             if (isTurn)
             {
@@ -119,7 +124,20 @@ namespace _2DRPG_Object_Oriented_Map_System
                       playerCollider.Bounds.Width,
                       playerCollider.Bounds.Height
                     );
-
+                    var boss = ObjectManager.Find("Boss");
+                    if (boss != null)
+                    {
+                        var bossCollider = boss.GetComponent<Collider>();
+                        if (bossCollider != null && tempPlayerBounds.Intersects(bossCollider.Bounds))
+                        {
+                            var bossHealth = boss.GetComponent<HealthComponent>();
+                            bossAI = boss.GetComponent<BossEnemyAI>();
+                            bossHealth?.TakeDamage(1);
+                            bossAI?.Stun();
+                            EndTurn();
+                            return false;
+                        }
+                    }
                     // Create a copy of the enemies list to avoid concurrent modification.
                     var enemies = ObjectManager.FindAllObjectsByTag("enemy"); 
                     foreach (var enemyObject in enemies)

@@ -5,88 +5,90 @@ using Microsoft.Xna.Framework;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
-    /// <summary>
-    /// Map Manager class is responsible for loading map files based on an index.
-    /// </summary>
-    public class MapManager
-{
-        public Vector2 SpawnPoint { get; set; }
-        private List<string> _levelPaths;
+    public enum GameMode
+    {
+        Adventure,
+        Endless
+    }
 
-        public int CurrentLevelIndex { get { return _currentLevelIndex; } }
-        private int _currentLevelIndex;
+    public class MapManager
+    {
+        public Vector2 SpawnPoint { get; set; }
+        public List<string> LevelPaths { get { return _levelPaths; } set { _levelPaths = value; } }
+        private List<string> _levelPaths;
+        public int StoryLevelIndex { get { return _storyLevelIndex; } set { _storyLevelIndex = value; } }
+        private int _storyLevelIndex;
         public int CurrentLevel { get { return currentLevel; } }
         int currentLevel;
         public Tilemap CurrentMap { get { return _currentMap; } set { _currentMap = value; } }
         private Tilemap _currentMap;
         private Vector2 _lastExitTile;
-
         public int MapHeight { get { return _mapHeight; } }
         private int _mapHeight = 25;
-
         public int MapWidth { get { return _mapWidth; } }
         private int _mapWidth = 15;
         private Random _random = new Random();
+        public GameMode CurrentGameMode { get; set; }
 
-        /// <summary>
-        /// Initializes the map manager, loads map files and sets current level index.
-        /// </summary>
-        public MapManager()
+        public MapManager(GameMode gameMode)
         {
-            // Initialize map manager and list of level paths.
-            //_currentLevelIndex = 0;
-            //_levelPaths = new List<string>();
             currentLevel = 1;
+            _levelPaths = new List<string>();
+            LoadStoryMaps();
+            _storyLevelIndex = 0;
+            CurrentGameMode = gameMode;
         }
-        /// <summary>
-        ///  Loads map files by scanning for files at predefined paths.
-        /// </summary>
-        /*public void LoadMaps()
+
+        private void LoadStoryMaps()
         {
-            // Add three levels to the list, because I made three levels.
             for (int i = 0; i < 3; i++)
             {
                 string levelPath = $"Content/Level{i}.txt";
                 if (File.Exists(levelPath))
                 {
-                   /_levelPaths.Add(levelPath);
+                    _levelPaths.Add(levelPath);
                 }
                 else
                 {
                     Console.WriteLine($"Warning: Level file {levelPath} does not exist.");
                 }
             }
-        }*/
-
-        /// <summary>
-        /// Next Map method increments the current level index.
-        /// </summary>
-        public void NextMap()
-        {
-            //_currentLevelIndex++;
-            currentLevel++;
         }
 
-        /// <summary>
-        /// Creates and loads a new map from the current level's file.
-        /// Sets the spawn point for the player.
-        /// </summary>
-        /// <returns></returns>
+        public void NextMap()
+        {
+            if (CurrentGameMode == GameMode.Adventure)
+            {
+                _storyLevelIndex++;
+            }
+            //In endless mode, the map is generated each time, so no need to increment index.
+        }
+
         public Tilemap CreateMap()
         {
             _currentMap = new Tilemap();
-            string bossLevel = $"Content/boss.txt";
-            if (currentLevel < 3)
+            if (CurrentGameMode == GameMode.Adventure)
+            {
+                if (_storyLevelIndex < _levelPaths.Count)
+                {
+                    _currentMap.LoadFromFile(_levelPaths[_storyLevelIndex]);
+                }
+                else
+                {
+                    string bossLevel = $"Content/boss.txt";
+                    _currentMap.LoadFromFile(bossLevel);
+                }
+            }
+            else
             {
                 _currentMap.GenerateProceduralMap(_mapHeight, _mapWidth);
             }
-            else
-            {   
-                //TODO: Load Boss level here.
-                _currentMap.LoadFromFile(bossLevel);
-            }
             return _currentMap;
         }
+
+        // ... (rest of MapManager remains the same)
+    
+
 
         public Vector2 FindEnemySpawn(string name)
         {
@@ -122,7 +124,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 _currentMap.ClearMap(); 
                 _currentMap = null; 
             }
-            _currentLevelIndex = 0;
+            _storyLevelIndex = 0;
         }
 
 

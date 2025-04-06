@@ -19,7 +19,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         private Scene currentScene;
         UIManager uiManager;
         bool isPausePressed = false;
-        int timer = 0;
+        private GameMode currentGameMode;
+
+        int mouseResetTimer = 0;
+        private const int mouseResetDelay = 20;
         /// <summary>
         /// The current Game State.
         /// </summary>
@@ -73,12 +76,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             base.Initialize();
         }
 
-        private void InitializeLevel()
-        {           
-            mapManager = new MapManager();
+        private void InitializeAdventureScene()
+        {
+            currentGameMode = GameMode.Adventure;
+            mapManager = new MapManager(currentGameMode);
             currentScene = new Scene();
             currentScene.Initialize(mapManager);
-            //SoundManager.PlayMusic("mapMusic");
+            SoundManager.PlayMusic("mapMusic");
+        }
+
+        private void InitializeEndlessScene()
+        {
+            currentGameMode = GameMode.Endless;
+            mapManager = new MapManager(currentGameMode);
+            currentScene = new Scene();
+            currentScene.Initialize(mapManager);
+            SoundManager.PlayMusic("mapMusic");
         }
 
         private void CleanupLevel()
@@ -104,6 +117,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
                 // Clear the TurnManager
                 TurnManager.Instance.CurrentTurnTaker = null;
+                TurnManager.Instance.IsTurnActive = false;
                 TurnManager.Instance.ClearTurnTakers();
             }
         }
@@ -118,7 +132,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             // Load all the textures at once.
             AssetManager.LoadContent(Content);
-            uiManager = new UIManager();
+            uiManager = new UIManager(GraphicsDevice);
         }
         /// <summary>
         /// Update method is responsible for updating the game state.
@@ -132,11 +146,17 @@ namespace _2DRPG_Object_Oriented_Map_System
             switch (CurrentState)
             {
                 case GameState.MainMenu:
-                    uiManager.UpdateMainMenu(gameTime);
+                    if (mouseResetTimer > 0)
+                    {
+                        mouseResetTimer--;
+                    }
+                    else
+                    {
+                        uiManager.UpdateMainMenu(gameTime);
+                    }
                     if (state.IsKeyDown(Keys.Enter))
                     {
                         CurrentState = GameState.Playing;
-                        InitializeLevel();
                     }
                     break;
                 case GameState.Playing:
@@ -168,7 +188,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             _spriteBatch.Begin();
 
             switch (CurrentState)
-            { 
+            {
                 case GameState.MainMenu:
                     uiManager.DrawMainMenu(_spriteBatch);
                     break;
@@ -188,16 +208,22 @@ namespace _2DRPG_Object_Oriented_Map_System
             base.Draw(gameTime);
         }
 
-        public void Play()
+        public void AdventureClicked()
         {
-            InitializeLevel();
+            InitializeAdventureScene();
             CurrentState = GameState.Playing;
         }
 
+        public void EndlessClicked()
+        {
+            InitializeEndlessScene();
+            CurrentState = GameState.Playing;
+        }
         public void MainMenu()
         {
             CleanupLevel();
-            CurrentState = GameState.MainMenu;
+            mouseResetTimer = mouseResetDelay;
+            CurrentState = GameState.MainMenu;          
         }
 
         public void InitiateBoss()
@@ -207,7 +233,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             Cutscene bossCutscene = new Cutscene(GraphicsDevice);
         }
 
-        public void Resume()         
+        public void Resume()
         {
             CurrentState = GameState.Playing;
             isPausePressed = false;

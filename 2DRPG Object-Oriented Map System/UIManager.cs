@@ -2,7 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System.Threading;
+using SpriteFontPlus;
+using System.IO;
 
 
 namespace _2DRPG_Object_Oriented_Map_System
@@ -13,19 +14,23 @@ namespace _2DRPG_Object_Oriented_Map_System
     public class UIManager
     {
         private Vector2 displayPosition = new Vector2(0, 0);
-        private Vector2 playButtonPosition = new Vector2(450, 250);
-        private Vector2 quitButtonPosition = new Vector2(450, 350);
+        private Vector2 adventureButtonPosition = new Vector2(450, 290);
+        private Vector2 returnButtonPosition = new Vector2(450, 290);
+        private Vector2 resumeButtonPosition = new Vector2(450, 290);
+        private Vector2 endlessButtonPosition = new Vector2(450, 350);
+        private Vector2 quitButtonPosition = new Vector2(450, 410);
         Texture2D mainMenuBackground;
         Texture2D pauseMenuBackground;
         Texture2D gameOverMenuBackground;
         Texture2D buttonTexture;
-        SpriteFont buttonTextFont;
-        const string playText = "PLAY GAME";
+        const string adventureText = "ADVENTURE";
+        const string endlessText = "ENDLESS";
         const string returnText = "MAIN MENU";
         const string resumeText = "CONTINUE";
         const string quitText = "QUIT GAME";
-        Vector2 buttonOffset = new Vector2(5, 2);
-        UIButton playButton;
+        Vector2 buttonOffset = new Vector2(20, 12);
+        UIButton adventureButton;
+        UIButton endlessButton;
         UIButton returnButton;
         UIButton resumeButton;
         UIButton quitButton;
@@ -34,23 +39,41 @@ namespace _2DRPG_Object_Oriented_Map_System
         Color defaultColor = Color.White;
         Color highlightedColor = Color.Gray;
 
-        public UIManager()
+        MouseState previousMouseState;
+
+        public UIManager(GraphicsDevice graphicsDevice)
         {
-            mainMenuBackground = AssetManager.GetTexture("MainMenu");
+            mainMenuBackground = AssetManager.GetTexture("menu");
             pauseMenuBackground = AssetManager.GetTexture("PauseMenu");
             gameOverMenuBackground = AssetManager.GetTexture("GameOverMenu");
             buttonTexture = AssetManager.GetTexture("button");
-            buttonTextFont = AssetManager.GetFont("font");
-            playButton = new UIButton(buttonTexture, buttonTextFont, playText, playButtonPosition, buttonOffset);
-            returnButton = new UIButton(buttonTexture, buttonTextFont, returnText, playButtonPosition, buttonOffset);
-            resumeButton = new UIButton(buttonTexture, buttonTextFont, resumeText, playButtonPosition, buttonOffset);
+            string fontPath = Path.Combine("Content", "Minecraft.ttf"); // or whatever the filename is.
+            var fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes(fontPath),
+                25,
+                1024,
+                1024,
+                new[]
+                {
+            CharacterRange.BasicLatin,
+            CharacterRange.Latin1Supplement,
+            CharacterRange.LatinExtendedA,
+            CharacterRange.Cyrillic
+                }
+            );
+
+            SpriteFont buttonTextFont = fontBakeResult.CreateSpriteFont(graphicsDevice);
+            adventureButton = new UIButton(buttonTexture, buttonTextFont, adventureText, adventureButtonPosition, buttonOffset);
+            endlessButton = new UIButton(buttonTexture, buttonTextFont, endlessText, endlessButtonPosition, buttonOffset);
+            returnButton = new UIButton(buttonTexture, buttonTextFont, returnText, returnButtonPosition, buttonOffset);
+            resumeButton = new UIButton(buttonTexture, buttonTextFont, resumeText, resumeButtonPosition, buttonOffset);
             quitButton = new UIButton(buttonTexture, buttonTextFont, quitText, quitButtonPosition, buttonOffset);
         }
 
         public void DrawMainMenu(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(mainMenuBackground, displayPosition, Color.White);
-            playButton.Draw(spriteBatch);
+            adventureButton.Draw(spriteBatch);
+            endlessButton.Draw(spriteBatch);
             quitButton.Draw(spriteBatch);
         }
 
@@ -71,7 +94,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public void UpdateMainMenu(GameTime gameTime)
         {
             CurrentButtons.Clear();
-            CurrentButtons.Add(playButton);
+            CurrentButtons.Add(adventureButton);
+            CurrentButtons.Add(endlessButton);
             CurrentButtons.Add(quitButton);
             UpdateMouseState(CurrentButtons);
         }
@@ -104,12 +128,17 @@ namespace _2DRPG_Object_Oriented_Map_System
 
                 if (button.IsWithinBounds(mousePosition) && !button.WasPressedThisFrame)
                 {
-                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
                     {
-                        if (button == playButton)
+                        if (button == adventureButton)
                         {
-                            playButton.WasPressedThisFrame = true;
-                            GameManager.Instance.Play();
+                            adventureButton.WasPressedThisFrame = true;
+                            GameManager.Instance.AdventureClicked();
+                        }
+                        else if (button == endlessButton)
+                        {
+                            endlessButton.WasPressedThisFrame = true;
+                            GameManager.Instance.EndlessClicked();
                         }
                         else if (button == returnButton)
                         {
@@ -133,6 +162,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     button.WasPressedThisFrame = false;
                 }
             }
+            previousMouseState = mouseState;
         }
     }
 

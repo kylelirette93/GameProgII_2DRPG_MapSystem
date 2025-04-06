@@ -19,7 +19,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         Stopwatch timer = new Stopwatch();
         bool waitingForNextTurn = false;
-        private int turnDelay = 2000;
+        private int turnDelay = 5000;
 
         public BossEnemyAI(string name) : base(name)
         {
@@ -31,32 +31,36 @@ namespace _2DRPG_Object_Oriented_Map_System
             Idle,
             Move,
             Shoot,
-            Charge
+            Charge,
+            Stunned,
+            Follow,
+            Attack
         }
 
         public override void Update()
         {
+            stunnedCounter = 0;
             base.Update();
             if (!isTurn)
             {
                 return;
             }
-            if (!waitingForNextTurn)
-            {
-                DisplayNextAction();
-                currentAction = nextAction;
-                HandleBossActions();
-                waitingForNextTurn = true;
-                timer.Restart();
-            }
-            else
+            if (waitingForNextTurn)
             {
                 if (timer.ElapsedMilliseconds > turnDelay)
                 {
                     waitingForNextTurn = false;
-                    EndTurn();
                     nextAction = new Random().Next(4);
+                    DisplayNextAction();
+                    EndTurn();
                 }
+            }
+            else
+            {
+                // Add a check to prevent repeat calls, if needed.
+                HandleBossActions();
+                waitingForNextTurn = true;
+                timer.Restart();
             }
         }
 
@@ -81,7 +85,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         private void HandleBossActions()
         {
-            CurrentAction = (BossActions)currentAction; // Use the stored current action
+            CurrentAction = (BossActions)nextAction; // Use the stored current action
 
             switch (CurrentAction)
             {
