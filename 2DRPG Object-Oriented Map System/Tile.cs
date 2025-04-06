@@ -11,7 +11,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// Tile class is responsible for managing tile properties.
     /// </summary>
     public class Tile
-{
+    {
         private bool _isWalkable;
         private bool _isExit;
         private Texture2D _texture;
@@ -41,7 +41,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             spriteBatch.Draw(Texture, Position, SourceRectangle, Color.White);
         }
 
-        public void Shake()
+        /*public void Shake()
         {
             if (!isShaking)
             {
@@ -49,13 +49,13 @@ namespace _2DRPG_Object_Oriented_Map_System
                 isShaking = true;
                 shakeTimer = 0.0f;
             }
-        }
+        }*/
 
         public void Update()
         {
             if (isShaking)
             {
-                shakeTimer += shakeSpeed; // Increment with adjustable speed
+                shakeTimer += shakeSpeed; 
 
                 if (shakeTimer < 2.0f)
                 {
@@ -63,7 +63,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 else
                 {
-                    Position = originalPosition; // Reset to original position
+                    Position = originalPosition;
                     isShaking = false;
                 }
             }

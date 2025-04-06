@@ -96,8 +96,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <summary>
         /// Generate's a procedural map based on the width and height and tile rules.
         /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
+        /// <param name="width">Width of map being generated.</param>
+        /// <param name="height">Height of map being generated.</param>
         public void GenerateProceduralMap(int width, int height)
         {
             Tiles = new Tile[width, height];
@@ -161,10 +161,31 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private int CountObstacleNeighbors(int x, int y)
         {
-            return (from dx in Enumerable.Range(-1, 3)
-                    from dy in Enumerable.Range(-1, 3)
-                    where (dx != 0 || dy != 0) && !Tiles[x + dx, y + dy].IsWalkable
-                    select 1).Sum();
+            int obstacleCount = 0;
+
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dx != 0 || dy != 0) // Exclude the center tile.
+                    {
+                        int neighborX = x + dx;
+                        int neighborY = y + dy;
+
+                        // Check if the neighbor is within the tile grid bounds.
+                        if (neighborX >= 0 && neighborX < Tiles.GetLength(0) &&
+                            neighborY >= 0 && neighborY < Tiles.GetLength(1))
+                        {
+                            if (!Tiles[neighborX, neighborY].IsWalkable)
+                            {
+                                obstacleCount++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return obstacleCount;
         }
 
         /// <summary>
@@ -270,12 +291,14 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <exception cref="Exception"></exception>
         private Tile CreateTileFromSymbol(char symbol)
         {
-            return tileMappings.GetValueOrDefault(symbol) ?? throw new Exception($"Unknown tile symbol: {symbol}");
-        }
-
-        public void GetTile(int cordX, int cordY) 
-        {
-            // Get a tile at specified position
+            if (tileMappings.ContainsKey(symbol))
+            {
+                return tileMappings[symbol];
+            }
+            else
+            {
+                throw new Exception($"Unknown tile symbol: {symbol}");
+            }
         }
 
         public void ClearMap()
@@ -291,7 +314,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-        public void Shake()
+        /*public void Shake()
         {
             // Shake the tilemap!
             for (int x = 0; x < Tiles.GetLength(0); x++)
@@ -305,5 +328,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
         }
+        */
     }
 }

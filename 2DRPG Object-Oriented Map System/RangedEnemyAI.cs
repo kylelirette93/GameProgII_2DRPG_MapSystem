@@ -44,7 +44,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             switch (CurrentState)
             {
                 case EnemyState.Follow:
-                    Debug.WriteLine("Enemy Turn");
+                    //Debug.WriteLine("Enemy Turn");
                     if (IsAdjacentToPlayer())
                     {
                         ChangeState(EnemyState.Attack);
@@ -68,7 +68,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                     break;
                 case EnemyState.Attack:
-                    Debug.WriteLine("Enemy Turn, Attack State");
+                    //Debug.WriteLine("Enemy Turn, Attack State");
                     DealDamage();
                     EndTurn();
                     break;

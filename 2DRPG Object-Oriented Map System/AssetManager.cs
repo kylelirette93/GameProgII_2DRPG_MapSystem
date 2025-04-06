@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace _2DRPG_Object_Oriented_Map_System
 {
     /// <summary>
-    /// Asset Manager class is responsible for loading all assets at once.
+    /// Asset Manager class is responsible for loading all assets at ibce,
     /// </summary>
     public static class AssetManager
 {
@@ -113,21 +113,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 return font;
             }
             return null;
-        }
-
-        /// <summary>
-        ///  Get's a sound effect by name and returns it.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        /// <exception cref="System.Exception"></exception>
-        public static SoundEffect GetSound(string name)
-        {
-            if (soundFiles.ContainsKey(name))
-            {
-                return soundFiles[name];
-            }
-            throw new System.Exception($"Sound {name} not found");
         }
 }
 }

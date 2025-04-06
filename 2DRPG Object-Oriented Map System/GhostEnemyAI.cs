@@ -9,7 +9,7 @@ namespace _2DRPG_Object_Oriented_Map_System
     /// </summary>
     public class GhostEnemyAI : BaseEnemyAI
     {
-        
+
         public GhostEnemyAI(string name) : base(name)
         {
             Id = Guid.NewGuid().ToString();
@@ -17,14 +17,14 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public override void Initialize()
         {
-            base.Initialize();            
+            base.Initialize();
         }
 
         public override void UpdateTarget()
         {
             if (playerTransform == null || enemyTransform == null)
             {
-                Debug.WriteLine("Can't find target, somethings null!");
+                //Debug.WriteLine("Can't find target, somethings null!");
                 return;
             }
             enemyPosition = new Point((int)(enemyTransform.Position.X / tilemap.TileWidth),

@@ -132,8 +132,9 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
         private void SpawnRandomEnemies(MapManager mapManager)
         {
-            if (mapManager.CurrentGameMode == GameMode.Adventure && mapManager.StoryLevelIndex == mapManager.LevelPaths.Count)
+            if (mapManager.CurrentGameMode == GameMode.Adventure && mapManager.AdventureLevelIndex == mapManager.LevelPaths.Count)
             {
+                // Create game objects for the boss battle!
                 Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
                 ObjectManager.AddGameObject(Item);
                 Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
@@ -145,10 +146,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 ObjectManager.AddGameObject(Item);
                 Boss = GameObjectFactory.CreateBossEnemy(mapManager);
                 ObjectManager.AddGameObject(Boss);
-                if (Boss.GetComponent<BossEnemyAI>() != null)
-                {
-                    TurnManager.Instance.AddTurnTaker(Boss.GetComponent<BossEnemyAI>());
-                }
+                Debug.WriteLine("Boss added to turn manager.");                
             }
             else
             {
@@ -165,25 +163,25 @@ namespace _2DRPG_Object_Oriented_Map_System
                             enemyName = $"enemy_{Guid.NewGuid()}";
                             textureName = "enemy";
                             ObjectManager.AddGameObject(GameObjectFactory.CreateEnemy(mapManager, enemyName, textureName));
-                            Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
+                            //Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
                             break;
                         case 1:
                             enemyName = $"enemy2_{Guid.NewGuid()}";
                             textureName = "ranged_enemy";
                             ObjectManager.AddGameObject(GameObjectFactory.CreateRangedEnemy(mapManager, enemyName, textureName));
-                            Debug.WriteLine($"Spawned {enemyName} with RangedEnemyAI.");
+                            //Debug.WriteLine($"Spawned {enemyName} with RangedEnemyAI.");
                             break;
                         case 2:
                             enemyName = $"enemy3_{Guid.NewGuid()}";
                             textureName = "ghost_enemy";
                             ObjectManager.AddGameObject(GameObjectFactory.CreateGhostEnemy(mapManager, enemyName, textureName));
-                            Debug.WriteLine($"Spawned {enemyName} with GhostEnemyAI.");
+                            //Debug.WriteLine($"Spawned {enemyName} with GhostEnemyAI.");
                             break;
                         default:
                             enemyName = $"enemy_{Guid.NewGuid()}";
                             textureName = "enemy";
                             ObjectManager.AddGameObject(GameObjectFactory.CreateEnemy(mapManager, enemyName, textureName));
-                            Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
+                            //Debug.WriteLine($"Spawned {enemyName} with BaseEnemyAI (or MeleeEnemyAI).");
                             break;
                     }
                     // Debug.WriteLine($"Enemy type: {enemyType}");

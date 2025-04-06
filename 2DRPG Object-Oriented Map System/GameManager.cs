@@ -215,24 +215,35 @@ namespace _2DRPG_Object_Oriented_Map_System
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// This method is responsible for handling the mouse click event for adventure mode.
+        /// </summary>
         public void AdventureClicked()
         {
             InitializeAdventureScene();
             CurrentState = GameState.Playing;
         }
 
+        /// <summary>
+        /// This method is responsible for handling the mouse click event for endless mode.
+        /// </summary>
         public void EndlessClicked()
         {
             InitializeEndlessScene();
             CurrentState = GameState.Playing;
         }
+        /// <summary>
+        /// This method is responsible for handling the mouse click event for the main menu.
+        /// </summary>
         public void MainMenu()
         {
             CleanupLevel();
             mouseResetTimer = mouseResetDelay;
             CurrentState = GameState.MainMenu;          
         }
-
+        /// <summary>
+        /// This method is responsible for handling the mouse click event for the pause menu.
+        /// </summary>
         public void Resume()
         {
             CurrentState = GameState.Playing;

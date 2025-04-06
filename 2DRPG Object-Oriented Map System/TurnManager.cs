@@ -46,11 +46,13 @@ public class TurnManager
         {
             if (turnTaker.Id == turnTaker1.Id)
             {
-                Debug.WriteLine($"Duplicate turn taker found: {turnTaker.Id}");
+                // Avoid adding duplicates.
                 return;
             }
         }
-        turnQueue.Enqueue(turnTaker);      
+        
+        turnQueue.Enqueue(turnTaker);  
+        //Debug.WriteLine($"{turnTaker} has been added to the queue.");
     }
 
     /// <summary>
@@ -59,6 +61,7 @@ public class TurnManager
     /// <param name="turnTaker"></param>
     public void RemoveTurnTaker(ITurnTaker turnTaker)
     {
+        // Removes the turn taker from the queue.
         turnQueue = new Queue<ITurnTaker>(turnQueue.Where(t => !t.Equals(turnTaker)));
     }
 
@@ -98,7 +101,9 @@ public class TurnManager
             }
         }
     }
-
+    /// <summary>
+    /// This method clear's the turn queue. Useful when transitioning scenes.
+    /// </summary>
     public void ClearTurnTakers()
     {
         turnQueue.Clear();

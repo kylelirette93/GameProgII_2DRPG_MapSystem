@@ -5,6 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// State that stores the current game mode, to tell the map manager what to load.
+    /// </summary>
     public enum GameMode
     {
         Adventure,
@@ -16,8 +19,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         public Vector2 SpawnPoint { get; set; }
         public List<string> LevelPaths { get { return _levelPaths; } set { _levelPaths = value; } }
         private List<string> _levelPaths;
-        public int StoryLevelIndex { get { return _storyLevelIndex; } set { _storyLevelIndex = value; } }
-        private int _storyLevelIndex;
+        public int AdventureLevelIndex { get { return _adventureLevelIndex; } set { _adventureLevelIndex = value; } }
+        private int _adventureLevelIndex;
         public int CurrentLevel { get { return currentLevel; } }
         int currentLevel;
         public Tilemap CurrentMap { get { return _currentMap; } set { _currentMap = value; } }
@@ -27,6 +30,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         private int _mapHeight = 25;
         public int MapWidth { get { return _mapWidth; } }
         private int _mapWidth = 15;
+
         private Random _random = new Random();
         public GameMode CurrentGameMode { get; set; }
 
@@ -35,7 +39,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             currentLevel = 1;
             _levelPaths = new List<string>();
             LoadStoryMaps();
-            _storyLevelIndex = 0;
+            _adventureLevelIndex = 0;
             CurrentGameMode = gameMode;
         }
 
@@ -59,9 +63,8 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (CurrentGameMode == GameMode.Adventure)
             {
-                _storyLevelIndex++;
+                _adventureLevelIndex++;
             }
-            //In endless mode, the map is generated each time, so no need to increment index.
         }
 
         public Tilemap CreateMap()
@@ -69,9 +72,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             _currentMap = new Tilemap();
             if (CurrentGameMode == GameMode.Adventure)
             {
-                if (_storyLevelIndex < _levelPaths.Count)
+                if (_adventureLevelIndex < _levelPaths.Count)
                 {
-                    _currentMap.LoadFromFile(_levelPaths[_storyLevelIndex]);
+                    _currentMap.LoadFromFile(_levelPaths[_adventureLevelIndex]);
                 }
                 else
                 {
@@ -85,8 +88,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             return _currentMap;
         }
-
-        // ... (rest of MapManager remains the same)
     
 
 
@@ -124,7 +125,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 _currentMap.ClearMap(); 
                 _currentMap = null; 
             }
-            _storyLevelIndex = 0;
+            _adventureLevelIndex = 0;
         }
 
 

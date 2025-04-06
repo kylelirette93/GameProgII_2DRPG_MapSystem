@@ -44,7 +44,6 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public PlayerController(string name)
         {
-            Name = name;
             previousState = Keyboard.GetState();
         }
 

@@ -2,9 +2,11 @@
 using System;
 using System.Diagnostics;
 
-
 namespace _2DRPG_Object_Oriented_Map_System
 {
+    /// <summary>
+    /// The Boss Enemy AI class is responsible for handling the boss enemy's AI. It predicts and picks a random action, such as idle, move, shoot, or charge.
+    /// </summary>
     public class BossEnemyAI : RangedEnemyAI
     {
         private int nextAction;
@@ -15,19 +17,27 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         Stopwatch timer = new Stopwatch();
         bool waitingForNextTurn = false;
-        private int turnDelay = 250;
+        private int turnDelay = 500;
+        bool hasTakenAction = false;
 
         // Pathfinding for boss.
         GameObject boss;
         Transform bossTransform;
         Point bossPosition;
 
+        // Random number generator for boss actions.
+        private static readonly Random random = new Random();
+
         public BossEnemyAI(string name) : base(name)
         {
+            Id = Guid.NewGuid().ToString();
             nextAction = new Random().Next(4);
             name = "Boss";
         }
 
+        /// <summary>
+        /// States for the boss actions.
+        /// </summary>
         public enum BossActions
         {
             Idle,
@@ -46,7 +56,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             else
             {
-                Debug.WriteLine("Error: Boss GameObject not found!");
+                //Debug.WriteLine("Boss not found.");
             }
         }
 
@@ -54,7 +64,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (tilemap == null || playerTransform == null || bossTransform == null || enemyTransform == null)
             {
-                Debug.WriteLine("Can't find target, somethings null!");
+                //Debug.WriteLine("Can't find target, somethings null!");
                 return;
             }
 
@@ -66,7 +76,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (currentPath == null)
             {
-                Debug.WriteLine("No path found");
+                //Debug.WriteLine("No path found");
             }
         }
 
@@ -89,6 +99,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             bool adjacent = IsAdjacentToPlayer();
             if (!waitingForNextTurn)
             {
+                hasTakenAction = false;
                 HandleBossActions();
                 waitingForNextTurn = true;
                 timer.Restart();
@@ -103,42 +114,55 @@ namespace _2DRPG_Object_Oriented_Map_System
                     EndTurn(); // End turn after the delay.
                 }
             }
-
         }
 
+        public override void EndTurn()
+        {
+            if (hasTakenAction)
+            {
+                base.EndTurn();
+            }
+        }
+
+        /// <summary>
+        /// This method displays an icon for the next action the boss will take.
+        /// </summary>
         private void DisplayNextAction()
         {
             displayIcon = ObjectManager.Find("Boss").GetComponent<DisplayIcon>();
             switch (nextAction)
             {
                 case (int)BossActions.Idle:
-                    displayIcon.SetIcon(AssetManager.GetTexture("boss_idle_icon"));
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_idle_icon"), turnDelay);
                     break;
                 case (int)BossActions.Move:
-                    displayIcon.SetIcon(AssetManager.GetTexture("boss_move_icon"));
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_move_icon"), turnDelay);
                     break;
                 case (int)BossActions.Shoot:
-                    displayIcon.SetIcon(AssetManager.GetTexture("boss_shoot_icon"));
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_shoot_icon"), turnDelay);
                     break;
                 case (int)BossActions.Charge:
-                    displayIcon.SetIcon(AssetManager.GetTexture("boss_charge_icon"));
+                    displayIcon.SetIcon(AssetManager.GetTexture("boss_charge_icon"), turnDelay);
                     break;
             }
         }
+
         private void HandleBossActions()
         {
-            CurrentAction = (BossActions)nextAction; // Use the stored current action
-            Debug.WriteLine($"Boss chose action: {CurrentAction}");
+            // Use the stored action.
+            CurrentAction = (BossActions)nextAction;
+            //Debug.WriteLine($"Boss chose action: {CurrentAction}");
 
             switch (CurrentAction)
             {
-                case BossActions.Idle: // Idle
+                case BossActions.Idle:
+                    hasTakenAction = true;
                     EndTurn();
                     break;
-                case BossActions.Move: // Move
+                case BossActions.Move:
                     MoveTowardsPlayer();
                     break;
-                case BossActions.Shoot: // Shoot
+                case BossActions.Shoot:
                     if (IsInLineOfSight())
                     {
                         if (projectile == null)
@@ -153,7 +177,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                         EndTurn();
                     }
                     break;
-                case BossActions.Charge: // Charge
+                case BossActions.Charge:
                     ChargeTowardsPlayer();
                     break;
             }
@@ -191,12 +215,14 @@ namespace _2DRPG_Object_Oriented_Map_System
                 currentPath = null;
                 currentPathIndex = 0;
             }
+            hasTakenAction = true;
         }
+
         private void ChargeTowardsPlayer()
         {
             if (bossTransform == null || playerTransform == null || tilemap == null)
             {
-                Debug.WriteLine("Can't charge, somethings null!");
+                //Debug.WriteLine("Can't charge, somethings null!");
                 return;
             }
             Vector2 chargeDirection = GetClosestDirection();
@@ -221,9 +247,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                     break;
                 }
             }
-            EndTurn();
-            ShakeMap();
-           
+            //ShakeMap();
+            hasTakenAction = true;
         }
 
         private Vector2 GetClosestDirection()
@@ -245,15 +270,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-        private void ShakeMap()
-        {
-            Tilemap tilemap = ObjectManager.Find("tilemap").GetComponent<Tilemap>();
-            if (tilemap != null)
-            {
-                tilemap.Shake();
-            }
-        }
-
         public override GameObject CreateProjectile()
         {
             if (boss == null || player == null || playerTransform == null || bossTransform == null)
@@ -270,6 +286,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             //Debug.WriteLine($"Projectile direction + {projectileDirection}");
             projectile.GetComponent<ProjectileComponent>().Direction = projectileDirection;
             projectile.GetComponent<ProjectileComponent>().EnemyTag = boss.Tag;
+            hasTakenAction = true;
             return projectile;
         }
     }

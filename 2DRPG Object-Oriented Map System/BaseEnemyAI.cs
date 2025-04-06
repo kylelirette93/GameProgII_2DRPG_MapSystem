@@ -40,13 +40,13 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         /// <summary>
         /// Constructor for the EnemyAI class. Has two names, one for the GameObject and one for the EnemyAI to be managed in turn component. 
-        /// Not my finest solution, but works for now.
         /// </summary>
         /// <param name="name"></param>
         public BaseEnemyAI(string name)
         {
-            Name = name;
+            // Unique ID for turn manager.
             Id = Guid.NewGuid().ToString();
+            // Name of the enemy ai for object manager.
             _name = name;
             stunnedCounter = 0;
             pathfinder = new Pathfinder();
@@ -59,13 +59,15 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             if (tilemap == null || playerTransform == null || enemyTransform == null)
             {
-                Debug.WriteLine("Can't find target, somethings null!");
+                //Debug.WriteLine("Can't find target, somethings null!");
                 return;
             }
 
+            // Convert tile coordinates to point coordinates.
             enemyPosition = new Point((int)(enemyTransform.Position.X / tilemap.TileWidth), (int)(enemyTransform.Position.Y / tilemap.TileHeight));
             playerPosition = new Point((int)(playerTransform.Position.X / tilemap.TileWidth), (int)(playerTransform.Position.Y / tilemap.TileHeight));
 
+            // Find a path based on the enemy and player positions.
             currentPath = pathfinder.FindPath(nodeMap, enemyPosition, playerPosition);
             currentPathIndex = 0;
 
@@ -74,7 +76,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 Debug.WriteLine("No path found");
             }
         }
-
         /// <summary>
         /// Simple state machine for the enemy AI.
         /// </summary>
@@ -110,6 +111,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             if (tilemap != null)
             {
+                // Build the node map for pathfinding based on the tilemap.
                 nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles);
             }      
         }
@@ -263,6 +265,9 @@ namespace _2DRPG_Object_Oriented_Map_System
             return spawnPosition;
         }
 
+        /// <summary>
+        /// This method clamp's the enemy's position to the tilemap bounds.
+        /// </summary>
         public void ClampPosition()
         {
             Vector2 currentPosition = enemyTransform.Position;
@@ -286,23 +291,15 @@ namespace _2DRPG_Object_Oriented_Map_System
             currentPosition.X = Math.Clamp(currentPosition.X, minX, maxX);
             currentPosition.Y = Math.Clamp(currentPosition.Y, minY, maxY);
 
-            // Nudge enemy's position if its on a wall.
-            if (currentPosition.X == minX)
+            // Nudge enemy's position if it's on a wall.
+            if (currentPosition.X == minX || currentPosition.X == maxX)
             {
-                currentPosition.X += 1;
-            }
-            else if (currentPosition.X == maxX)
-            {
-                currentPosition.X -= 1;
+                currentPosition.X += (currentPosition.X == minX) ? 1 : -1;
             }
 
-            if (currentPosition.Y == minY)
+            if (currentPosition.Y == minY || currentPosition.Y == maxY)
             {
-                currentPosition.Y += 1; 
-            }
-            else if (currentPosition.Y == maxY)
-            {
-                currentPosition.Y -= 1; 
+                currentPosition.Y += (currentPosition.Y == minY) ? 1 : -1;
             }
 
             enemyTransform.Position = currentPosition;

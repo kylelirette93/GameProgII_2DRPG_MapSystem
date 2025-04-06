@@ -22,7 +22,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// Game object property for the component.
         /// </summary>
         protected GameObject GameObject { get; private set; }
-        protected string Name { get; set; }
 
         /// <summary>
         /// Set Game Object method is responsible for setting the game object for the component.
@@ -91,7 +90,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             if (enemyType != null)
             {
-                // Check's which enemy type we should animation. Duct tape last minute solution.
+                // Check's which enemy type we should animation. 
                 if (enemyType.Type == "ranged")
                 {
                     animationTextureName = "ranged_enemy_hurt";
@@ -126,7 +125,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             Health -= damage;
             SoundManager.PlaySound("hurtSound");
-            stunnedAnimation.PlayAnimation(); // Reuse the existing AnimationComponent
+            stunnedAnimation.PlayAnimation(); 
 
             if (Health <= 0)
             {
@@ -143,6 +142,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     var enemyAI = GameObject?.GetComponent<BaseEnemyAI>();
                     if (enemyAI is BossEnemyAI)
                     {
+                        TurnManager.Instance.RemoveTurnTaker(enemyAI);
                         GameManager.Instance.ChangeState(GameManager.GameState.GameWin);
                     }
                     TurnManager.Instance.RemoveTurnTaker(enemyAI);
@@ -366,9 +366,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-               
-        
-
         /// <summary>
         /// This method is responsible for calling use item method of the item, and removing it from the inventory.
         /// </summary>
@@ -397,14 +394,12 @@ namespace _2DRPG_Object_Oriented_Map_System
             else if (currentState.IsKeyDown(Keys.D4) && previousState.IsKeyUp(Keys.D4)) UseItem(3);
             else if (currentState.IsKeyDown(Keys.D5) && previousState.IsKeyUp(Keys.D5)) UseItem(4);
 
-            // Delayed texture shift
             if (itemToRemove != null)
             {
                 int index = items.IndexOf(itemToRemove);
                 items.Remove(itemToRemove);
                 itemToRemove = null;
 
-                // Shift textures
                 int originalItemCount = items.Count + 1;
                 for (int i = index; i < originalItemCount; i++)
                 {
@@ -418,7 +413,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                     }
                 }
 
-                // Update last slot
                 for (int i = items.Count; i < inventorySlots; i++)
                 {
                     slotTextures[i] = AssetManager.GetTexture("default_slot");
@@ -667,7 +661,13 @@ namespace _2DRPG_Object_Oriented_Map_System
             var boss = ObjectManager.Find("Boss");
             if (boss != null)
             {
+                // Spawn hurricanes around boss.
                 var bossTransform = boss.GetComponent<Transform>();
+                GameObject hurricane = GameObjectFactory.CreateHurricane();
+                ObjectManager.AddGameObject(hurricane);
+                hurricane.GetComponent<Transform>().Position = bossTransform.Position;
+                hurricane.GetComponent<AnimationComponent>().PlayAnimation();
+                SoundManager.PlaySound("swoosh");
                 Vector2 direction = bossTransform.Position - playerTransform.Position;
                 if (direction != Vector2.Zero)
                 {
@@ -681,6 +681,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
             foreach (var enemy in enemies)
             {
+                // Spawn hurricanes around each enemy.
                 var enemyTransform = enemy.GetComponent<Transform>();
                 GameObject hurricane = GameObjectFactory.CreateHurricane();
                 ObjectManager.AddGameObject(hurricane);
@@ -890,9 +891,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             MathHelper.Pi,       
             0f                  
         };
-
-
-
 
             Vector2 playerPosition = ObjectManager.Find("player").GetComponent<Transform>().Position;
 
