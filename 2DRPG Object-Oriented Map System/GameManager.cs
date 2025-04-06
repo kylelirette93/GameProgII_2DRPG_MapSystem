@@ -20,6 +20,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         UIManager uiManager;
         bool isPausePressed = false;
         private GameMode currentGameMode;
+        public int Level = 0;
 
         int mouseResetTimer = 0;
         private const int mouseResetDelay = 20;
@@ -52,7 +53,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             Playing,
             Paused,
             GameOver,
-            Boss
+            GameWin
         }
 
         /// <summary>
@@ -96,6 +97,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         private void CleanupLevel()
         {
+            Level = 0;
             if (currentScene != null && mapManager != null)
             {
                 currentScene.Clear(mapManager);
@@ -174,6 +176,9 @@ namespace _2DRPG_Object_Oriented_Map_System
                 case GameState.GameOver:
                     uiManager.UpdateQuitMenu(gameTime);
                     break;
+                case GameState.GameWin:
+                    uiManager.UpdateWinMenu(gameTime);
+                    break;
             }
             base.Update(gameTime);
         }
@@ -194,6 +199,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     break;
                 case GameState.Playing:
                     ObjectManager.DrawAll(_spriteBatch);
+                    uiManager.DrawGameplayPanel(_spriteBatch);
                     break;
                 case GameState.Paused:
                     uiManager.DrawPauseMenu(_spriteBatch);
@@ -201,7 +207,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 case GameState.GameOver:
                     uiManager.DrawGameOverMenu(_spriteBatch);
                     break;
-                case GameState.Boss:
+                case GameState.GameWin:
+                    uiManager.DrawWinMenu(_spriteBatch);
                     break;
             }
             _spriteBatch.End();
@@ -224,13 +231,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             CleanupLevel();
             mouseResetTimer = mouseResetDelay;
             CurrentState = GameState.MainMenu;          
-        }
-
-        public void InitiateBoss()
-        {
-            CleanupLevel();
-            CurrentState = GameState.Boss;
-            Cutscene bossCutscene = new Cutscene(GraphicsDevice);
         }
 
         public void Resume()

@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace _2DRPG_Object_Oriented_Map_System
 {
@@ -19,11 +15,17 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         Stopwatch timer = new Stopwatch();
         bool waitingForNextTurn = false;
-        private int turnDelay = 5000;
+        private int turnDelay = 250;
+
+        // Pathfinding for boss.
+        GameObject boss;
+        Transform bossTransform;
+        Point bossPosition;
 
         public BossEnemyAI(string name) : base(name)
         {
             nextAction = new Random().Next(4);
+            name = "Boss";
         }
 
         public enum BossActions
@@ -32,36 +34,76 @@ namespace _2DRPG_Object_Oriented_Map_System
             Move,
             Shoot,
             Charge,
-            Stunned,
-            Follow,
-            Attack
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            boss = ObjectManager.Find("Boss");
+            if (boss != null)
+            {
+                bossTransform = boss.GetComponent<Transform>();
+            }
+            else
+            {
+                Debug.WriteLine("Error: Boss GameObject not found!");
+            }
+        }
+
+        public override void UpdateTarget()
+        {
+            if (tilemap == null || playerTransform == null || bossTransform == null || enemyTransform == null)
+            {
+                Debug.WriteLine("Can't find target, somethings null!");
+                return;
+            }
+
+            bossPosition = new Point((int)(bossTransform.Position.X / tilemap.TileWidth), (int)(bossTransform.Position.Y / tilemap.TileHeight));
+            playerPosition = new Point((int)(playerTransform.Position.X / tilemap.TileWidth), (int)(playerTransform.Position.Y / tilemap.TileHeight));
+
+            currentPath = pathfinder.FindPath(nodeMap, bossPosition, playerPosition);
+            currentPathIndex = 0;
+
+            if (currentPath == null)
+            {
+                Debug.WriteLine("No path found");
+            }
         }
 
         public override void Update()
         {
-            stunnedCounter = 0;
-            base.Update();
+            if (player != null)
+            {
+                playerTransform.Position = player.GetComponent<Transform>().Position;
+            }
+            if (!_initialized)
+            {
+                Initialize();
+                _initialized = true;
+            }
             if (!isTurn)
             {
                 return;
             }
-            if (waitingForNextTurn)
+            bool lineOfSight = IsInLineOfSight();
+            bool adjacent = IsAdjacentToPlayer();
+            if (!waitingForNextTurn)
+            {
+                HandleBossActions();
+                waitingForNextTurn = true;
+                timer.Restart();
+            }
+            else
             {
                 if (timer.ElapsedMilliseconds > turnDelay)
                 {
                     waitingForNextTurn = false;
                     nextAction = new Random().Next(4);
                     DisplayNextAction();
-                    EndTurn();
+                    EndTurn(); // End turn after the delay.
                 }
             }
-            else
-            {
-                // Add a check to prevent repeat calls, if needed.
-                HandleBossActions();
-                waitingForNextTurn = true;
-                timer.Restart();
-            }
+
         }
 
         private void DisplayNextAction()
@@ -86,16 +128,30 @@ namespace _2DRPG_Object_Oriented_Map_System
         private void HandleBossActions()
         {
             CurrentAction = (BossActions)nextAction; // Use the stored current action
+            Debug.WriteLine($"Boss chose action: {CurrentAction}");
 
             switch (CurrentAction)
             {
                 case BossActions.Idle: // Idle
+                    EndTurn();
                     break;
                 case BossActions.Move: // Move
                     MoveTowardsPlayer();
                     break;
                 case BossActions.Shoot: // Shoot
-                    FireProjectile();
+                    if (IsInLineOfSight())
+                    {
+                        if (projectile == null)
+                        {
+                            FireProjectile();
+                        }
+                        EndTurn();
+                    }
+                    else
+                    {
+                        FollowPlayer();
+                        EndTurn();
+                    }
                     break;
                 case BossActions.Charge: // Charge
                     ChargeTowardsPlayer();
@@ -107,12 +163,46 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             FollowPlayer();
         }
+
+        public override void FollowPlayer()
+        {
+            UpdateTarget();
+            if (currentPath == null || currentPathIndex >= currentPath.Count)
+            {
+                EndTurn();
+                return;
+            }
+
+            if (IsAdjacentToPlayer())
+            {
+                DealDamage();
+                nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles);
+                return;
+            }
+
+            Point nextPoint = currentPath[currentPathIndex];
+            Vector2 newPosition = new Vector2(nextPoint.X * tilemap.TileWidth, nextPoint.Y * tilemap.TileHeight);
+
+            bossTransform.Position = newPosition;
+            currentPathIndex++;
+
+            if (currentPathIndex >= currentPath.Count)
+            {
+                currentPath = null;
+                currentPathIndex = 0;
+            }
+        }
         private void ChargeTowardsPlayer()
         {
+            if (bossTransform == null || playerTransform == null || tilemap == null)
+            {
+                Debug.WriteLine("Can't charge, somethings null!");
+                return;
+            }
             Vector2 chargeDirection = GetClosestDirection();
             for (int i = 0; i < chargeDistance; i++)
             {
-                Vector2 nextPosition = enemyTransform.Position + chargeDirection * tilemap.TileWidth;
+                Vector2 nextPosition = bossTransform.Position + chargeDirection * tilemap.TileWidth;
 
                 int nextTileX = (int)(nextPosition.X / tilemap.TileWidth);
                 int nextTileY = (int)(nextPosition.Y / tilemap.TileHeight);
@@ -122,7 +212,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                     break;
                 }
 
-                enemyTransform.Position = nextPosition;
+                bossTransform.Position = nextPosition;
 
                 if (IsAdjacentToPlayer())
                 {
@@ -131,13 +221,18 @@ namespace _2DRPG_Object_Oriented_Map_System
                     break;
                 }
             }
+            EndTurn();
             ShakeMap();
            
         }
 
         private Vector2 GetClosestDirection()
         {
-            Vector2 direction = playerTransform.Position - enemyTransform.Position;
+            if (playerTransform == null || bossTransform == null)
+            {
+                return Vector2.Zero;
+            }
+            Vector2 direction = playerTransform.Position - bossTransform.Position;
             direction.Normalize();
 
             if (Math.Abs(direction.X) > Math.Abs(direction.Y))
@@ -157,6 +252,25 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 tilemap.Shake();
             }
+        }
+
+        public override GameObject CreateProjectile()
+        {
+            if (boss == null || player == null || playerTransform == null || bossTransform == null)
+            {
+                Debug.WriteLine("Can't create projectile, somethings null!");
+                return null;
+            }
+            GameObject projectile = GameObjectFactory.CreateProjectile(boss.GetComponent<Transform>().Position);
+            ObjectManager.AddGameObject(projectile);
+
+            Transform projectileTransform = projectile.GetComponent<Transform>();
+            Vector2 projectileDirection = playerTransform.Position - bossTransform.Position;
+            projectileDirection.Normalize();
+            //Debug.WriteLine($"Projectile direction + {projectileDirection}");
+            projectile.GetComponent<ProjectileComponent>().Direction = projectileDirection;
+            projectile.GetComponent<ProjectileComponent>().EnemyTag = boss.Tag;
+            return projectile;
         }
     }
 }

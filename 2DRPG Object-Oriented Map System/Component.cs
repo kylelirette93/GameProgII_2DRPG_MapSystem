@@ -139,7 +139,12 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
                 else 
                 {
+
                     var enemyAI = GameObject?.GetComponent<BaseEnemyAI>();
+                    if (enemyAI is BossEnemyAI)
+                    {
+                        GameManager.Instance.ChangeState(GameManager.GameState.GameWin);
+                    }
                     TurnManager.Instance.RemoveTurnTaker(enemyAI);
                     GameObject.Destroy();
 
@@ -370,6 +375,10 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// <param name="slotNumber"></param>
         public void UseItem(int slotNumber)
         {
+            if (GameObject.GetComponent<PlayerController>() != null && !GameObject.GetComponent<PlayerController>().IsTurn)
+            {
+                return; 
+            }
             if (slotNumber >= 0 && slotNumber < items.Count && items[slotNumber] != null && !itemUsed)
             {
                 items[slotNumber].UseItem();
@@ -528,7 +537,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             // If the projectile is null, destroy it.
             else
             {
-                enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); // End Turn
+                enemyObject?.GetComponent<RangedEnemyAI>()?.EndTurn(); 
                 GameObject?.Destroy();
             }
         }
@@ -563,13 +572,16 @@ namespace _2DRPG_Object_Oriented_Map_System
         public override void UseItem()
         {
            healthComponent = ObjectManager.Find("player")?.GetComponent<HealthComponent>();
+           var playerController = ObjectManager.Find("player")?.GetComponent<PlayerController>();
             if (healthComponent != null)
             {
                 healthComponent.Health += 10;
+                SoundManager.PlaySound("heal");
                 if (healthComponent.Health > healthComponent.MaxHealth)
                 {
                     healthComponent.Health = healthComponent.MaxHealth;
                 }
+                playerController.EndTurn();
                 Remove();
             }
         }
@@ -612,6 +624,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         {
             // Deals damage to each enemy on the map.
             var boss = ObjectManager.Find("Boss");
+            var playerController = ObjectManager.Find("player").GetComponent<PlayerController>();
             if (boss != null)
             {
                 boss.GetComponent<HealthComponent>()?.TakeDamage(2);
@@ -631,6 +644,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 lightningStrike.GetComponent<AnimationComponent>().PlayAnimation();
                 SoundManager.PlaySound("lightning");
             }
+            playerController.EndTurn();
         }
     }
 
@@ -668,6 +682,11 @@ namespace _2DRPG_Object_Oriented_Map_System
             foreach (var enemy in enemies)
             {
                 var enemyTransform = enemy.GetComponent<Transform>();
+                GameObject hurricane = GameObjectFactory.CreateHurricane();
+                ObjectManager.AddGameObject(hurricane);
+                hurricane.GetComponent<Transform>().Position = enemy.GetComponent<Transform>().Position;
+                hurricane.GetComponent<AnimationComponent>().PlayAnimation();
+                SoundManager.PlaySound("swoosh");
                 Vector2 direction = enemyTransform.Position - playerTransform.Position;
                 if (direction != Vector2.Zero)
                 {

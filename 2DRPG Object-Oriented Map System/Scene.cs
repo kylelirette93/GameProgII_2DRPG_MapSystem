@@ -57,6 +57,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             TurnManager.Instance.CurrentTurnTaker = Player.GetComponent<PlayerController>();
             Player.GetComponent<PlayerController>().StartTurn();
             AddEnemyTurns();
+            GameManager.Instance.Level++;
         }
 
         
@@ -104,6 +105,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             // Remove the old exit last
             ObjectManager.RemoveGameObject(previousExit);
             AddEnemyTurns();
+            GameManager.Instance.Level++;
         }
 
         private void ClearToExit()
@@ -135,9 +137,18 @@ namespace _2DRPG_Object_Oriented_Map_System
                 Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
                 ObjectManager.AddGameObject(Item);
                 Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
+                Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
+                ObjectManager.AddGameObject(Item);
+                Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
+                ObjectManager.AddGameObject(Item);
+                Item = GameObjectFactory.CreateRandomItem(mapManager, Player.GetComponent<Transform>().Position, 32);
                 ObjectManager.AddGameObject(Item);
                 Boss = GameObjectFactory.CreateBossEnemy(mapManager);
                 ObjectManager.AddGameObject(Boss);
+                if (Boss.GetComponent<BossEnemyAI>() != null)
+                {
+                    TurnManager.Instance.AddTurnTaker(Boss.GetComponent<BossEnemyAI>());
+                }
             }
             else
             {
@@ -217,6 +228,10 @@ namespace _2DRPG_Object_Oriented_Map_System
                 else if (gameObject.GetComponent<GhostEnemyAI>() != null)
                 {
                     TurnManager.Instance.AddTurnTaker(gameObject.GetComponent<GhostEnemyAI>());
+                }
+                else if (gameObject.GetComponent<BossEnemyAI>() != null)
+                {
+                    TurnManager.Instance.AddTurnTaker(gameObject.GetComponent<BossEnemyAI>());
                 }
             }
         }

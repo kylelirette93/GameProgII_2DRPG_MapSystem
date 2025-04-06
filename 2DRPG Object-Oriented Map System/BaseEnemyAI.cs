@@ -105,7 +105,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             if (enemy != null)
             {
                 enemyTransform = enemy.GetComponent<Transform>();
-                Debug.WriteLine($"Enemy Object ID: {enemy.GetHashCode()}, Transform Object ID: {enemyTransform.GetHashCode()}");
+                //Debug.WriteLine($"Enemy Object ID: {enemy.GetHashCode()}, Transform Object ID: {enemyTransform.GetHashCode()}");
                 CalculateEnemySpawn();
             }
             if (tilemap != null)
@@ -368,7 +368,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             player.GetComponent<HealthComponent>()?.TakeDamage(1);
         }
 
-        public void EndTurn()
+        public virtual void EndTurn()
         {
             isTurn = false;
         }

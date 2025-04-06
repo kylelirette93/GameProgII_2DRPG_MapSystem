@@ -69,6 +69,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 textures["player_idle"] = content.Load<Texture2D>("player_idle");
                 textures["lightningstrike"] = content.Load<Texture2D>("lightningstrike");
                 textures["groundstrike"] = content.Load<Texture2D>("groundstrike");
+                textures["blank"] = content.Load<Texture2D>("blank");
+                textures["hurricane"] = content.Load<Texture2D>("hurricane");
 
                 font = content.Load<SpriteFont>("font");
                 minecraft = content.Load<SpriteFont>("Minecraft");
@@ -78,6 +80,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 soundFiles["charge"] = content.Load<SoundEffect>("charge");
                 soundFiles["fireshot"] = content.Load<SoundEffect>("fireshot");
                 soundFiles["lightning"] = content.Load<SoundEffect>("lightning");
+                soundFiles["heal"] = content.Load<SoundEffect>("heal");
+                soundFiles["swoosh"] = content.Load<SoundEffect>("swoosh");
 
             }
         }

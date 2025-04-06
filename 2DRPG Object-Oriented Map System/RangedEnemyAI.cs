@@ -6,7 +6,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 {
     public class RangedEnemyAI : BaseEnemyAI
     {
-        GameObject projectile;
+        protected GameObject projectile;
         public RangedEnemyAI(string name) : base(name)
         {
             Id = Guid.NewGuid().ToString();
@@ -79,7 +79,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             }
         }
 
-        private bool IsInLineOfSight()
+        protected bool IsInLineOfSight()
         {
             if (enemy != null && player != null && tilemap != null)
             {
@@ -132,13 +132,13 @@ namespace _2DRPG_Object_Oriented_Map_System
         }
 
         // Creates a projectile and assigns it to a variable at the class level.
-        public void FireProjectile()
+        public virtual void FireProjectile()
         {
             //Debug.WriteLine("FireProjectile() called.")
             projectile = CreateProjectile();
         }
 
-        public void EndTurn()
+        public override void EndTurn()
         {
             projectile = null;
             base.EndTurn(); 
@@ -149,7 +149,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         /// This method creates a projectile and fires it towards the player.
         /// </summary>
         /// <returns></returns>
-        public GameObject CreateProjectile()
+        public virtual GameObject CreateProjectile()
         {
             GameObject projectile = GameObjectFactory.CreateProjectile(enemy.GetComponent<Transform>().Position);
             ObjectManager.AddGameObject(projectile);

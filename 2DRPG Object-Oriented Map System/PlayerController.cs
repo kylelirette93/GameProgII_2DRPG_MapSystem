@@ -133,7 +133,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                             var bossHealth = boss.GetComponent<HealthComponent>();
                             bossAI = boss.GetComponent<BossEnemyAI>();
                             bossHealth?.TakeDamage(1);
-                            bossAI?.Stun();
                             EndTurn();
                             return false;
                         }

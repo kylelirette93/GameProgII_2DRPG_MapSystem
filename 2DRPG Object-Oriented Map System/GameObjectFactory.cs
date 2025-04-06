@@ -94,11 +94,10 @@ namespace _2DRPG_Object_Oriented_Map_System
             bossEnemy.AddComponent(new Collider(bossEnemy.GetComponent<Sprite>().SpriteBounds));
             bossEnemy.AddComponent(new BossEnemyAI("Boss"));
             bossEnemy.AddComponent(new DisplayIcon(bossEnemy.GetComponent<Transform>().Position - new Vector2(100, 100)));
-            bossEnemy.GetComponent<DisplayIcon>().SetIcon(AssetManager.GetTexture("boss_idle_icon"));
             EnemyType type = new EnemyType();
             type.Type = "boss";
             bossEnemy.AddComponent(type);
-            HealthComponent healthComponent = new HealthComponent(25);
+            HealthComponent healthComponent = new HealthComponent(15);
             bossEnemy.AddComponent(healthComponent);
             healthComponent.Initialize();
             return bossEnemy;
@@ -233,6 +232,15 @@ namespace _2DRPG_Object_Oriented_Map_System
             return scrollOfForce;
         }
 
+        public static GameObject CreateHurricane()
+        {
+            GameObject hurricane = new GameObject("hurricane");
+            hurricane.AddComponent(new Transform());
+            hurricane.AddComponent(new Sprite(AssetManager.GetTexture("blank")));
+            AnimationComponent hurricaneAnimation = new AnimationComponent(AssetManager.GetTexture("hurricane"), 6, false);
+            hurricane.AddComponent(hurricaneAnimation);
+            return hurricane;
+        }
         public static GameObject InventorySystem()
         {
             GameObject inventorySystem = new GameObject("Inventory System");

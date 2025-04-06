@@ -15,19 +15,36 @@ namespace _2DRPG_Object_Oriented_Map_System
     {
         private Vector2 displayPosition = new Vector2(0, 0);
         private Vector2 adventureButtonPosition = new Vector2(450, 290);
-        private Vector2 returnButtonPosition = new Vector2(450, 290);
-        private Vector2 resumeButtonPosition = new Vector2(450, 290);
+        private Vector2 returnButtonPosition = new Vector2(450, 350);
+        private Vector2 resumeButtonPosition = new Vector2(450, 350);
         private Vector2 endlessButtonPosition = new Vector2(450, 350);
         private Vector2 quitButtonPosition = new Vector2(450, 410);
-        Texture2D mainMenuBackground;
-        Texture2D pauseMenuBackground;
-        Texture2D gameOverMenuBackground;
+        private Vector2 menuTextPosition = new Vector2(300, 25);
+        private Vector2 pauseTextPosition = new Vector2(450, 25);
+        private Vector2 gameOverTextPosition = new Vector2(385, 25);
+        private Vector2 gameWinTextPosition = new Vector2(410, 25);
+        private Vector2 instructionsTextPosition = new Vector2(810,100);
+        Texture2D menuBackground;
         Texture2D buttonTexture;
+        const string menuText = "THE SHIFTING DEEP";
+        const string pauseText = "PAUSED";
+        const string gameOverText = "GAME OVER";
+        const string winText = "VICTORY!";
         const string adventureText = "ADVENTURE";
         const string endlessText = "ENDLESS";
         const string returnText = "MAIN MENU";
         const string resumeText = "CONTINUE";
         const string quitText = "QUIT GAME";
+        int currentLevel = 1;
+        string instructionsText = "INSTRUCTIONS:\n\n" +
+            "Use the WASD to move.\n" +
+            "Move into enemy to attack.\n" +
+            "Press number key to use item.\n" +
+            "Press 'ESC' to pause the game.\n\n" +
+            "Good luck!\n\n";
+        SpriteFont buttonTextFont;
+        SpriteFont titleTextFont;
+        SpriteFont instructionsTextFont;
         Vector2 buttonOffset = new Vector2(20, 12);
         UIButton adventureButton;
         UIButton endlessButton;
@@ -35,6 +52,7 @@ namespace _2DRPG_Object_Oriented_Map_System
         UIButton resumeButton;
         UIButton quitButton;
         List<UIButton> CurrentButtons = new List<UIButton>();
+        
 
         Color defaultColor = Color.White;
         Color highlightedColor = Color.Gray;
@@ -43,25 +61,11 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public UIManager(GraphicsDevice graphicsDevice)
         {
-            mainMenuBackground = AssetManager.GetTexture("menu");
-            pauseMenuBackground = AssetManager.GetTexture("PauseMenu");
-            gameOverMenuBackground = AssetManager.GetTexture("GameOverMenu");
+            menuBackground = AssetManager.GetTexture("menu");
             buttonTexture = AssetManager.GetTexture("button");
-            string fontPath = Path.Combine("Content", "Minecraft.ttf"); // or whatever the filename is.
-            var fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes(fontPath),
-                25,
-                1024,
-                1024,
-                new[]
-                {
-            CharacterRange.BasicLatin,
-            CharacterRange.Latin1Supplement,
-            CharacterRange.LatinExtendedA,
-            CharacterRange.Cyrillic
-                }
-            );
-
-            SpriteFont buttonTextFont = fontBakeResult.CreateSpriteFont(graphicsDevice);
+            CreateButtonTextFont(graphicsDevice);
+            CreateTitleTextFont(graphicsDevice);
+            CreateInstructionsTextFont(graphicsDevice);
             adventureButton = new UIButton(buttonTexture, buttonTextFont, adventureText, adventureButtonPosition, buttonOffset);
             endlessButton = new UIButton(buttonTexture, buttonTextFont, endlessText, endlessButtonPosition, buttonOffset);
             returnButton = new UIButton(buttonTexture, buttonTextFont, returnText, returnButtonPosition, buttonOffset);
@@ -71,7 +75,8 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void DrawMainMenu(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(mainMenuBackground, displayPosition, Color.White);
+            spriteBatch.Draw(menuBackground, displayPosition, Color.White);
+            spriteBatch.DrawString(titleTextFont, menuText, menuTextPosition, Color.White);
             adventureButton.Draw(spriteBatch);
             endlessButton.Draw(spriteBatch);
             quitButton.Draw(spriteBatch);
@@ -79,14 +84,36 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public void DrawPauseMenu(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(pauseMenuBackground, displayPosition, Color.White);
+            spriteBatch.Draw(menuBackground, displayPosition, Color.White);
+            spriteBatch.DrawString(titleTextFont, pauseText, pauseTextPosition, Color.White);
             resumeButton.Draw(spriteBatch);
             quitButton.Draw(spriteBatch);
         }
 
+        public void DrawGameplayPanel(SpriteBatch spriteBatch)
+        {
+            Vector2 textSize = titleTextFont.MeasureString(instructionsText);
+            Vector2 centerPosition = new Vector2(GameManager.Instance.GraphicsDevice.Viewport.Width / 2, instructionsTextPosition.Y);
+            Vector2 textPosition = centerPosition - new Vector2(textSize.X / 2, 0);
+            spriteBatch.DrawString(instructionsTextFont, instructionsText, instructionsTextPosition, Color.White);
+            currentLevel = GameManager.Instance.Level;
+            string levelText = "Level: " + currentLevel.ToString();
+            spriteBatch.DrawString(instructionsTextFont, levelText, instructionsTextPosition + new Vector2(0, 20), Color.White);
+            
+        }
+
         public void DrawGameOverMenu(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(gameOverMenuBackground, displayPosition, Color.White);
+            spriteBatch.Draw(menuBackground, displayPosition, Color.White);
+            spriteBatch.DrawString(titleTextFont, gameOverText, gameOverTextPosition, Color.White);
+            returnButton.Draw(spriteBatch);
+            quitButton.Draw(spriteBatch);
+        }
+
+        public void DrawWinMenu(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(menuBackground, displayPosition, Color.White);
+            spriteBatch.DrawString(titleTextFont, winText, gameWinTextPosition, Color.White);
             returnButton.Draw(spriteBatch);
             quitButton.Draw(spriteBatch);
         }
@@ -114,6 +141,71 @@ namespace _2DRPG_Object_Oriented_Map_System
             CurrentButtons.Add(returnButton);
             CurrentButtons.Add(quitButton);
             UpdateMouseState(CurrentButtons);
+        }
+
+        public void UpdateWinMenu(GameTime gameTime)
+        {
+            CurrentButtons.Clear();
+            CurrentButtons.Add(returnButton);
+            CurrentButtons.Add(quitButton);
+            UpdateMouseState(CurrentButtons);
+        }
+
+        private void CreateButtonTextFont(GraphicsDevice graphicsDevice)
+        {
+            string fontPath = Path.Combine("Content", "Minecraft.ttf"); 
+            var fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes(fontPath),
+                25,
+                1024,
+                1024,
+                new[]
+                {
+            CharacterRange.BasicLatin,
+            CharacterRange.Latin1Supplement,
+            CharacterRange.LatinExtendedA,
+            CharacterRange.Cyrillic
+                }
+            );
+
+            buttonTextFont = fontBakeResult.CreateSpriteFont(graphicsDevice);
+        }
+
+        private void CreateInstructionsTextFont(GraphicsDevice graphicsDevice)
+        {
+            string fontPath = Path.Combine("Content", "Minecraft.ttf");
+            var fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes(fontPath),
+                17,
+                512,
+                512,
+                new[]
+                {
+            CharacterRange.BasicLatin,
+            CharacterRange.Latin1Supplement,
+            CharacterRange.LatinExtendedA,
+            CharacterRange.Cyrillic
+                }
+            );
+
+            instructionsTextFont = fontBakeResult.CreateSpriteFont(graphicsDevice);
+        }
+
+        private void CreateTitleTextFont(GraphicsDevice graphicsDevice)
+        {
+            string fontPath = Path.Combine("Content", "Minecraft.ttf");
+            var fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes(fontPath),
+                50,
+                1024,
+                1024,
+                new[]
+                {
+            CharacterRange.BasicLatin,
+            CharacterRange.Latin1Supplement,
+            CharacterRange.LatinExtendedA,
+            CharacterRange.Cyrillic
+                }
+            );
+
+            titleTextFont = fontBakeResult.CreateSpriteFont(graphicsDevice);
         }
 
         private void UpdateMouseState(List<UIButton> buttons)
