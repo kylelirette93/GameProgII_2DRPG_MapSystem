@@ -18,7 +18,6 @@ namespace _2DRPG_Object_Oriented_Map_System
         Stopwatch timer = new Stopwatch();
         bool waitingForNextTurn = false;
         private int turnDelay = 500;
-        bool hasTakenAction = false;
 
         // Pathfinding for boss.
         GameObject boss;
@@ -99,7 +98,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             bool adjacent = IsAdjacentToPlayer();
             if (!waitingForNextTurn)
             {
-                hasTakenAction = false;
                 HandleBossActions();
                 waitingForNextTurn = true;
                 timer.Restart();
@@ -113,14 +111,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                     DisplayNextAction();
                     EndTurn(); // End turn after the delay.
                 }
-            }
-        }
-
-        public override void EndTurn()
-        {
-            if (hasTakenAction)
-            {
-                base.EndTurn();
             }
         }
 
@@ -156,7 +146,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             switch (CurrentAction)
             {
                 case BossActions.Idle:
-                    hasTakenAction = true;
                     EndTurn();
                     break;
                 case BossActions.Move:
@@ -169,11 +158,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                         {
                             FireProjectile();
                         }
-                        EndTurn();
-                    }
-                    else
-                    {
-                        FollowPlayer();
                         EndTurn();
                     }
                     break;
@@ -201,6 +185,7 @@ namespace _2DRPG_Object_Oriented_Map_System
             {
                 DealDamage();
                 nodeMap = pathfinder.BuildNodeMap(tilemap.Tiles);
+                EndTurn();
                 return;
             }
 
@@ -215,7 +200,6 @@ namespace _2DRPG_Object_Oriented_Map_System
                 currentPath = null;
                 currentPathIndex = 0;
             }
-            hasTakenAction = true;
         }
 
         private void ChargeTowardsPlayer()
@@ -248,7 +232,7 @@ namespace _2DRPG_Object_Oriented_Map_System
                 }
             }
             //ShakeMap();
-            hasTakenAction = true;
+            EndTurn();
         }
 
         private Vector2 GetClosestDirection()
@@ -286,7 +270,6 @@ namespace _2DRPG_Object_Oriented_Map_System
             //Debug.WriteLine($"Projectile direction + {projectileDirection}");
             projectile.GetComponent<ProjectileComponent>().Direction = projectileDirection;
             projectile.GetComponent<ProjectileComponent>().EnemyTag = boss.Tag;
-            hasTakenAction = true;
             return projectile;
         }
     }

@@ -92,8 +92,11 @@ namespace _2DRPG_Object_Oriented_Map_System
 
             SpawnRandomEnemies(mapManager);
 
-            Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
-            ObjectManager.AddGameObject(Exit);
+            if (mapManager.CurrentGameMode == GameMode.Adventure && mapManager.AdventureLevelIndex != mapManager.LevelPaths.Count)
+            {
+                Exit = GameObjectFactory.CreateExit(mapManager, Player.GetComponent<Transform>().Position, 32);
+                ObjectManager.AddGameObject(Exit);
+            }
 
             mapManager.SetPlayerStartPosition(Player, previousExit);
 
@@ -146,7 +149,8 @@ namespace _2DRPG_Object_Oriented_Map_System
                 ObjectManager.AddGameObject(Item);
                 Boss = GameObjectFactory.CreateBossEnemy(mapManager);
                 ObjectManager.AddGameObject(Boss);
-                Debug.WriteLine("Boss added to turn manager.");                
+                Debug.WriteLine("Boss added to turn manager.");
+                Exit?.Destroy();
             }
             else
             {
