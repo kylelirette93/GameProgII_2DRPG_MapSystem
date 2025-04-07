@@ -59,7 +59,7 @@ namespace _2DRPG_Object_Oriented_Map_System
 
         public UIManager(GraphicsDevice graphicsDevice)
         {
-            menuBackground = AssetManager.GetTexture("menu");
+            menuBackground = AssetManager.GetTexture("MainMenu");
             buttonTexture = AssetManager.GetTexture("button");
             CreateFonts(graphicsDevice);
             CreateButtons();

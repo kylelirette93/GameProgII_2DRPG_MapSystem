@@ -30,7 +30,6 @@
     <None Remove="Content\Level1.txt" />
     <None Remove="Content\Level2.txt" />
     <None Remove="Content\lightningstrike.png" />
-    <None Remove="Content\MainMenu.png" />
     <None Remove="Content\mapMusic.wav" />
     <None Remove="Content\obstacle_tile.png" />
     <None Remove="Content\pixel.png" />
@@ -71,9 +70,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\lightningstrike.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\MainMenu.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\mapMusic.wav">
