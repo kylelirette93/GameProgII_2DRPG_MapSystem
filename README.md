@@ -63,16 +63,63 @@
   The 'AnimationComponent' class inherits from 'DrawableComponent' and is used to play an animation by displaying a sequence of frames from a sprite sheet using a loop and drawing the iteration to the source rectangle.
   
 - **TurnManager class**
-  The 'TurnManager' class is responsible for managing turn-based actions in the game. It manages a queue of 'TurnComponent' objects, each representing an entity that can take a turn. A queue lock object is used to synchronize access to the turn queue, preventing race conditions in multithreaded scenarios, keeping the queue's internal state from becoming corrupted.
-
+  The 'TurnManager' class is responsible for managing turn-based actions in the game. It manages a queue of classes that implement the ITurnTaker interface, each representing a game object that can take a turn.
+  
+- **ITurnTaker class**
+  The 'ITurnTaker' class is responsible for enforcing a common interface on any turn takers. It's implemented in the 'PlayerController', 'BaseEnemyAI' and any classes that derived from 'BaseEnemyAI'.
+  
 - **PlayerController class (Derived)**
   The 'PlayerController' class inherits from 'TurnComponent' and is responsible for controlling a player game object. It determines if the player can move to the next tile, based on the direction of input.
 
-- **EnemyAI class (Derived)**
-  The 'EnemyAI' class inherits from 'TurnComponent' and handles enemy behaviour based on the turn-based system. It manages three distinct states: 'Stunned', 'Follow', and 'Attack'. In the 'Follow' state, the enemy calculates the direction toward the player,
+- **BaseEnemyAI class (Derived)**
+  The 'BaseEnemyAI' class inherits from 'Component' and implements the ITurnTaker interface. It manages three distinct states: 'Stunned', 'Follow', and 'Attack'. In the 'Follow' state, the enemy calculates the direction toward the player,
   converts this to tile-based movement and attempts to move. Before moving, it verifies the target tile is walkable and free of collisions. If adjacent to the player, the enemy than transitions to the 'Attack' state.
 
-- **UIManager class**
-  The 'UIManager' class is responsible for rendering text to the screen using a sprite font.
+- **MeleeEnemyAI class (Derived)**
+  The 'MeleeEnemyAI' class inherits from 'BaseEnemyAI'.
 
-  
+- **RangedEnemyAI class (Derived)**
+  The 'RangedEnemyAI' class inherits from 'BaseEnemyAI'. It uses most of the methods that 'BaseEnemyAI' implements, however it overrides update to introduce a 'RangedAttack' State. If the player is within the line of sight, the ranged
+  enemy fires a projectile at the player.
+
+- **BossEnemyAI class (Derived)**
+  The 'BossEnemyAI' class inherits from 'RangedEnemyAI'. It uses most of the methods that 'RangedEnemyAI' implements, however it override initialization to get a reference to the Boss 'GameObject's 'Component's. Additionally, it implements
+  a different turn cycle than the ranged enemy. It predicts it's next action, based on states and display's an icon above it's head before taking an action. The Boss takes one of 4 random actions, Idle, Move, Shoot or Charge.
+
+- **PathFinder class**
+  The 'PathFinder' class is responsible for finding the shortest path from the enemy to the player. It implements the A* pathfinding algorithm to find the shortest path based on a grid-based map, represented by 'PathNode' objects.
+
+- **PathNode class**
+  The 'PathNode' class stores information about each node in the grid, including it's position, walkability and costs used in the algorithm.
+
+- **UIManager class**
+  The 'UIManager' class is responsible for drawing and updating various menus and drawing text to the screen.
+
+  ## Game Flow Implementation ##
+  This section describes the implementation of the game's flow, including transitions between menus, levels and game states.
+
+  ### Main Menu ###
+  The main menu provides options to start in adventure mode with levels loaded from a file. After the third level a boss fight level is loaded.
+
+  **Pause Menu:** Activated by pressing the 'ESC' key, it allows the player to resume gameplay or quit.
+  **Game Over:** Triggered when the player's health reaches zero, displaying a game over screen with options to return to main menu or quit.
+  **Victory:** Triggered when the player kills the boss, displaying a victory screen with options to return to main menu or quit.
+
+  ## Boss Battle Implementation ##
+
+  ### Boss AI ###
+  The boss AI is implemented in the 'BossEnemyAI' class, which is derived from the 'RangedEnemyAI'.
+  The boss implements a state machine of it's own, which four states, Idle, Move, Shoot, Charge.
+  Before each action, it *predicts* what it will do on it's turn, before the boss makes a move. It does this by storing it's next action in order to use it for displaying an icon. Than the boss takes the previously stored action. It's an illusion! No really.
+  If the predicted action is Idle, he does nothing.
+  If the predicted action is to Move, it uses pathfinding to move one point.
+  If the predicted action is to Shoot, it first checks if the player is in the line of sight. If the player is it shoots, otherwise it readjusts direction.
+  If the predicted action is to charge, it get's the closest direction towards the player, and charges in that direction based on charge distance, which is 3 moves.
+  The 'DisplayIcon' Component is used to visually indicate the boss's upcoming action. It gets drawn slightly above the boss's head and the delay for the icon is based on the boss's turn delay.
+
+  ## Visual Improvements Added ##
+  - Player now has an idle animation.
+  - All scrolls now have animation and sound effects. Additionally drinking a potion makes a sound.
+  - Buttons change between normal and grey color when hovering over them.
+  - Tried to implement tile shaking effect when the boss charged, but failed to integrate it with boss enemy ai. Having multiple timers was causing issues.
+  - Instructions are displayed on the right panel, positioned under inventory. It informs the player how to play, and also what level they are on. 
