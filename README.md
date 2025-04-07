@@ -75,24 +75,24 @@
   The 'BaseEnemyAI' class inherits from 'Component' and implements the ITurnTaker interface. It manages three distinct states: 'Stunned', 'Follow', and 'Attack'. In the 'Follow' state, the enemy calculates the direction toward the player,
   converts this to tile-based movement and attempts to move. Before moving, it verifies the target tile is walkable and free of collisions. If adjacent to the player, the enemy than transitions to the 'Attack' state.
 
-  - **MeleeEnemyAI class (Derived)**
+- **MeleeEnemyAI class (Derived)**
   The 'MeleeEnemyAI' class inherits from 'BaseEnemyAI'.
 
-  - **RangedEnemyAI class (Derived)**
+- **RangedEnemyAI class (Derived)**
   The 'RangedEnemyAI' class inherits from 'BaseEnemyAI'. It uses most of the methods that 'BaseEnemyAI' implements, however it overrides update to introduce a 'RangedAttack' State. If the player is within the line of sight, the ranged
   enemy fires a projectile at the player.
 
-  - **BossEnemyAI class (Derived)**
-    The 'BossEnemyAI' class inherits from 'RangedEnemyAI'. It uses most of the methods that 'RangedEnemyAI' implements, however it override initialization to get a reference to the Boss 'GameObject's 'Component's. Additionally, it implements
-    a different turn cycle than the ranged enemy. It predicts it's next action, based on states and display's an icon above it's head before taking an action. The Boss takes one of 4 random actions, Idle, Move, Shoot or Charge.
+- **BossEnemyAI class (Derived)**
+  The 'BossEnemyAI' class inherits from 'RangedEnemyAI'. It uses most of the methods that 'RangedEnemyAI' implements, however it override initialization to get a reference to the Boss 'GameObject's 'Component's. Additionally, it implements
+  a different turn cycle than the ranged enemy. It predicts it's next action, based on states and display's an icon above it's head before taking an action. The Boss takes one of 4 random actions, Idle, Move, Shoot or Charge.
 
-  - **PathFinder class**
-    The 'PathFinder' class is responsible for finding the shortest path from the enemy to the player. It implements the A* pathfinding algorithm to find the shortest path based on a grid-based map, represented by 'PathNode' objects.
+- **PathFinder class**
+  The 'PathFinder' class is responsible for finding the shortest path from the enemy to the player. It implements the A* pathfinding algorithm to find the shortest path based on a grid-based map, represented by 'PathNode' objects.
 
-  - **PathNode class**
-    The 'PathNode' class stores information about each node in the grid, including it's position, walkability and costs used in the algorithm.
+- **PathNode class**
+  The 'PathNode' class stores information about each node in the grid, including it's position, walkability and costs used in the algorithm.
 
-  - **UIManager class**
+- **UIManager class**
   The 'UIManager' class is responsible for drawing and updating various menus and drawing text to the screen.
 
   ## Game Flow Implementation ##
